@@ -361,4 +361,4 @@ Không xóa credential MFA khỏi DB bằng SQL tay để "test lại enrollment
 
 - IAM-003 docs đã merge qua PR #6; không tạo/sửa lại ở IAM-004.
 - Optional MFA cho Employee, reset/recovery và UI QR/backup-code thuộc task sau.
-- Không tự đổi status SDLC thành Done/Approved chỉ vì smoke local xanh; còn review + CI + gate của Khanh.
+- TASK-IAM-004 chỉ được đóng sau review + smoke + CI; Khanh đã xác nhận CI xanh ngày 21/09/2026. Việc đóng task không thay đổi trạng thái Approved của tài liệu SDLC.

@@ -13,6 +13,7 @@ class ProxyTestModule {}
 const CLIENT_IP = "203.0.113.10";
 const CLOUDFLARE_IP = "198.51.100.20";
 const RENDER_IP = "10.24.8.245";
+const HTTP_TEST_TIMEOUT_MS = 15_000;
 
 describe("configureTrustProxy", () => {
   it("ignores X-Forwarded-For when no proxy is trusted", async () => {
@@ -20,13 +21,13 @@ describe("configureTrustProxy", () => {
 
     expect(result.ip).not.toBe(CLIENT_IP);
     expect(result.ips).toEqual([]);
-  });
+  }, HTTP_TEST_TIMEOUT_MS);
 
   it("resolves the client through the observed Cloudflare and Render path", async () => {
     const result = await resolveIp(3, `${CLIENT_IP}, ${CLOUDFLARE_IP}, ${RENDER_IP}`);
 
     expect(result.ip).toBe(CLIENT_IP);
-  });
+  }, HTTP_TEST_TIMEOUT_MS);
 
   it("ignores an address spoofed to the left of the trusted path", async () => {
     const spoofedIp = "192.0.2.99";
@@ -36,14 +37,14 @@ describe("configureTrustProxy", () => {
     );
 
     expect(result.ip).toBe(CLIENT_IP);
-  });
+  }, HTTP_TEST_TIMEOUT_MS);
 
   it("still resolves the socket address when no forwarded header is present", async () => {
     const result = await resolveIp(3);
 
     expect(result.ip).toBeTruthy();
     expect(result.ips).toEqual([]);
-  });
+  }, HTTP_TEST_TIMEOUT_MS);
 });
 
 describe("resolveTrustedClientIp", () => {

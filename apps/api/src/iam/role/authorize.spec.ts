@@ -63,7 +63,10 @@ const config = { NODE_ENV: "test", JWT_ACCESS_TTL_SECONDS: 900, JWT_ISSUER: "vex
   providers: [
     { provide: APP_CONFIG, useValue: config },
     TokenService,
-    { provide: SessionService, useValue: { assertActive: async () => undefined } },
+    { provide: SessionService, useValue: {
+      assertActive: async () => undefined,
+      assertOperatorAccountCurrent: async () => undefined,
+    } },
   ],
 })
 class ProbeModule {}

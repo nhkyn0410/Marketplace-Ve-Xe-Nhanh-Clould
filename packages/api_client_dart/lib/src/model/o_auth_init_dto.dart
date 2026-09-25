@@ -11,10 +11,9 @@ part 'o_auth_init_dto.g.dart';
 /// OAuthInitDto
 ///
 /// Properties:
-/// * [callbackURL]
+/// * [callbackURL] 
 @BuiltValue()
-abstract class OAuthInitDto
-    implements Built<OAuthInitDto, OAuthInitDtoBuilder> {
+abstract class OAuthInitDto implements Built<OAuthInitDto, OAuthInitDtoBuilder> {
   @BuiltValueField(wireName: r'callbackURL')
   String? get callbackURL;
 
@@ -56,9 +55,7 @@ class _$OAuthInitDtoSerializer implements PrimitiveSerializer<OAuthInitDto> {
     OAuthInitDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -109,3 +106,5 @@ class _$OAuthInitDtoSerializer implements PrimitiveSerializer<OAuthInitDto> {
     return result.build();
   }
 }
+
+

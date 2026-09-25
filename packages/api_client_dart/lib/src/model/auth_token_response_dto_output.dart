@@ -12,17 +12,15 @@ part 'auth_token_response_dto_output.g.dart';
 /// AuthTokenResponseDtoOutput
 ///
 /// Properties:
-/// * [accessToken]
-/// * [tokenType]
-/// * [expiresIn]
-/// * [scope]
-/// * [role]
-/// * [refreshToken]
-/// * [refreshExpiresIn]
+/// * [accessToken] 
+/// * [tokenType] 
+/// * [expiresIn] 
+/// * [scope] 
+/// * [role] 
+/// * [refreshToken] 
+/// * [refreshExpiresIn] 
 @BuiltValue()
-abstract class AuthTokenResponseDtoOutput
-    implements
-        Built<AuthTokenResponseDtoOutput, AuthTokenResponseDtoOutputBuilder> {
+abstract class AuthTokenResponseDtoOutput implements Built<AuthTokenResponseDtoOutput, AuthTokenResponseDtoOutputBuilder> {
   @BuiltValueField(wireName: r'accessToken')
   String get accessToken;
 
@@ -48,25 +46,18 @@ abstract class AuthTokenResponseDtoOutput
 
   AuthTokenResponseDtoOutput._();
 
-  factory AuthTokenResponseDtoOutput(
-          [void updates(AuthTokenResponseDtoOutputBuilder b)]) =
-      _$AuthTokenResponseDtoOutput;
+  factory AuthTokenResponseDtoOutput([void updates(AuthTokenResponseDtoOutputBuilder b)]) = _$AuthTokenResponseDtoOutput;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(AuthTokenResponseDtoOutputBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<AuthTokenResponseDtoOutput> get serializer =>
-      _$AuthTokenResponseDtoOutputSerializer();
+  static Serializer<AuthTokenResponseDtoOutput> get serializer => _$AuthTokenResponseDtoOutputSerializer();
 }
 
-class _$AuthTokenResponseDtoOutputSerializer
-    implements PrimitiveSerializer<AuthTokenResponseDtoOutput> {
+class _$AuthTokenResponseDtoOutputSerializer implements PrimitiveSerializer<AuthTokenResponseDtoOutput> {
   @override
-  final Iterable<Type> types = const [
-    AuthTokenResponseDtoOutput,
-    _$AuthTokenResponseDtoOutput
-  ];
+  final Iterable<Type> types = const [AuthTokenResponseDtoOutput, _$AuthTokenResponseDtoOutput];
 
   @override
   final String wireName = r'AuthTokenResponseDtoOutput';
@@ -119,9 +110,7 @@ class _$AuthTokenResponseDtoOutputSerializer
     AuthTokenResponseDtoOutput object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -146,8 +135,7 @@ class _$AuthTokenResponseDtoOutputSerializer
         case r'tokenType':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType:
-                const FullType(AuthTokenResponseDtoOutputTokenTypeEnum),
+            specifiedType: const FullType(AuthTokenResponseDtoOutputTokenTypeEnum),
           ) as AuthTokenResponseDtoOutputTokenTypeEnum;
           result.tokenType = valueDes;
           break;
@@ -215,40 +203,34 @@ class _$AuthTokenResponseDtoOutputSerializer
   }
 }
 
+
 class AuthTokenResponseDtoOutputTokenTypeEnum extends EnumClass {
+
   @BuiltValueEnumConst(wireName: r'Bearer')
-  static const AuthTokenResponseDtoOutputTokenTypeEnum bearer =
-      _$authTokenResponseDtoOutputTokenTypeEnum_bearer;
+  static const AuthTokenResponseDtoOutputTokenTypeEnum bearer = _$authTokenResponseDtoOutputTokenTypeEnum_bearer;
 
-  static Serializer<AuthTokenResponseDtoOutputTokenTypeEnum> get serializer =>
-      _$authTokenResponseDtoOutputTokenTypeEnumSerializer;
+  static Serializer<AuthTokenResponseDtoOutputTokenTypeEnum> get serializer => _$authTokenResponseDtoOutputTokenTypeEnumSerializer;
 
-  const AuthTokenResponseDtoOutputTokenTypeEnum._(String name) : super(name);
+  const AuthTokenResponseDtoOutputTokenTypeEnum._(String name): super(name);
 
-  static BuiltSet<AuthTokenResponseDtoOutputTokenTypeEnum> get values =>
-      _$authTokenResponseDtoOutputTokenTypeEnumValues;
-  static AuthTokenResponseDtoOutputTokenTypeEnum valueOf(String name) =>
-      _$authTokenResponseDtoOutputTokenTypeEnumValueOf(name);
+  static BuiltSet<AuthTokenResponseDtoOutputTokenTypeEnum> get values => _$authTokenResponseDtoOutputTokenTypeEnumValues;
+  static AuthTokenResponseDtoOutputTokenTypeEnum valueOf(String name) => _$authTokenResponseDtoOutputTokenTypeEnumValueOf(name);
 }
 
 class AuthTokenResponseDtoOutputScopeEnum extends EnumClass {
+
   @BuiltValueEnumConst(wireName: r'passenger')
-  static const AuthTokenResponseDtoOutputScopeEnum passenger =
-      _$authTokenResponseDtoOutputScopeEnum_passenger;
+  static const AuthTokenResponseDtoOutputScopeEnum passenger = _$authTokenResponseDtoOutputScopeEnum_passenger;
   @BuiltValueEnumConst(wireName: r'operator')
-  static const AuthTokenResponseDtoOutputScopeEnum operator_ =
-      _$authTokenResponseDtoOutputScopeEnum_operator_;
+  static const AuthTokenResponseDtoOutputScopeEnum operator_ = _$authTokenResponseDtoOutputScopeEnum_operator_;
   @BuiltValueEnumConst(wireName: r'platform')
-  static const AuthTokenResponseDtoOutputScopeEnum platform =
-      _$authTokenResponseDtoOutputScopeEnum_platform;
+  static const AuthTokenResponseDtoOutputScopeEnum platform = _$authTokenResponseDtoOutputScopeEnum_platform;
 
-  static Serializer<AuthTokenResponseDtoOutputScopeEnum> get serializer =>
-      _$authTokenResponseDtoOutputScopeEnumSerializer;
+  static Serializer<AuthTokenResponseDtoOutputScopeEnum> get serializer => _$authTokenResponseDtoOutputScopeEnumSerializer;
 
-  const AuthTokenResponseDtoOutputScopeEnum._(String name) : super(name);
+  const AuthTokenResponseDtoOutputScopeEnum._(String name): super(name);
 
-  static BuiltSet<AuthTokenResponseDtoOutputScopeEnum> get values =>
-      _$authTokenResponseDtoOutputScopeEnumValues;
-  static AuthTokenResponseDtoOutputScopeEnum valueOf(String name) =>
-      _$authTokenResponseDtoOutputScopeEnumValueOf(name);
+  static BuiltSet<AuthTokenResponseDtoOutputScopeEnum> get values => _$authTokenResponseDtoOutputScopeEnumValues;
+  static AuthTokenResponseDtoOutputScopeEnum valueOf(String name) => _$authTokenResponseDtoOutputScopeEnumValueOf(name);
 }
+

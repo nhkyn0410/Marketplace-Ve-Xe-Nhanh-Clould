@@ -60,6 +60,39 @@ export function mfaRequired(): AuthException {
   );
 }
 
+/** Thao tác nhạy cảm cần bằng chứng `/auth/re-auth` còn hiệu lực (TASK-IAM-005 Q8). */
+export function reauthRequired(): AuthException {
+  return new AuthException(
+    HttpStatus.UNAUTHORIZED,
+    "AUTH_REAUTH_REQUIRED",
+    "Vui lòng xác thực lại trước khi thực hiện thao tác này.",
+  );
+}
+
+export function passwordChangeRequired(detail = "Bạn phải đổi mật khẩu tạm trước khi đăng nhập."): AuthException {
+  return new AuthException(
+    HttpStatus.UNAUTHORIZED,
+    "AUTH_PASSWORD_CHANGE_REQUIRED",
+    detail,
+  );
+}
+
+export function invalidPasswordChangeToken(): AuthException {
+  return new AuthException(
+    HttpStatus.UNAUTHORIZED,
+    "AUTH_PASSWORD_CHANGE_TOKEN_INVALID",
+    "Yêu cầu đổi mật khẩu không hợp lệ hoặc đã hết hạn.",
+  );
+}
+
+export function passwordReuseForbidden(): AuthException {
+  return new AuthException(
+    HttpStatus.BAD_REQUEST,
+    "AUTH_PASSWORD_REUSE_FORBIDDEN",
+    "Mật khẩu mới phải khác mật khẩu tạm.",
+  );
+}
+
 /** Redis chết → fail-closed (KHÔNG bypass) nhưng trả đúng 503 thay vì 500 (ADR-015). */
 export function serviceUnavailable(): AuthException {
   return new AuthException(

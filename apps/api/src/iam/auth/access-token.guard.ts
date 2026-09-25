@@ -15,8 +15,9 @@ export type AuthenticatedRequest = Request & { user?: VerifiedAccessToken };
 const ALLOW_REVOKED_SESSION = "iam:allow-revoked-session";
 
 /**
- * Cho route chạy dù phiên đã bị revoke (chữ ký + hạn token vẫn phải đúng). Chỉ dành cho logout:
- * logout lần hai phải 200 (idempotent), mà sau lần một phiên đã revoke rồi.
+ * Cho route chạy dù phiên đã bị revoke (chữ ký + hạn token vẫn phải đúng). Chỉ dành cho thao tác
+ * revoke idempotent (logout và retry DELETE chính family vừa tự revoke); service đích phải bảo đảm
+ * token chết không được tác động resource khác.
  */
 export const AllowRevokedSession = () => SetMetadata(ALLOW_REVOKED_SESSION, true);
 
@@ -46,6 +47,7 @@ export class AccessTokenGuard implements CanActivate {
     );
     if (!allowRevoked) {
       await this.sessions.assertActive(claims.sid);
+      await this.sessions.assertOperatorAccountCurrent(claims);
     }
     request.user = claims;
     return true;

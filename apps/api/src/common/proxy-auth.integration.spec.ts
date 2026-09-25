@@ -113,6 +113,7 @@ async function createFixture() {
     limiter,
     history,
     {} as never,
+    {} as never,
     {} as never
   );
   const app = await NestFactory.create<NestExpressApplication>(

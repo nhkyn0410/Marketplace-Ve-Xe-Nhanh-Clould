@@ -62,3 +62,12 @@ export function isRole(value: unknown): value is Role {
 export function requiresMfa(role: string): boolean {
   return isRole(role) && ROLE_REQUIRES_MFA[role];
 }
+
+/** Keep role-name decisions in iam/role; callers use intent-specific predicates. */
+export function isPlatformAdminRole(role: string): boolean {
+  return role === Role.PLATFORM_ADMIN;
+}
+
+export function isOperatorOwnerRole(role: string): boolean {
+  return role === Role.OPERATOR_OWNER;
+}

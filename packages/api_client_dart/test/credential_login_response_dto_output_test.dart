@@ -67,5 +67,20 @@ void main() {
       // TODO
     });
 
+    // bool passwordChangeRequired
+    test('to test the property `passwordChangeRequired`', () async {
+      // TODO
+    });
+
+    // String passwordChangeToken
+    test('to test the property `passwordChangeToken`', () async {
+      // TODO
+    });
+
+    // int passwordChangeExpiresIn
+    test('to test the property `passwordChangeExpiresIn`', () async {
+      // TODO
+    });
+
   });
 }

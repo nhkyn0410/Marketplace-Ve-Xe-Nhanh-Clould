@@ -545,7 +545,7 @@ function generateBackupCodes(): string[] {
 }
 
 /** Env schema đã kiểm base64 chuẩn + đúng 32 byte; ở đây chỉ còn fallback dev. */
-function resolveEncryptionKey(config: AppConfig): Buffer {
+export function resolveEncryptionKey(config: AppConfig): Buffer {
   if (config.MFA_ENCRYPTION_KEY) {
     return Buffer.from(config.MFA_ENCRYPTION_KEY, "base64");
   }

@@ -51,6 +51,7 @@ import {
   OAuthRedirectResponseDto,
   OtpRequestDto,
   OtpVerifyDto,
+  PasswordChangeRequiredDto,
   ReauthDto,
   RefreshTokenDto,
   RegisterDto
@@ -176,6 +177,38 @@ export class AuthController {
     return toMfaVerifyResponse(
       await this.authService.verifyMfa(dto.challengeToken, dto.code, this.context(req))
     );
+  }
+
+  @Post("password/change-required")
+  @HttpCode(200)
+  @NoStore()
+  @ApiBody({ type: PasswordChangeRequiredDto })
+  @ZodResponse({
+    status: 200,
+    description: "Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token.",
+    type: MessageResponseDto
+  })
+  @ApiResponse({
+    status: 401,
+    description: "Challenge giả, hết hạn, đã dùng hoặc account không còn hợp lệ.",
+    content: problemContent
+  })
+  @ApiResponse({
+    status: 400,
+    description: "Mật khẩu mới trùng mật khẩu tạm.",
+    content: problemContent
+  })
+  @ApiResponse({ status: 503, description: "Redis không khả dụng (fail-closed).", content: problemContent })
+  async changeRequiredPassword(
+    @Body() dto: PasswordChangeRequiredDto,
+    @Req() req: Request
+  ): Promise<MessageResponse> {
+    await this.authService.changeRequiredPassword(
+      dto.passwordChangeToken,
+      dto.newPassword,
+      this.context(req)
+    );
+    return { status: "ok" };
   }
 
   @Post("oauth/:provider")
@@ -308,6 +341,9 @@ function toTokenResponse(result: LoginResult): AuthTokenResponse {
 }
 
 function toCredentialLoginResponse(result: CredentialLoginResult): CredentialLoginResponse {
+  if ("passwordChangeRequired" in result) {
+    return result;
+  }
   if ("mfaRequired" in result) {
     return result;
   }

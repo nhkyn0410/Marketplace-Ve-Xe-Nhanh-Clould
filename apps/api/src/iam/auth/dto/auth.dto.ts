@@ -52,6 +52,15 @@ export class MfaVerifyDto extends createZodDto(
   })
 ) {}
 
+/** Đổi mật khẩu tạm trước khi được phép đi tiếp tới MFA/token (TASK-IAM-005 Q4). */
+export class PasswordChangeRequiredDto extends createZodDto(
+  z.object({
+    passwordChangeToken: z.string().min(32).max(200),
+    // V1 ưu tiên độ dài thay vì rule ký tự khó nhớ; temp password do server sinh riêng.
+    newPassword: z.string().min(12).max(128)
+  })
+) {}
+
 /** Passenger gửi `otp`; account mật khẩu gửi `password` hoặc `mfaCode` khi MFA đã bật. */
 export class ReauthDto extends createZodDto(
   z
@@ -88,6 +97,13 @@ export const MfaChallengeResponseSchema = z.object({
 });
 export type MfaChallengeResponse = z.infer<typeof MfaChallengeResponseSchema>;
 
+export const PasswordChangeChallengeResponseSchema = z.object({
+  passwordChangeRequired: z.literal(true),
+  passwordChangeToken: z.string(),
+  passwordChangeExpiresIn: z.number().int().positive()
+});
+export type PasswordChangeChallengeResponse = z.infer<typeof PasswordChangeChallengeResponseSchema>;
+
 const CredentialTokenResponseSchema = AuthTokenResponseSchema.extend({
   mfaRequired: z.literal(false)
 });
@@ -96,7 +112,8 @@ const CredentialTokenResponseSchema = AuthTokenResponseSchema.extend({
 // `title`: generator Dart đặt tên model theo nó (thiếu thì ra `...OutputAnyOf1`).
 export const CredentialLoginResponseSchema = z.union([
   CredentialTokenResponseSchema.meta({ title: "CredentialTokenResponse" }),
-  MfaChallengeResponseSchema.meta({ title: "MfaChallengeResponse" })
+  MfaChallengeResponseSchema.meta({ title: "MfaChallengeResponse" }),
+  PasswordChangeChallengeResponseSchema.meta({ title: "PasswordChangeChallengeResponse" })
 ]);
 export type CredentialLoginResponse = z.infer<typeof CredentialLoginResponseSchema>;
 // Union không `extends` được (TS2509) → DTO dạng hằng. nestjs-zod đặt tên component OpenAPI theo

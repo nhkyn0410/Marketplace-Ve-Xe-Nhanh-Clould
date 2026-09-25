@@ -16,5 +16,11 @@ void main() {
     test('to test the property `otp`', () async {
       // TODO
     });
+
+    // String mfaCode
+    test('to test the property `mfaCode`', () async {
+      // TODO
+    });
+
   });
 }

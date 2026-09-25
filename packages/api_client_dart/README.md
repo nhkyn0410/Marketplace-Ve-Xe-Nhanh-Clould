@@ -48,12 +48,13 @@ import 'package:api_client_dart/api_client_dart.dart';
 
 
 final api = ApiClientDart().getAuthApi();
+final PasswordChangeRequiredDto passwordChangeRequiredDto = ; // PasswordChangeRequiredDto | 
 
 try {
-    final response = await api.authControllerLogout();
+    final response = await api.authControllerChangeRequiredPassword(passwordChangeRequiredDto);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling AuthApi->authControllerLogout: $e\n");
+    print("Exception when calling AuthApi->authControllerChangeRequiredPassword: $e\n");
 }
 
 ```
@@ -64,6 +65,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AuthApi*](doc/AuthApi.md) | [**authControllerChangeRequiredPassword**](doc/AuthApi.md#authcontrollerchangerequiredpassword) | **POST** /v1/auth/password/change-required | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerLogout**](doc/AuthApi.md#authcontrollerlogout) | **POST** /v1/auth/logout | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerOauth**](doc/AuthApi.md#authcontrolleroauth) | **POST** /v1/auth/oauth/{provider} | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerOauthSession**](doc/AuthApi.md#authcontrolleroauthsession) | **POST** /v1/auth/oauth/session | 
@@ -75,19 +77,32 @@ Class | Method | HTTP request | Description
 [*AuthApi*](doc/AuthApi.md) | [**authControllerRequestOtp**](doc/AuthApi.md#authcontrollerrequestotp) | **POST** /v1/auth/otp/request | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyMfa**](doc/AuthApi.md#authcontrollerverifymfa) | **POST** /v1/auth/mfa/verify | 
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyOtp**](doc/AuthApi.md#authcontrollerverifyotp) | **POST** /v1/auth/otp/verify | 
+[*AuthApi*](doc/AuthApi.md) | [**sessionControllerList**](doc/AuthApi.md#sessioncontrollerlist) | **GET** /v1/auth/sessions | 
+[*AuthApi*](doc/AuthApi.md) | [**sessionControllerRevoke**](doc/AuthApi.md#sessioncontrollerrevoke) | **DELETE** /v1/auth/sessions/{sessionId} | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerHealth**](doc/HealthApi.md#appcontrollerhealth) | **GET** /v1/health | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerMongo**](doc/HealthApi.md#appcontrollermongo) | **GET** /v1/health/mongo | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerPostgres**](doc/HealthApi.md#appcontrollerpostgres) | **GET** /v1/health/postgres | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerQueues**](doc/HealthApi.md#appcontrollerqueues) | **GET** /v1/health/queues | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerRedis**](doc/HealthApi.md#appcontrollerredis) | **GET** /v1/health/redis | 
+[*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerCreate**](doc/OperatorEmployeesApi.md#employeeaccountcontrollercreate) | **POST** /v1/operator/employees | 
+[*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerList**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerlist) | **GET** /v1/operator/employees | 
+[*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerResetPassword**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerresetpassword) | **POST** /v1/operator/employees/{employeeId}/password-reset | 
+[*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerUpdate**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerupdate) | **PATCH** /v1/operator/employees/{employeeId} | 
 
 
 ## Documentation For Models
 
+ - [AccountMutationResponseDtoOutput](doc/AccountMutationResponseDtoOutput.md)
  - [AuthTokenResponseDtoOutput](doc/AuthTokenResponseDtoOutput.md)
  - [CredentialLoginDto](doc/CredentialLoginDto.md)
  - [CredentialLoginResponseDtoOutput](doc/CredentialLoginResponseDtoOutput.md)
  - [CredentialTokenResponse](doc/CredentialTokenResponse.md)
+ - [EmployeeAccountResponseDtoOutput](doc/EmployeeAccountResponseDtoOutput.md)
+ - [EmployeeCreateDto](doc/EmployeeCreateDto.md)
+ - [EmployeeListResponseDtoOutput](doc/EmployeeListResponseDtoOutput.md)
+ - [EmployeeListResponseDtoOutputItemsInner](doc/EmployeeListResponseDtoOutputItemsInner.md)
+ - [EmployeePasswordResetDto](doc/EmployeePasswordResetDto.md)
+ - [EmployeeUpdateDto](doc/EmployeeUpdateDto.md)
  - [HealthResponseDtoOutput](doc/HealthResponseDtoOutput.md)
  - [MessageResponseDtoOutput](doc/MessageResponseDtoOutput.md)
  - [MfaChallengeResponse](doc/MfaChallengeResponse.md)
@@ -98,6 +113,8 @@ Class | Method | HTTP request | Description
  - [OAuthRedirectResponseDtoOutput](doc/OAuthRedirectResponseDtoOutput.md)
  - [OtpRequestDto](doc/OtpRequestDto.md)
  - [OtpVerifyDto](doc/OtpVerifyDto.md)
+ - [PasswordChangeChallengeResponse](doc/PasswordChangeChallengeResponse.md)
+ - [PasswordChangeRequiredDto](doc/PasswordChangeRequiredDto.md)
  - [PostgresHealthResponseDtoOutput](doc/PostgresHealthResponseDtoOutput.md)
  - [ProblemDetailsDto](doc/ProblemDetailsDto.md)
  - [QueueHealthResponseDtoOutput](doc/QueueHealthResponseDtoOutput.md)
@@ -106,6 +123,8 @@ Class | Method | HTTP request | Description
  - [RedisHealthResponseDtoOutput](doc/RedisHealthResponseDtoOutput.md)
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
  - [RegisterDto](doc/RegisterDto.md)
+ - [SessionListResponseDtoOutput](doc/SessionListResponseDtoOutput.md)
+ - [SessionListResponseDtoOutputItemsInner](doc/SessionListResponseDtoOutputItemsInner.md)
 
 
 ## Documentation For Authorization

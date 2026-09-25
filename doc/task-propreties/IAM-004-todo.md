@@ -4,12 +4,12 @@
 > **Dependency:** TASK-IAM-002 ✓ (hybrid token + `auth_sessions` + Redis). TASK-IAM-003 và bộ tài liệu IAM-003 đã merge vào `develop` qua PR #6; **không tạo lại** trong task này.
 > **Cách dùng:** chỉ tick `[x]` khi có bằng chứng tương ứng. Guide chạy tay: `IAM-004-guide.md`. Nghiệm thu: `IAM-004-verification-checklist.md`.
 
-## Trạng thái (19/09/2026) — 🟡 **CODE XONG `.1`–`.9`, CHỜ KHANH COMMIT + CI**
+## Trạng thái (21/09/2026) — ✅ **DONE**
 
 - ✅ Khanh chốt toàn bộ quyết định IAM-004 ngày **18/09/2026**; bảng dưới là nguồn thực thi của task.
 - ✅ 19/09/2026: code + test + review xong. Số đo: **310/310** test (Postgres/Redis/Mongo thật, role app, `REQUIRE_DB_TESTS=1`); turbo `typecheck lint test build` **35/35**; smoke API build thật **23/23** (guide §5–§10, gồm tắt Redis); 11 mutation vào các chốt bảo mật đều bị test bắt; Dart client khớp OpenAPI (mô phỏng đúng job `contract.yml`).
 - ✅ 2 review (`code-reviewer` + `security-auditor`): không đường nào cấp token khi thiếu MFA; 2 finding **High** + các Medium/Low đã sửa — xem "Ghi nhận khi hiện thực".
-- ⏳ Còn: Khanh commit/push → CI xanh → task row Done. Không tự promote SDLC.
+- ✅ Khanh xác nhận CI branch xanh ngày 21/09/2026; checklist và task row đã cập nhật `Done`. Không thay đổi trạng thái Approved của tài liệu SDLC.
 
 ---
 
@@ -183,11 +183,11 @@ Mở rộng DTO với `mfaCode`; đúng một trong password/OTP/MFA; TOTP và b
 
 **Success:** `IAM-004-verification-checklist.md` phần A–G có evidence; không giảm test cũ; static/build xanh. — **Đạt:** 310/310 (IAM-003 là 248; không xoá test cũ — `auth-session.int.spec` IAM-002 nay login qua MFA); turbo 35/35; log API smoke không khớp mẫu nhạy cảm nào.
 
-### 🟡 #10 — [IAM-004.10] Review + smoke + đóng task
+### ✅ #10 — [IAM-004.10] Review + smoke + đóng task
 
 Chạy `code-reviewer` + `security-auditor`, guide từ đầu tới cuối, CI branch. Chỉ sau khi tất cả xanh mới cập nhật task row/PROJECT-STATE theo quy trình dự án.
 
-**Success:** không còn finding blocking/high; CI xanh; checklist có số đo thật; không tự promote SDLC `Approved`/`Done` trước gate. — 🟡 review + smoke xong; còn commit/push (Khanh), CI, task row.
+**Success:** không còn finding blocking/high; CI xanh; checklist có số đo thật; không tự promote SDLC `Approved`/`Done` trước gate. — ✅ Khanh xác nhận CI xanh ngày 21/09/2026; task row đã chuyển `Done`.
 
 ---
 

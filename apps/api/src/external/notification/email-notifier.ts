@@ -12,8 +12,18 @@ export type OtpEmailMessage = {
   purpose: string;
 };
 
+export type TemporaryPasswordEmailMessage = {
+  email: string;
+  /** Plaintext secret chỉ tồn tại trong memory để gửi đúng một lần; caller không được log/lưu. */
+  temporaryPassword: string;
+  loginIdentifier: string;
+  expiresAt: Date;
+};
+
 export interface EmailNotifier {
   sendOtp(message: OtpEmailMessage): Promise<void>;
+  /** Optional trong port để adapter/mocks OTP legacy không giả vờ hỗ trợ enrollment. */
+  sendTemporaryPassword?(message: TemporaryPasswordEmailMessage): Promise<void>;
 }
 
 /** Mask email cho log/audit — không lộ địa chỉ đầy đủ (Security §9). */

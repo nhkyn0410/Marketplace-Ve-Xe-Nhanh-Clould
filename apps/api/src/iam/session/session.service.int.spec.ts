@@ -457,6 +457,92 @@ describe.skipIf(!url && !requireDb)("SessionService — Postgres thật", () => 
     expect(Date.now() - started).toBeLessThan(2_000);
   });
 
+  it("session management: một item/family sau rotation, current theo sid, revoke owned idempotent và không đụng device khác", async () => {
+    const managedSubjectId = `int_${randomUUID()}`;
+    const foreignSubjectId = `int_${randomUUID()}`;
+    onTestFinished(async () => {
+      await sessionsTable.deleteMany({
+        where: { subjectId: { in: [managedSubjectId, foreignSubjectId] } },
+      });
+    });
+    const first = await sessions.create(
+      { type: SubjectType.PASSENGER, id: managedSubjectId },
+      {
+        ip: "203.0.113.42",
+        userAgent: "Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 raw-version",
+      },
+    );
+    const current = await sessions.rotate(first.refreshToken, {
+      ip: "203.0.113.43",
+      userAgent: "Mozilla/5.0 (Windows NT 10.0) Chrome/131.0 raw-version",
+    });
+    const other = await sessions.create(
+      { type: SubjectType.PASSENGER, id: managedSubjectId },
+      { ip: "2001:db8::1234", userAgent: "Dart/3.9 Android" },
+    );
+
+    const page = await sessions.listForSubject(
+      SubjectType.PASSENGER,
+      managedSubjectId,
+      current.session.id,
+      { limit: 20 },
+    );
+    expect(page.items).toHaveLength(2);
+    const rotatedFamily = page.items.find(
+      (item) => item.sessionId === first.session.familyId,
+    );
+    expect(rotatedFamily).toMatchObject({
+      current: true,
+      deviceLabel: "Chrome on Windows",
+      ipAddress: "203.0.113.*",
+      createdAt: first.session.issuedAt.toISOString(),
+    });
+    expect(JSON.stringify(page)).not.toContain(current.session.id);
+    expect(JSON.stringify(page)).not.toContain("raw-version");
+
+    await sessions.revokeOwnedFamily(
+      SubjectType.PASSENGER,
+      managedSubjectId,
+      first.session.familyId,
+      current.session.id,
+    );
+    await sessions.revokeOwnedFamily(
+      SubjectType.PASSENGER,
+      managedSubjectId,
+      first.session.familyId,
+      current.session.id,
+    );
+    expect(await errorCode(sessions.rotate(current.refreshToken, {}))).toBe(
+      "AUTH_SESSION_EXPIRED",
+    );
+    await expect(sessions.rotate(other.refreshToken, {})).resolves.toBeDefined();
+
+    const foreign = await sessions.create(
+      { type: SubjectType.PASSENGER, id: foreignSubjectId },
+      {},
+    );
+    expect(
+      await errorCode(
+        sessions.revokeOwnedFamily(
+          SubjectType.PASSENGER,
+          managedSubjectId,
+          foreign.session.familyId,
+          other.session.id,
+        ),
+      ),
+    ).toBe("AUTH_SESSION_NOT_FOUND");
+    expect(
+      await errorCode(
+        sessions.revokeOwnedFamily(
+          SubjectType.PASSENGER,
+          managedSubjectId,
+          randomUUID(),
+          other.session.id,
+        ),
+      ),
+    ).toBe("AUTH_SESSION_NOT_FOUND");
+  });
+
   it("deleteExpiredSessions: xoá row hết hạn quá 30 ngày, giữ row mới hết hạn để còn điều tra", async () => {
     const old = await sessions.create(
       { type: SubjectType.PASSENGER, id: subjectId },

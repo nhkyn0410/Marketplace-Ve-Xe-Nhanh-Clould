@@ -17,15 +17,22 @@ import { CredentialService } from "./auth/credential.service";
 import { LoginHistoryService } from "./auth/login-history.service";
 import { MfaService } from "./auth/mfa.service";
 import { OtpRateLimiter } from "./auth/otp-rate-limiter";
+import { PasswordChangeService } from "./auth/password-change.service";
 import { TokenService } from "./auth/token.service";
+import { RecentReauthGuard } from "./role/recent-reauth.guard";
 import { RefreshTokenService } from "./session/refresh-token.service";
+import { SessionController } from "./session/session.controller";
 import { SessionService } from "./session/session.service";
 import { SessionCache } from "./session/session-cache";
+import { AccountProvisioningService } from "./user/account-provisioning.service";
+import { EmployeeAccountController } from "./user/employee-account.controller";
+import { EmployeeAccountService } from "./user/employee-account.service";
+import { TemporaryCredentialEmailLimiter } from "./user/temporary-credential-email-limiter";
 
 /** TASK-IAM-001/002 — Better Auth + login 3-namespace + hybrid token (DOMAIN-MAP `iam/auth`, `iam/session`). */
 @Module({
   imports: [DatabaseModule, AuditModule, RedisModule, NotificationModule],
-  controllers: [AuthController],
+  controllers: [AuthController, SessionController, EmployeeAccountController],
   providers: [
     {
       provide: BETTER_AUTH,
@@ -41,11 +48,16 @@ import { SessionCache } from "./session/session-cache";
     OtpRateLimiter,
     LoginHistoryService,
     MfaService,
+    PasswordChangeService,
+    RecentReauthGuard,
+    AccountProvisioningService,
+    EmployeeAccountService,
+    TemporaryCredentialEmailLimiter,
     AuthService,
     RefreshTokenService,
     SessionService,
     SessionCache,
   ],
-  exports: [BETTER_AUTH, TokenService, SessionService],
+  exports: [BETTER_AUTH, TokenService, SessionService, AccountProvisioningService],
 })
 export class IamModule {}

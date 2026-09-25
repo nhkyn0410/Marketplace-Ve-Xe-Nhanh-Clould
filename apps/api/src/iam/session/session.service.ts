@@ -1,23 +1,33 @@
 import { randomUUID } from "node:crypto";
-import { Inject, Injectable, Logger } from "@nestjs/common";
+import { isIP } from "node:net";
+import { BadRequestException, Inject, Injectable, Logger } from "@nestjs/common";
 import { type AuditEventInput, AuditService } from "../../audit/audit.service";
 import { APP_CONFIG, type AppConfig } from "../../config/env.config";
 import { type DbTransaction, PrismaService } from "../../database/prisma.service";
 import {
   type AuthSession,
   SessionRevokeReason,
-  type SubjectType,
+  SubjectType,
 } from "../../database/prisma.types";
 import type { RequestContext } from "../auth/auth.service";
+import type { VerifiedAccessToken } from "../auth/token.service";
 import { RefreshTokenService } from "./refresh-token.service";
 import { SessionCache } from "./session-cache";
-import { sessionExpired } from "./session.errors";
+import {
+  decodeSessionCursor,
+  encodeSessionCursor,
+  type SessionListQuery,
+  type SessionListResponse,
+} from "./session.dto";
+import { sessionExpired, sessionNotFound } from "./session.errors";
 import { userRefOf } from "./subject-type";
 
 export type SessionSubject = {
   type: SubjectType;
   id: string;
   operatorId?: string;
+  /** Account version captured at login; old versions remain invalid if post-mutation Redis revoke fails. */
+  authEpoch?: number;
   /** Session chỉ được đánh dấu sau khi TOTP/backup-code hợp lệ; không nhận từ client. */
   mfaVerified?: boolean;
 };
@@ -26,6 +36,17 @@ export type IssuedSession = {
   session: AuthSession;
   /** Token thô — trả cho client đúng một lần. */
   refreshToken: string;
+};
+
+type SessionListRow = {
+  familyId: string;
+  sortMicros: string;
+  createdAt: Date;
+  lastUsedAt: Date;
+  expiresAt: Date;
+  ip: string | null;
+  userAgent: string | null;
+  current: boolean;
 };
 
 /** Thua race rotate — ném bên TRONG transaction để Prisma rollback row con. */
@@ -82,6 +103,7 @@ export class SessionService {
           userRef: userRefOf(subject.type, subject.id),
           familyId: randomUUID(),
           refreshTokenHash: hash,
+          authEpoch: subject.authEpoch ?? 0,
           expiresAt: this.refreshExpiry(new Date()),
           operatorId: subject.operatorId,
           mfaVerifiedAt: subject.mfaVerified ? new Date() : undefined,
@@ -133,6 +155,7 @@ export class SessionService {
             userRef: current.userRef,
             familyId: current.familyId,
             refreshTokenHash: hash,
+            authEpoch: current.authEpoch,
             expiresAt: this.refreshExpiry(now),
             operatorId: current.operatorId,
             mfaVerifiedAt: current.mfaVerifiedAt,
@@ -192,8 +215,228 @@ export class SessionService {
     await this.cache.markActive(sid);
   }
 
+  /**
+   * Defense-in-depth for internal accounts: account mutation increments auth_epoch in Postgres.
+   * Check on every request, even when Redis cached the sid as active. A failed post-mutation
+   * Redis revoke can therefore never revive an older JWT after Redis recovers.
+   */
+  async assertOperatorAccountCurrent(claims: VerifiedAccessToken): Promise<void> {
+    if (claims.scope !== "operator" || !claims.operatorId) {
+      return;
+    }
+    const valid = await this.prisma.withSystem(async (tx) => {
+      const session = await tx.authSession.findUnique({
+        where: { id: claims.sid },
+        select: {
+          subjectType: true,
+          subjectId: true,
+          operatorId: true,
+          authEpoch: true,
+          revokedAt: true,
+        },
+      });
+      if (
+        !session ||
+        session.revokedAt ||
+        session.subjectId !== claims.sub ||
+        session.operatorId !== claims.operatorId
+      ) {
+        return false;
+      }
+      if (session.subjectType === SubjectType.OPERATOR) {
+        const account = await tx.operatorAccount.findUnique({
+          where: { id: claims.sub },
+          include: { operator: true },
+        });
+        return Boolean(
+          account &&
+          account.operatorId === claims.operatorId &&
+          account.authEpoch === session.authEpoch &&
+          account.role === claims.role &&
+          account.status === "ACTIVE" &&
+          account.operator.status === "ACTIVE" &&
+          !account.credentialDeliveryPending &&
+          !account.passwordChangeRequired &&
+          account.operator.operatorSlug === claims.operatorSlug
+        );
+      }
+      if (session.subjectType === SubjectType.EMPLOYEE) {
+        const account = await tx.employeeAccount.findUnique({
+          where: { id: claims.sub },
+          include: { operator: true },
+        });
+        return Boolean(
+          account &&
+          account.operatorId === claims.operatorId &&
+          account.authEpoch === session.authEpoch &&
+          account.role === claims.role &&
+          account.status === "ACTIVE" &&
+          account.operator.status === "ACTIVE" &&
+          !account.credentialDeliveryPending &&
+          !account.passwordChangeRequired &&
+          account.operator.operatorSlug === claims.operatorSlug
+        );
+      }
+      return false;
+    });
+    if (!valid) {
+      throw sessionExpired();
+    }
+  }
+
   async findById(sid: string): Promise<AuthSession | null> {
     return this.system((sessions) => sessions.findUnique({ where: { id: sid } }));
+  }
+
+  /**
+   * Một item đại diện một login/device family. CTE giữ lịch sử rotation để lấy thời điểm login gốc,
+   * nhưng chỉ xuất leaf refresh token còn hoạt động. Public response/cursor tuyệt đối không chứa row
+   * id (`sid`), refresh hash hoặc raw user-agent.
+   */
+  async listForSubject(
+    subjectType: SubjectType,
+    subjectId: string,
+    currentSid: string,
+    query: SessionListQuery,
+  ): Promise<SessionListResponse> {
+    const cursor = decodeSessionCursor(query.cursor);
+    if (query.cursor && !cursor) {
+      throw new BadRequestException("Cursor phiên đăng nhập không hợp lệ.");
+    }
+    const cursorSortMicros = cursor?.sortMicros ?? null;
+    const cursorFamilyId = cursor?.sessionId ?? null;
+    const take = query.limit + 1;
+    const userRef = userRefOf(subjectType, subjectId);
+
+    const rows = await this.prisma.withSystem((tx) =>
+      tx.$queryRaw<SessionListRow[]>`
+        WITH family_rows AS (
+          SELECT
+            id,
+            family_id,
+            issued_at,
+            expires_at,
+            last_used_at,
+            replaced_by_id,
+            rotated_at,
+            revoked_at,
+            ip,
+            user_agent,
+            MIN(issued_at) OVER (PARTITION BY family_id) AS created_at,
+            MAX(GREATEST(issued_at, COALESCE(last_used_at, issued_at)))
+              OVER (PARTITION BY family_id) AS family_last_used_at
+          FROM auth_sessions
+          WHERE user_ref = ${userRef}
+            AND subject_type::text = ${subjectType}
+            AND subject_id = ${subjectId}
+        ),
+        active_families AS (
+          SELECT DISTINCT ON (family_id)
+            id,
+            family_id,
+            created_at,
+            family_last_used_at,
+            expires_at,
+            ip,
+            user_agent
+          FROM family_rows
+          WHERE replaced_by_id IS NULL
+            AND rotated_at IS NULL
+            AND revoked_at IS NULL
+            AND expires_at > NOW()
+          ORDER BY family_id, issued_at DESC, id DESC
+        )
+        SELECT
+          family_id AS "familyId",
+          ((EXTRACT(EPOCH FROM created_at) * 1000000)::bigint)::text
+            AS "sortMicros",
+          created_at AS "createdAt",
+          family_last_used_at AS "lastUsedAt",
+          expires_at AS "expiresAt",
+          ip,
+          user_agent AS "userAgent",
+          COALESCE(
+            family_id = (
+              SELECT family_id FROM family_rows WHERE id = ${currentSid} LIMIT 1
+            ),
+            FALSE
+          ) AS "current"
+        FROM active_families
+        WHERE (
+          ${cursorSortMicros}::bigint IS NULL
+          OR (
+            (EXTRACT(EPOCH FROM created_at) * 1000000)::bigint,
+            family_id
+          ) < (
+            ${cursorSortMicros}::bigint,
+            ${cursorFamilyId}::text
+          )
+        )
+        ORDER BY created_at DESC, family_id DESC
+        LIMIT ${take}
+      `,
+    );
+
+    const page = rows.slice(0, query.limit);
+    const last = page.at(-1);
+    return {
+      items: page.map((row) => ({
+        sessionId: row.familyId,
+        current: row.current,
+        deviceLabel: deviceLabel(row.userAgent),
+        ipAddress: maskIpAddress(row.ip),
+        createdAt: row.createdAt.toISOString(),
+        lastUsedAt: row.lastUsedAt.toISOString(),
+        expiresAt: row.expiresAt.toISOString(),
+      })),
+      nextCursor:
+        rows.length > query.limit && last
+          ? encodeSessionCursor({
+              sortMicros: last.sortMicros,
+              sessionId: last.familyId,
+            })
+          : null,
+    };
+  }
+
+  /**
+   * Ownership nằm ngay trong query. Row lịch sử được giữ sau revoke nên cùng subject gọi lại vẫn
+   * 204; family của subject khác và id giả đều nhận cùng AUTH_SESSION_NOT_FOUND.
+   */
+  async revokeOwnedFamily(
+    subjectType: SubjectType,
+    subjectId: string,
+    familyId: string,
+    currentSid: string,
+  ): Promise<void> {
+    // DELETE cho phép token vừa tự revoke đi qua guard để retry được 204. Vì vậy service phải phân
+    // biệt: caller còn active được revoke mọi device của mình; caller đã revoked chỉ được retry đúng
+    // family của chính sid đó, không được dùng token chết để DoS các device khác.
+    const cached = await this.cache.lookup(currentSid);
+    const rows = await this.system((sessions) =>
+      sessions.findMany({
+        where: {
+          subjectType,
+          subjectId,
+          userRef: userRefOf(subjectType, subjectId),
+          OR: [{ familyId }, { id: currentSid }],
+        },
+        select: { id: true, familyId: true, revokedAt: true },
+      }),
+    );
+    const caller = rows.find((row) => row.id === currentSid);
+    if (!caller) {
+      throw sessionExpired();
+    }
+    const callerActive = cached !== "revoked" && caller.revokedAt === null;
+    if (!callerActive && caller.familyId !== familyId) {
+      throw sessionExpired();
+    }
+    const owned = rows.find((row) => row.familyId === familyId);
+    if (!owned) {
+      throw sessionNotFound();
+    }
+    await this.revokeFamily(owned.familyId, SessionRevokeReason.LOGOUT);
   }
 
   /**
@@ -358,4 +601,60 @@ function subjectEvent(
     operatorId: session.operatorId ?? undefined,
     ...extra,
   };
+}
+
+/** Chỉ suy nhãn từ tập token biết trước; không bao giờ nối raw user-agent vào response. */
+export function deviceLabel(userAgent: string | null): string {
+  if (!userAgent) {
+    return "Unknown device";
+  }
+  const browser = /Edg\//i.test(userAgent)
+    ? "Edge"
+    : /OPR\//i.test(userAgent)
+      ? "Opera"
+      : /(Chrome|CriOS)\//i.test(userAgent)
+        ? "Chrome"
+        : /(Firefox|FxiOS)\//i.test(userAgent)
+          ? "Firefox"
+          : /Safari\//i.test(userAgent) && /Version\//i.test(userAgent)
+            ? "Safari"
+            : /(Dart\/|okhttp\/)/i.test(userAgent)
+              ? "Mobile app"
+              : "Device";
+  const os = /Windows/i.test(userAgent)
+    ? "Windows"
+    : /Android/i.test(userAgent)
+      ? "Android"
+      : /(iPhone|iPad|iPod)/i.test(userAgent)
+        ? "iOS"
+        : /Mac OS X/i.test(userAgent)
+          ? "macOS"
+          : /Linux/i.test(userAgent)
+            ? "Linux"
+            : null;
+  return os ? `${browser} on ${os}` : browser;
+}
+
+export function maskIpAddress(ip: string | null): string | null {
+  if (!ip) {
+    return null;
+  }
+  const version = isIP(ip);
+  if (version === 4) {
+    const octets = ip.split(".");
+    return `${octets[0]}.${octets[1]}.${octets[2]}.*`;
+  }
+  if (version !== 6) {
+    return null;
+  }
+  const mappedV4 = ip.slice(ip.lastIndexOf(":") + 1);
+  if (isIP(mappedV4) === 4) {
+    return `::ffff:${maskIpAddress(mappedV4)}`;
+  }
+  const prefix = ip
+    .split(":")
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(":");
+  return prefix ? `${prefix}:*` : "IPv6:*";
 }

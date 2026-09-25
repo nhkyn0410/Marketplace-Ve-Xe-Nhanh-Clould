@@ -11,28 +11,24 @@ part 'refresh_token_dto.g.dart';
 /// RefreshTokenDto
 ///
 /// Properties:
-/// * [refreshToken]
+/// * [refreshToken] 
 @BuiltValue()
-abstract class RefreshTokenDto
-    implements Built<RefreshTokenDto, RefreshTokenDtoBuilder> {
+abstract class RefreshTokenDto implements Built<RefreshTokenDto, RefreshTokenDtoBuilder> {
   @BuiltValueField(wireName: r'refreshToken')
   String get refreshToken;
 
   RefreshTokenDto._();
 
-  factory RefreshTokenDto([void updates(RefreshTokenDtoBuilder b)]) =
-      _$RefreshTokenDto;
+  factory RefreshTokenDto([void updates(RefreshTokenDtoBuilder b)]) = _$RefreshTokenDto;
 
   @BuiltValueHook(initializeBuilder: true)
   static void _defaults(RefreshTokenDtoBuilder b) => b;
 
   @BuiltValueSerializer(custom: true)
-  static Serializer<RefreshTokenDto> get serializer =>
-      _$RefreshTokenDtoSerializer();
+  static Serializer<RefreshTokenDto> get serializer => _$RefreshTokenDtoSerializer();
 }
 
-class _$RefreshTokenDtoSerializer
-    implements PrimitiveSerializer<RefreshTokenDto> {
+class _$RefreshTokenDtoSerializer implements PrimitiveSerializer<RefreshTokenDto> {
   @override
   final Iterable<Type> types = const [RefreshTokenDto, _$RefreshTokenDto];
 
@@ -57,9 +53,7 @@ class _$RefreshTokenDtoSerializer
     RefreshTokenDto object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object,
-            specifiedType: specifiedType)
-        .toList();
+    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
   }
 
   void _deserializeProperties(
@@ -109,3 +103,5 @@ class _$RefreshTokenDtoSerializer
     return result.build();
   }
 }
+
+

@@ -9,6 +9,7 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**authControllerChangeRequiredPassword**](AuthApi.md#authcontrollerchangerequiredpassword) | **POST** /v1/auth/password/change-required | 
 [**authControllerLogout**](AuthApi.md#authcontrollerlogout) | **POST** /v1/auth/logout | 
 [**authControllerOauth**](AuthApi.md#authcontrolleroauth) | **POST** /v1/auth/oauth/{provider} | 
 [**authControllerOauthSession**](AuthApi.md#authcontrolleroauthsession) | **POST** /v1/auth/oauth/session | 
@@ -20,7 +21,50 @@ Method | HTTP request | Description
 [**authControllerRequestOtp**](AuthApi.md#authcontrollerrequestotp) | **POST** /v1/auth/otp/request | 
 [**authControllerVerifyMfa**](AuthApi.md#authcontrollerverifymfa) | **POST** /v1/auth/mfa/verify | 
 [**authControllerVerifyOtp**](AuthApi.md#authcontrollerverifyotp) | **POST** /v1/auth/otp/verify | 
+[**sessionControllerList**](AuthApi.md#sessioncontrollerlist) | **GET** /v1/auth/sessions | 
+[**sessionControllerRevoke**](AuthApi.md#sessioncontrollerrevoke) | **DELETE** /v1/auth/sessions/{sessionId} | 
 
+
+# **authControllerChangeRequiredPassword**
+> MessageResponseDtoOutput authControllerChangeRequiredPassword(passwordChangeRequiredDto)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+final PasswordChangeRequiredDto passwordChangeRequiredDto = ; // PasswordChangeRequiredDto | 
+
+try {
+    final response = api.authControllerChangeRequiredPassword(passwordChangeRequiredDto);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->authControllerChangeRequiredPassword: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **passwordChangeRequiredDto** | [**PasswordChangeRequiredDto**](PasswordChangeRequiredDto.md)|  | 
+
+### Return type
+
+[**MessageResponseDtoOutput**](MessageResponseDtoOutput.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerLogout**
 > MessageResponseDtoOutput authControllerLogout()
@@ -464,6 +508,89 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **sessionControllerList**
+> SessionListResponseDtoOutput sessionControllerList(cursor, limit)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+final String cursor = cursor_example; // String | 
+final int limit = 56; // int | 
+
+try {
+    final response = api.sessionControllerList(cursor, limit);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->sessionControllerList: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **cursor** | **String**|  | [optional] 
+ **limit** | **int**|  | [optional] [default to 20]
+
+### Return type
+
+[**SessionListResponseDtoOutput**](SessionListResponseDtoOutput.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **sessionControllerRevoke**
+> sessionControllerRevoke(sessionId)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+final String sessionId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | Public session family id nhận từ GET /auth/sessions.
+
+try {
+    api.sessionControllerRevoke(sessionId);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->sessionControllerRevoke: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **sessionId** | **String**| Public session family id nhận từ GET /auth/sessions. | 
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

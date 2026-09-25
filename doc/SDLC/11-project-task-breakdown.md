@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent |
 | Người duyệt   | Nguyễn Hồng Khanh           |
 | Ngày tạo      | 11/05/2026                  |
-| Ngày cập nhật | 17/09/2026                  |
+| Ngày cập nhật | 25/09/2026                  |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -26,6 +26,10 @@
 | v0.5      | 09/09/2026 | AI Agent       | Thêm **`TASK-FND-009`** — setup 2 app Flutter (`apps/passenger_mobile` + `apps/employee_mobile`, `packages/mobile_shared/`, Dart client `packages/api_client_dart/` sinh bằng `openapi-generator` pin `v7.25.0`), dependency `TASK-FND-008`. Sửa `TASK-OPS-001`: "EAS mobile" → build mobile Flutter (Android local; iOS tuỳ chọn khi có macOS) — vết Expo còn sót sau cascade v0.4.                                                                                                                                         |
 | v0.6      | 17/09/2026 | AI Agent       | Thêm **`TASK-FND-010`** — nền FE web (Tailwind 4 + token VXN + Shadcn/ui + khung layout 3 app), dependency `TASK-FND-001`. Khanh chốt Shadcn/ui cho cả 3 app web (ADR-013). |
 | v0.7      | 17/09/2026 | AI Agent       | Rà FE cũ phát hiện 4 nhóm yêu cầu SRS chưa có task chứa → thêm **`TASK-MKT-001`** (profile công khai Operator, FR-MKT-06 + FR-NSR-15), **`TASK-MKT-002`** (hồ sơ hành khách + hành khách thường dùng, FR-IAM-11 + FR-MKT-13), **`TASK-PROM-001`** (promotion, FR-PROM-01..07 + FR-ADM-12), **`TASK-ADM-003`** (kiểm duyệt nội dung, FR-ADM-13). Thu hẹp nguồn `TASK-ADM-002` `FR-ADM-10..17` → `FR-ADM-10..11, 14..17` để FR-ADM-12/13 chỉ thuộc một task. `TASK-FND-010`: layout Marketplace đổi header → sidebar. |
+| v0.8      | 21/09/2026 | AI Agent       | Cập nhật `TASK-IAM-004` → **Done** sau khi Khanh xác nhận CI branch xanh; không thay đổi trạng thái Approved của tài liệu.                                                                                                                                                                                                                                                                                                                                                                                                   |
+| v0.9      | 23/09/2026 | AI Agent       | Sửa `TASK-DOC-006` về Ready (chờ Khanh): tài liệu 08 vẫn Draft, 09 Approved. `TASK-DOC-008` chỉ yêu cầu tạo tài liệu 12 nên giữ Done. Giảm nhiễu căn lề bảng. |
+| v0.10     | 25/09/2026 | AI Agent       | Cập nhật `TASK-IAM-005` → **Done** sau khi Khanh xác nhận CI 5/5 job xanh và PR #10 đã merge; không thay đổi trạng thái Approved của tài liệu. |
+| v0.11     | 25/09/2026 | AI Agent       | **Tách §7.3 Transport resource** từ 4 thành 9 task. Lý do: `TASK-TRN-003` gom FR-OPS-06..13 và phụ thuộc vòng với BTP (FR-OPS-11..12 đổi chuyến đã bán vé cần booking + notification, trong khi `TASK-BTP-001` chờ TRN-003); Transport thiếu Catalog (loại xe, điểm đón/trả chuẩn chỉ nằm ở `TASK-ADM-001`). Thêm **`TASK-CAT-001`** (Catalog nền: schema + seed DB-MIG-04 + API đọc), **`TASK-TRN-005`** (Fare), **`TASK-TRN-006`** (vòng đời bán + khóa ghế thủ công), **`TASK-TRN-007`** (lịch lặp lại), **`TASK-TRN-008`** (đổi chuyến đã bán vé). Thu hẹp TRN-003 còn Trip/TripStop/TripSeat; TRN-004 thêm chi tiết chuyến FR-MKT-05 (trước đó chưa task nào chứa). TRN-002 bỏ phụ thuộc TRN-001 (làm song song). `TASK-BTP-001` phụ thuộc TRN-003 → TRN-006. Giữ nguyên ID cũ để không vỡ tham chiếu. |
 
 ---
 
@@ -103,14 +107,14 @@ Sau Sprint 5 rework + Sprint 4 Phase 4 DevOps, các doc thiết kế đã reset 
 
 | Task ID      | Task                                                    | Nguồn           | Owner              | Dependency    | Status            |
 | ------------ | ------------------------------------------------------- | --------------- | ------------------ | ------------- | ----------------- |
-| TASK-DOC-001 | Review + promote 02 HLD (Review/Approved)               | 02 HLD          | Reviewer           | Rework DONE   | Ready (chờ Khanh) |
-| TASK-DOC-002 | Review + promote 04 DB                                  | 04 DB           | Reviewer/BE        | Rework DONE   | Ready (chờ Khanh) |
-| TASK-DOC-003 | Review + promote 03 LLD                                 | 03 LLD          | Reviewer/Architect | Rework DONE   | Ready (chờ Khanh) |
-| TASK-DOC-004 | Review + promote 05 API                                 | 05 API          | Reviewer/BE        | Rework DONE   | Ready (chờ Khanh) |
-| TASK-DOC-005 | Review + promote 07 Security                            | 07 Security     | Reviewer/Security  | Rework DONE   | Ready (chờ Khanh) |
+| TASK-DOC-001 | Review + promote 02 HLD (Review/Approved)               | 02 HLD          | Reviewer           | Rework DONE   | Done              |
+| TASK-DOC-002 | Review + promote 04 DB                                  | 04 DB           | Reviewer/BE        | Rework DONE   | Done              |
+| TASK-DOC-003 | Review + promote 03 LLD                                 | 03 LLD          | Reviewer/Architect | Rework DONE   | Done              |
+| TASK-DOC-004 | Review + promote 05 API                                 | 05 API          | Reviewer/BE        | Rework DONE   | Done              |
+| TASK-DOC-005 | Review + promote 07 Security                            | 07 Security     | Reviewer/Security  | Rework DONE   | Done              |
 | TASK-DOC-006 | Review + promote 08 Test + 09 Deploy                    | 08 Test, 09 Ops | Reviewer/QA/DevOps | Rework DONE   | Ready (chờ Khanh) |
-| TASK-DOC-007 | Hoàn thiện 06 UI/UX flow (User/Operator/Employee/Admin) | 06 UI/UX        | FE/Mobile/Reviewer | TASK-DOC-001  | Draft             |
-| TASK-DOC-008 | Tạo 12 Release Notes & Change Log (khi vào code)        | —               | Reviewer           | Code v1 start | Draft             |
+| TASK-DOC-007 | Hoàn thiện 06 UI/UX flow (User/Operator/Employee/Admin) | 06 UI/UX        | FE/Mobile/Reviewer | TASK-DOC-001  | Done              |
+| TASK-DOC-008 | Tạo 12 Release Notes & Change Log (khi vào code)        | —               | Reviewer           | Code v1 start | Done              |
 
 ---
 
@@ -135,26 +139,33 @@ Sau Sprint 5 rework + Sprint 4 Phase 4 DevOps, các doc thiết kế đã reset 
 
 | Task ID      | Task                                                                                                                   | Nguồn                  | Owner        | Dependency   | Status   |
 | ------------ | ---------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------ | ------------ | -------- |
-| TASK-IAM-001 | Better Auth + custom NestJS adapter; login 3-namespace (Email/OTP/OAuth + `{slug}/{username}` + `platform/{username}`) | FR-IAM-\*, ADR-017/020 | BE/FE/Mobile | TASK-FND-006 | **Done** |
-| TASK-IAM-002 | Hybrid token (JWT RS256 15min + opaque refresh 30d rotation/family) + `auth_sessions` + Redis cache                    | ADR-017                | BE           | TASK-IAM-001 | Draft    |
-| TASK-IAM-003 | RBAC 8-role + TenantGuard (JWT claims) + Postgres RLS                                                                  | FR-IAM-06, ADR-011/017 | BE           | TASK-IAM-002 | Draft    |
-| TASK-IAM-004 | MFA TOTP (mandatory Owner/PlatformAdmin/PlatformSupport) + backup code                                                 | ADR-017                | BE           | TASK-IAM-002 | Draft    |
-| TASK-IAM-005 | Closed enrollment provisioning (Platform cấp Operator+Owner; Owner cấp employee) + **FR-IAM-15** (xem danh sách phiên + thu hồi theo thiết bị) — chuyển từ IAM-002 theo quyết định Q4 ngày 16/09/2026; API §7.1 chưa có endpoint nên cần Khanh duyệt trước khi thêm | ADR-017, FR-IAM-15     | BE/FE        | TASK-IAM-003 | Draft    |
+| TASK-IAM-001 | Better Auth + custom NestJS adapter; login 3-namespace (Email/OTP/OAuth + `{slug}/{username}` + `platform/{username}`) | FR-IAM-\*, ADR-017/020 | BE/FE/Mobile | TASK-FND-006 | Done     |
+| TASK-IAM-002 | Hybrid token (JWT RS256 15min + opaque refresh 30d rotation/family) + `auth_sessions` + Redis cache                    | ADR-017                | BE           | TASK-IAM-001 | Done     |
+| TASK-IAM-003 | RBAC 8-role + TenantGuard (JWT claims) + Postgres RLS                                                                  | FR-IAM-06, ADR-011/017 | BE           | TASK-IAM-002 | Done     |
+| TASK-IAM-004 | MFA TOTP (mandatory Owner/PlatformAdmin/PlatformSupport) + backup code                                                 | ADR-017                | BE           | TASK-IAM-002 | Done     |
+| TASK-IAM-005 | Closed enrollment provisioning (Platform cấp Operator+Owner; Owner cấp employee) + **FR-IAM-15** (xem danh sách phiên + thu hồi theo thiết bị) — Q1–Q8 được Khanh duyệt ngày 22/09/2026; CI 5/5 job xanh, PR #10 merge ngày 25/09/2026 | ADR-017, FR-IAM-15     | BE/FE        | TASK-IAM-003 | Done     |
 
 ### 7.3. Transport resource
 
-| Task ID      | Task                                                              | Nguồn                  | Owner | Dependency   | Status |
-| ------------ | ----------------------------------------------------------------- | ---------------------- | ----- | ------------ | ------ |
-| TASK-TRN-001 | Vehicle/VehicleType/SeatMap (Prisma + JSONB layout) schema và API | FR-OPS-01..03          | BE/FE | TASK-FND-003 | Draft  |
-| TASK-TRN-002 | Route/StopPoint + Goong distance/duration cache DB                | FR-OPS-04..05, ADR-027 | BE/FE | TASK-TRN-001 | Draft  |
-| TASK-TRN-003 | Trip/Fare/TripSeat inventory schema và API                        | FR-OPS-06..13          | BE/FE | TASK-TRN-002 | Draft  |
-| TASK-TRN-004 | Search index Postgres + cache Redis (TTL 60s) cho trip            | FR-MKT-01..04, ADR-015 | BE/FE | TASK-TRN-003 | Draft  |
+Bảng xếp theo thứ tự làm. ID cũ giữ nguyên để không vỡ tham chiếu (`TASK-TRN-002` = Goong ở checklist FND-009; `TASK-TRN-003` ở EMP-001), nên số không trùng thứ tự. Luồng: `CAT-001 → (TRN-001 ∥ TRN-002) → TRN-003 → TRN-005 → TRN-006 → (TRN-004 ∥ TRN-007)`; `TRN-008` chờ thêm BTP-005 + NSR-001.
+
+| Task ID      | Task                                                                                                                                                                                                                                                | Nguồn                                              | Owner | Dependency                             | Status |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ----- | -------------------------------------- | ------ |
+| TASK-CAT-001 | **Catalog nền cho Transport**: schema `provinces`, `wards`, `stop_points_catalog`, `vehicle_types`, `amenities` + seed tối thiểu + API đọc cho Operator/Marketplace (05 API mới có `/admin/catalog/*` → cần Khanh duyệt endpoint đọc). Admin quản lý catalog + duyệt StopPoint đề xuất vẫn thuộc `TASK-ADM-001` | DB-MIG-04, FR-ADM-04 (phần đọc), LLD Catalog       | BE    | TASK-FND-003, TASK-IAM-003             | Draft  |
+| TASK-TRN-001 | Vehicle (biển số, `VehicleType`, tiện ích, trạng thái vận hành) + SeatMap/Seat (layout `JSONB`): `/operator/vehicles`, `/operator/seat-maps`; unique `(operator_id, plate_number)` + RLS                                                                  | FR-OPS-01..03, UC-12                               | BE/FE | TASK-CAT-001                           | Draft  |
+| TASK-TRN-002 | Route + RouteStop từ StopPoint chuẩn hoặc StopPoint riêng; đề xuất StopPoint mới (chờ Admin duyệt ở ADM-001; 05 API chưa có endpoint đề xuất → cần Khanh duyệt); adapter Goong `external/routing/goong/` lưu distance/duration vào DB lúc cấu hình route, không gọi mỗi lần search                               | FR-OPS-04..05, BR-23, BR-38, UC-13, ADR-027        | BE/FE | TASK-CAT-001                           | Draft  |
+| TASK-TRN-003 | Trip + TripStop + TripSeat (sinh từ SeatMap): tạo chuyến lẻ theo route/ngày giờ/xe ở trạng thái `DRAFT`; chặn một xe chạy hai chuyến trùng giờ hoặc thiếu thời gian quay đầu                                                                           | FR-OPS-06, BR-14                                   | BE/FE | TASK-TRN-001, TASK-TRN-002             | Draft  |
+| TASK-TRN-005 | Fare + FareRule theo chuyến / loại ghế / thời điểm, lưu lịch sử giá, VND `BIGINT` không âm; vượt trần/sàn chỉ cảnh báo (OQ-17); giá theo chặng ngoài v1; **test money bắt buộc**                                                                         | FR-OPS-08..09, BR-40..41                           | BE/FE | TASK-TRN-003                           | Draft  |
+| TASK-TRN-006 | Vòng đời bán **khi chưa có vé**: kiểm tra đủ điều kiện trước khi mở bán (route, xe/SeatMap, fare, điểm đón/trả, giờ) → mở / khóa / tạm dừng / hủy; khóa / mở ghế thủ công (`BLOCKED`) cho vé bán ngoài Platform                                         | FR-OPS-10, FR-OPS-13, BR-11, BR-39, BR-42          | BE/FE | TASK-TRN-005                           | Draft  |
+| TASK-TRN-004 | Search `GET /trips/search`: index Postgres + cache Redis (TTL 60s), chỉ chuyến đang mở bán + còn ghế; lọc/sắp xếp (theo đánh giá bật khi có TRUST-001) + **chi tiết chuyến** `GET /trips/{tripId}`                                                        | FR-MKT-01..05, BR-22, UC-02, ADR-015               | BE/FE | TASK-TRN-006                           | Draft  |
+| TASK-TRN-007 | Lịch chuyến lặp lại theo rule; chạy lại không sinh chuyến trùng (05 API chưa có endpoint → cần Khanh duyệt)                                                                                                                                          | FR-OPS-07                                          | BE/FE | TASK-TRN-006                           | Draft  |
+| TASK-TRN-008 | Đổi chuyến **đã bán vé**: bắt buộc lý do + audit + thông báo hành khách bị ảnh hưởng; đổi xe phải map được ghế đã bán; hủy chuyến có vé → dừng bán + chặn thanh toán mới + kích hoạt hoàn tiền                                                            | FR-OPS-11..12, BR-10, BR-12, BR-20, UC-14          | BE/FE | TASK-TRN-006, TASK-BTP-005, TASK-NSR-001 | Draft  |
 
 ### 7.4. Booking, payment, ticket
 
 | Task ID      | Task                                                                                            | Nguồn                  | Owner        | Dependency                 | Status |
 | ------------ | ----------------------------------------------------------------------------------------------- | ---------------------- | ------------ | -------------------------- | ------ |
-| TASK-BTP-001 | SeatHold Redis `SET NX EX 600` + Lua EVAL ownership                                             | FR-BTP-01..03, ADR-015 | BE           | TASK-TRN-003, TASK-FND-004 | Draft  |
+| TASK-BTP-001 | SeatHold Redis `SET NX EX 600` + Lua EVAL ownership                                             | FR-BTP-01..03, ADR-015 | BE           | TASK-TRN-006, TASK-FND-004 | Draft  |
 | TASK-BTP-002 | Booking snapshot + total calculation (BIGINT/Decimal)                                           | FR-BTP-05..06, ADR-009 | BE/FE        | TASK-BTP-001               | Draft  |
 | TASK-BTP-003 | PaymentGateway adapter VNPay (SHA512) + MoMo (SHA256) + webhook BullMQ + dedup `(provider,txn)` | FR-BTP-07..09, ADR-019 | BE           | TASK-BTP-002               | Draft  |
 | TASK-BTP-004 | Ticket issuance + QR token hash                                                                 | FR-BTP-10..11          | BE/FE/Mobile | TASK-BTP-003               | Draft  |

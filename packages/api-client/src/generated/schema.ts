@@ -180,6 +180,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/password/change-required": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_changeRequiredPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/oauth/{provider}": {
         parameters: {
             query?: never;
@@ -254,6 +270,86 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["AuthController_reauth"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["SessionController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/sessions/{sessionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["SessionController_revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["EmployeeAccountController_list"];
+        put?: never;
+        post: operations["EmployeeAccountController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/employees/{employeeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["EmployeeAccountController_update"];
+        trace?: never;
+    };
+    "/v1/operator/employees/{employeeId}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["EmployeeAccountController_resetPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -368,6 +464,11 @@ export interface components {
             enrollmentRequired: boolean;
             challengeExpiresIn: number;
             otpAuthUri?: string;
+        } | {
+            /** @constant */
+            passwordChangeRequired: true;
+            passwordChangeToken: string;
+            passwordChangeExpiresIn: number;
         };
         MfaVerifyDto: {
             challengeToken: string;
@@ -387,6 +488,10 @@ export interface components {
             mfaRequired: false;
             backupCodes?: string[];
         };
+        PasswordChangeRequiredDto: {
+            passwordChangeToken: string;
+            newPassword: string;
+        };
         OAuthInitDto: {
             /** Format: uri */
             callbackURL?: string;
@@ -402,6 +507,80 @@ export interface components {
             password?: string;
             otp?: string;
             mfaCode?: string;
+        };
+        SessionListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                sessionId: string;
+                current: boolean;
+                deviceLabel: string;
+                ipAddress: string | null;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                lastUsedAt: string;
+                /** Format: date-time */
+                expiresAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        EmployeeListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                username: string;
+                contactEmail: string | null;
+                /** @enum {string} */
+                role: "DRIVER" | "TICKET_STAFF" | "SUPPORT_STAFF";
+                /** @enum {string} */
+                status: "ACTIVE" | "LOCKED" | "DISABLED";
+                credentialDeliveryPending: boolean;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+            }[];
+            nextCursor: string | null;
+        };
+        EmployeeCreateDto: {
+            username: string;
+            /** Format: email */
+            contactEmail: string;
+            /** @enum {string} */
+            role: "DRIVER" | "TICKET_STAFF" | "SUPPORT_STAFF";
+            reason: string;
+        };
+        EmployeeAccountResponseDto_Output: {
+            /** Format: uuid */
+            id: string;
+            username: string;
+            contactEmail: string | null;
+            /** @enum {string} */
+            role: "DRIVER" | "TICKET_STAFF" | "SUPPORT_STAFF";
+            /** @enum {string} */
+            status: "ACTIVE" | "LOCKED" | "DISABLED";
+            credentialDeliveryPending: boolean;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        EmployeeUpdateDto: {
+            username?: string;
+            /** Format: email */
+            contactEmail?: string;
+            /** @enum {string} */
+            role?: "DRIVER" | "TICKET_STAFF" | "SUPPORT_STAFF";
+            /** @enum {string} */
+            status?: "ACTIVE" | "LOCKED" | "DISABLED";
+            reason: string;
+        };
+        EmployeePasswordResetDto: {
+            reason: string;
+        };
+        AccountMutationResponseDto_Output: {
+            /** @constant */
+            status: "ok";
         };
     };
     responses: never;
@@ -818,6 +997,57 @@ export interface operations {
             };
         };
     };
+    AuthController_changeRequiredPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChangeRequiredDto"];
+            };
+        };
+        responses: {
+            /** @description Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageResponseDto_Output"];
+                };
+            };
+            /** @description Mật khẩu mới trùng mật khẩu tạm. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Challenge giả, hết hạn, đã dùng hoặc account không còn hợp lệ. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Redis không khả dụng (fail-closed). */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
     AuthController_oauth: {
         parameters: {
             query?: never;
@@ -996,6 +1226,365 @@ export interface operations {
             };
             /** @description Vượt giới hạn thử. */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    SessionController_list: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Danh sách session family đang hoạt động của subject hiện tại. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionListResponseDto_Output"];
+                };
+            };
+            /** @description Cursor hoặc limit không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Access token hoặc phiên hiện tại không hợp lệ. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    SessionController_revoke: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Public session family id nhận từ GET /auth/sessions. */
+                sessionId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session family đã được thu hồi. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Access token hoặc phiên hiện tại không hợp lệ. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Family không tồn tại hoặc không thuộc subject hiện tại. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Không thể thu hồi fail-closed khi session cache không khả dụng. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    EmployeeAccountController_list: {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Danh sách tài khoản Employee trong tenant của Owner. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeListResponseDto_Output"];
+                };
+            };
+            /** @description Cursor/limit không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    EmployeeAccountController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeCreateDto"];
+            };
+        };
+        responses: {
+            /** @description Tạo Employee và gửi mật khẩu tạm một lần qua email. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeAccountResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Username đã tồn tại. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Vượt giới hạn email mật khẩu tạm. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Gửi mật khẩu tạm lỗi: detail chứa employeeId để list/reset lại; hoặc audit không khả dụng. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    EmployeeAccountController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeeUpdateDto"];
+            };
+        };
+        responses: {
+            /** @description Cập nhật tài khoản Employee trong cùng tenant. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeAccountResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Employee không tồn tại trong tenant. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Username/trạng thái xung đột. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Audit hoặc session revoke không khả dụng. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    EmployeeAccountController_resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                employeeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EmployeePasswordResetDto"];
+            };
+        };
+        responses: {
+            /** @description Thu hồi mọi phiên và gửi mật khẩu tạm mới. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountMutationResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Employee không tồn tại trong tenant. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Trạng thái tài khoản xung đột. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Vượt giới hạn email mật khẩu tạm hoặc cooldown reset. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Không thể gửi mật khẩu tạm hoặc thu hồi session. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

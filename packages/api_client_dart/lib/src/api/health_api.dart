@@ -4,16 +4,19 @@
 
 import 'dart:async';
 
+import 'package:built_value/json_object.dart';
 import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:api_client_dart/src/model/health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/mongo_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/postgres_health_response_dto_output.dart';
+import 'package:api_client_dart/src/model/problem_details_dto.dart';
 import 'package:api_client_dart/src/model/queue_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/redis_health_response_dto_output.dart';
 
 class HealthApi {
+
   final Dio _dio;
 
   final Serializers _serializers;
@@ -21,7 +24,7 @@ class HealthApi {
   const HealthApi(this._dio, this._serializers);
 
   /// appControllerHealth
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -33,7 +36,7 @@ class HealthApi {
   ///
   /// Returns a [Future] containing a [Response] with a [HealthResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<HealthResponseDtoOutput>> appControllerHealth({
+  Future<Response<HealthResponseDtoOutput>> appControllerHealth({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -66,12 +69,11 @@ class HealthApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(HealthResponseDtoOutput),
-            ) as HealthResponseDtoOutput;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(HealthResponseDtoOutput),
+      ) as HealthResponseDtoOutput;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -95,7 +97,7 @@ class HealthApi {
   }
 
   /// appControllerMongo
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -107,7 +109,7 @@ class HealthApi {
   ///
   /// Returns a [Future] containing a [Response] with a [MongoHealthResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<MongoHealthResponseDtoOutput>> appControllerMongo({
+  Future<Response<MongoHealthResponseDtoOutput>> appControllerMongo({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -140,12 +142,11 @@ class HealthApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(MongoHealthResponseDtoOutput),
-            ) as MongoHealthResponseDtoOutput;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(MongoHealthResponseDtoOutput),
+      ) as MongoHealthResponseDtoOutput;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -169,7 +170,7 @@ class HealthApi {
   }
 
   /// appControllerPostgres
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -181,7 +182,7 @@ class HealthApi {
   ///
   /// Returns a [Future] containing a [Response] with a [PostgresHealthResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<PostgresHealthResponseDtoOutput>> appControllerPostgres({
+  Future<Response<PostgresHealthResponseDtoOutput>> appControllerPostgres({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -214,12 +215,11 @@ class HealthApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(PostgresHealthResponseDtoOutput),
-            ) as PostgresHealthResponseDtoOutput;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(PostgresHealthResponseDtoOutput),
+      ) as PostgresHealthResponseDtoOutput;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -243,7 +243,7 @@ class HealthApi {
   }
 
   /// appControllerQueues
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -255,7 +255,7 @@ class HealthApi {
   ///
   /// Returns a [Future] containing a [Response] with a [QueueHealthResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<QueueHealthResponseDtoOutput>> appControllerQueues({
+  Future<Response<QueueHealthResponseDtoOutput>> appControllerQueues({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -288,12 +288,11 @@ class HealthApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(QueueHealthResponseDtoOutput),
-            ) as QueueHealthResponseDtoOutput;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(QueueHealthResponseDtoOutput),
+      ) as QueueHealthResponseDtoOutput;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -317,7 +316,7 @@ class HealthApi {
   }
 
   /// appControllerRedis
-  ///
+  /// 
   ///
   /// Parameters:
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
@@ -329,7 +328,7 @@ class HealthApi {
   ///
   /// Returns a [Future] containing a [Response] with a [RedisHealthResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<RedisHealthResponseDtoOutput>> appControllerRedis({
+  Future<Response<RedisHealthResponseDtoOutput>> appControllerRedis({ 
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -362,12 +361,11 @@ class HealthApi {
 
     try {
       final rawResponse = _response.data;
-      _responseData = rawResponse == null
-          ? null
-          : _serializers.deserialize(
-              rawResponse,
-              specifiedType: const FullType(RedisHealthResponseDtoOutput),
-            ) as RedisHealthResponseDtoOutput;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(RedisHealthResponseDtoOutput),
+      ) as RedisHealthResponseDtoOutput;
+
     } catch (error, stackTrace) {
       throw DioException(
         requestOptions: _response.requestOptions,
@@ -389,4 +387,5 @@ class HealthApi {
       extra: _response.extra,
     );
   }
+
 }

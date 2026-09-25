@@ -12,6 +12,7 @@ import { type Authorization, type AuthorizedRequest, REQUIRED_PERMISSION } from 
 import type { Permission } from "./permissions";
 import { PermissionGuard } from "./permission.guard";
 import { TenantGuard } from "./tenant.guard";
+import { RecentReauthGuard } from "./recent-reauth.guard";
 
 const problemContent = {
   "application/problem+json": { schema: { $ref: getSchemaPath(ProblemDetailsDto) } },
@@ -27,10 +28,18 @@ const problemContent = {
  * Route công khai (Guest) KHÔNG dùng decorator này — nó đòi token trước tiên (401); quyền của
  * ANONYMOUS trong bảng chỉ để service hỏi `can(null, …)`.
  */
-export function Authorize(permission: Permission): MethodDecorator {
+export function Authorize(
+  permission: Permission,
+  options: { requireReauth?: boolean } = {},
+): MethodDecorator {
   return applyDecorators(
     SetMetadata(REQUIRED_PERMISSION, permission),
-    UseGuards(AccessTokenGuard, PermissionGuard, TenantGuard),
+    UseGuards(
+      AccessTokenGuard,
+      PermissionGuard,
+      TenantGuard,
+      ...(options.requireReauth ? [RecentReauthGuard] : []),
+    ),
     ApiBearerAuth(),
     ApiExtraModels(ProblemDetailsDto),
     ApiResponse({ status: 401, description: "Thiếu hoặc sai access token.", content: problemContent }),

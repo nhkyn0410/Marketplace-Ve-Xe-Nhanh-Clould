@@ -3,10 +3,10 @@
 > Mục tiêu: chứng minh password của role privileged **chưa đủ để lấy token**, MFA dùng đúng chuẩn và mọi credential/challenge/code đều chống leak, replay và race.
 > Chạy theo thứ tự **A → G**; tick `[x]` chỉ khi có evidence. Lệnh chi tiết: `IAM-004-guide.md`. Phạm vi/sub-task: `IAM-004-todo.md`.
 
-## Snapshot trạng thái (19/09/2026)
+## Snapshot trạng thái (21/09/2026)
 
 - ✅ Q1–Q10 đã được Khanh chốt ngày 18/09/2026.
-- 🟡 **PHẦN A–F xong + G trừ CI**: 310/310 test (hạ tầng thật, role app); turbo 35/35; smoke API build thật 23/23; 2 review đã sửa hết finding High. Còn: commit/push (Khanh) → CI → task row.
+- ✅ **TASK-IAM-004 hoàn tất**: 310/310 test (hạ tầng thật, role app); turbo 35/35; smoke API build thật 23/23; 2 review đã sửa hết finding High; Khanh xác nhận CI branch xanh ngày 21/09/2026; task row đã chuyển `Done`.
 - ✅ Bộ docs IAM-003 đã merge qua PR #6; IAM-004 không tạo lại hay sửa ngược bộ đó.
 
 ---
@@ -94,8 +94,8 @@
 - [x] Toàn bộ IAM-001/002/003 regression xanh; số test không giảm — 310/310 (IAM-003: 248)
 - [x] `pnpm turbo run typecheck lint test build` xanh — 35/35
 - [x] `code-reviewer` + `security-auditor` không còn finding blocking/high — 2 High + Medium/Low đã sửa (todo Ghi nhận #4–#12); security-auditor kiểm lại: 5 finding đã đóng, 1 Medium mới (N1: re-auth khoá được login) đã sửa + test
-- [ ] CI branch xanh; chưa tick nếu chưa commit/push — ⏳ chờ Khanh commit/push (CLAUDE.md §4.7)
-- [ ] Chỉ sau toàn bộ gate mới cập nhật task row/PROJECT-STATE; không tự promote SDLC Approved
+- [x] CI branch xanh — Khanh xác nhận ngày 21/09/2026
+- [x] Sau toàn bộ gate đã cập nhật task row/PROJECT-STATE; không thay đổi trạng thái Approved của tài liệu SDLC
 
 ## PHẦN H — DoD theo sub-task
 
@@ -110,7 +110,7 @@
 | `.7` API/login | 3 role gate token; Employee regression; OpenAPI/client | [x] |
 | `.8` Re-auth | exactly-one method + proof TTL + no new token | [x] |
 | `.9` Security/test | Leak scan + integration + full regression | [x] |
-| `.10` Đóng task | review + smoke + CI + state update đúng gate | 🟡 review + smoke xong; còn commit, CI, task row |
+| `.10` Đóng task | review + smoke + CI + state update đúng gate | [x] |
 
 ## PHẦN I — Ranh giới (KHÔNG chặn nghiệm thu task này)
 

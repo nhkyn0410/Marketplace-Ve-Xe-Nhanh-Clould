@@ -32,5 +32,15 @@ void main() {
       // TODO
     });
 
+    // String refreshToken
+    test('to test the property `refreshToken`', () async {
+      // TODO
+    });
+
+    // int refreshExpiresIn
+    test('to test the property `refreshExpiresIn`', () async {
+      // TODO
+    });
+
   });
 }

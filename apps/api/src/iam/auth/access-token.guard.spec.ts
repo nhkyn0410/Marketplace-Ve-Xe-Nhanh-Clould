@@ -55,7 +55,8 @@ function contextWith(authorization?: string, route: object = NormalRoute) {
 
 describe("AccessTokenGuard", () => {
   const assertActive = vi.fn();
-  const sessions = { assertActive } as unknown as SessionService;
+  const assertOperatorAccountCurrent = vi.fn();
+  const sessions = { assertActive, assertOperatorAccountCurrent } as unknown as SessionService;
   const sid = randomUUID();
   let guard: AccessTokenGuard;
   let valid: string;
@@ -77,6 +78,8 @@ describe("AccessTokenGuard", () => {
   beforeEach(() => {
     assertActive.mockReset();
     assertActive.mockResolvedValue(undefined);
+    assertOperatorAccountCurrent.mockReset();
+    assertOperatorAccountCurrent.mockResolvedValue(undefined);
   });
 
   it("token hợp lệ, phiên còn sống → cho qua và gắn claim vào request", async () => {
@@ -84,6 +87,7 @@ describe("AccessTokenGuard", () => {
     expect(await guard.canActivate(context)).toBe(true);
     expect(request.user?.sid).toBe(sid);
     expect(assertActive).toHaveBeenCalledWith(sid);
+    expect(assertOperatorAccountCurrent).toHaveBeenCalledWith(expect.objectContaining({ sid }));
   });
 
   it("scheme không phân biệt hoa thường (RFC 7235)", async () => {

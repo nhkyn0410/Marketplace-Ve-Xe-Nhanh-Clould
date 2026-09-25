@@ -14,3 +14,15 @@ export function sessionExpired(): AuthException {
     "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
   );
 }
+
+/**
+ * Một response cho cả family không tồn tại và family thuộc subject khác. Không phân biệt hai ca để
+ * endpoint revoke không trở thành oracle dò session id của người dùng khác.
+ */
+export function sessionNotFound(): AuthException {
+  return new AuthException(
+    HttpStatus.NOT_FOUND,
+    "AUTH_SESSION_NOT_FOUND",
+    "Không tìm thấy phiên đăng nhập.",
+  );
+}

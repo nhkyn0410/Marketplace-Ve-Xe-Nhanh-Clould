@@ -29,10 +29,17 @@ describe("OpenAPI generation", () => {
         "/v1/auth/refresh",
         "/v1/auth/logout",
         "/v1/auth/re-auth",
-        "/v1/auth/mfa/verify"
+        "/v1/auth/mfa/verify",
+        "/v1/auth/password/change-required",
+        "/v1/operator/employees",
+        "/v1/operator/employees/{employeeId}/password-reset"
       ]) {
         expect(document.paths[path]?.post, `thiếu POST ${path} trong OpenAPI`).toBeDefined();
       }
+      expect(document.paths["/v1/auth/sessions"]?.get).toBeDefined();
+      expect(document.paths["/v1/auth/sessions/{sessionId}"]?.delete).toBeDefined();
+      expect(document.paths["/v1/operator/employees"]?.get).toBeDefined();
+      expect(document.paths["/v1/operator/employees/{employeeId}"]?.patch).toBeDefined();
 
       // `requestBody` phải có: script gen chạy bằng tsx (esbuild) nên KHÔNG có `design:paramtypes`
       // → @nestjs/swagger không suy ra được kiểu của `@Body()`. Thiếu `@ApiBody` thì spec vẫn hợp lệ
@@ -47,13 +54,17 @@ describe("OpenAPI generation", () => {
         "/v1/auth/platform/login",
         "/v1/auth/refresh",
         "/v1/auth/re-auth",
-        "/v1/auth/mfa/verify"
+        "/v1/auth/mfa/verify",
+        "/v1/auth/password/change-required",
+        "/v1/operator/employees",
+        "/v1/operator/employees/{employeeId}/password-reset"
       ]) {
         expect(
           document.paths[path]?.post?.requestBody,
           `POST ${path} thiếu requestBody — nhớ @ApiBody({ type: ... })`
         ).toBeDefined();
       }
+      expect(document.paths["/v1/operator/employees/{employeeId}"]?.patch?.requestBody).toBeDefined();
 
       // Path param phải được khai báo, nếu không spec KHÔNG hợp lệ (openapi-generator từ chối) và
       // client sinh ra gọi URL chứa literal "{provider}".
@@ -73,6 +84,11 @@ describe("OpenAPI generation", () => {
           { bearer: [] }
         ]);
       }
+      for (const path of ["/v1/auth/sessions", "/v1/operator/employees"]) {
+        expect(document.paths[path]?.get?.security, `${path} thiếu bearer`).toEqual([{ bearer: [] }]);
+      }
+      expect(document.paths["/v1/auth/sessions/{sessionId}"]?.delete?.security).toEqual([{ bearer: [] }]);
+      expect(document.paths["/v1/operator/employees/{employeeId}"]?.patch?.security).toEqual([{ bearer: [] }]);
       expect(document.components?.securitySchemes?.bearer).toBeDefined();
 
       // IAM-004: login Operator/Platform trả token HOẶC MFA challenge — client phải thấy cả hai nhánh,
@@ -89,15 +105,20 @@ describe("OpenAPI generation", () => {
         expect(variants.map((variant) => variant.required ?? []), path).toEqual(
           expect.arrayContaining([
             expect.arrayContaining(["accessToken", "refreshToken", "mfaRequired"]),
-            expect.arrayContaining(["mfaRequired", "challengeToken", "challengeExpiresIn"])
+            expect.arrayContaining(["mfaRequired", "challengeToken", "challengeExpiresIn"]),
+            expect.arrayContaining(["passwordChangeRequired", "passwordChangeToken", "passwordChangeExpiresIn"])
           ])
         );
       }
       expect(schemas?.MfaVerifyDto?.required).toEqual(expect.arrayContaining(["challengeToken", "code"]));
       expect(schemas?.MfaVerifyResponseDto_Output?.properties?.backupCodes).toBeDefined();
       expect(schemas?.ReauthDto?.properties?.mfaCode).toBeDefined();
+      expect(schemas?.PasswordChangeRequiredDto?.required).toEqual(
+        expect.arrayContaining(["passwordChangeToken", "newPassword"])
+      );
       // Verify dùng challenge token trong body, KHÔNG dùng Bearer (chưa có access token ở bước này).
       expect(document.paths["/v1/auth/mfa/verify"]?.post?.security).toBeUndefined();
+      expect(document.paths["/v1/auth/password/change-required"]?.post?.security).toBeUndefined();
 
       const oauthParams = document.paths["/v1/auth/oauth/{provider}"]?.post?.parameters ?? [];
       expect(

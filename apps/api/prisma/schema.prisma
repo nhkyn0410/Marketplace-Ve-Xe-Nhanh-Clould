@@ -51,6 +51,13 @@ enum EmployeeRole {
   SUPPORT_STAFF
 }
 
+/// Loại account sở hữu một tên đăng nhập trong namespace Operator.
+/// Registry dùng enum riêng để DB cấm Owner và Employee trùng username trong cùng tenant.
+enum OperatorLoginAccountType {
+  OPERATOR
+  EMPLOYEE
+}
+
 /// Role account Platform-side (RBAC 8-role, ADR-017).
 enum PlatformRole {
   PLATFORM_ADMIN
@@ -137,28 +144,55 @@ model OperatorProfile {
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
 
+  operatorAccounts   OperatorAccount[]
+  employeeAccounts   EmployeeAccount[]
+  operatorLoginNames OperatorLoginName[]
+
+  @@unique([id, operatorSlug])
+  @@map("operator_profiles")
+}
+
+/// Registry namespace đăng nhập dùng chung cho Owner và Employee trong một Operator.
+/// Trigger DB đồng bộ bảng này; application không tự ghi trực tiếp.
+model OperatorLoginName {
+  operatorId  String                   @map("operator_id")
+  username    String
+  accountType OperatorLoginAccountType @map("account_type")
+  accountId   String                   @map("account_id")
+  createdAt   DateTime                 @default(now()) @map("created_at")
+
+  operator         OperatorProfile   @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   operatorAccounts OperatorAccount[]
   employeeAccounts EmployeeAccount[]
 
-  @@map("operator_profiles")
+  @@id([operatorId, username])
+  @@unique([accountType, accountId])
+  @@map("operator_login_names")
 }
 
 // ──────────────── Operator-side identity (custom, Account-separate) ────────────────
 /// Login Operator owner: `{operatorSlug}/{username}` + password (closed enrollment).
 model OperatorAccount {
-  id           String        @id @default(uuid())
-  operatorId   String        @map("operator_id")
-  operatorSlug String        @map("operator_slug")
-  username     String
-  passwordHash String        @map("password_hash")
-  role         OperatorRole  @default(OPERATOR_OWNER)
-  status       AccountStatus @default(ACTIVE)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                         String        @id @default(uuid())
+  operatorId                 String        @map("operator_id")
+  operatorSlug               String        @map("operator_slug")
+  username                   String
+  contactEmail               String?       @map("contact_email")
+  passwordHash               String        @map("password_hash")
+  authEpoch                  Int           @default(0) @map("auth_epoch")
+  version                    Int           @default(0)
+  credentialDeliveryPending  Boolean       @default(false) @map("credential_delivery_pending")
+  passwordChangeRequired     Boolean       @default(false) @map("password_change_required")
+  temporaryPasswordExpiresAt DateTime?     @map("temporary_password_expires_at")
+  role                       OperatorRole  @default(OPERATOR_OWNER)
+  status                     AccountStatus @default(ACTIVE)
+  createdAt                  DateTime      @default(now()) @map("created_at")
+  updatedAt                  DateTime      @updatedAt @map("updated_at")
 
   // RESTRICT, không CASCADE (TASK-IAM-003): hành động cascade của FK chạy với quyền owner và BỎ QUA
   // RLS (kể cả FORCE) — xoá/đổi id một operator_profiles sẽ quét luôn account của tenant đó.
-  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  operator  OperatorProfile   @relation(fields: [operatorId, operatorSlug], references: [id, operatorSlug], onDelete: Restrict, onUpdate: Restrict)
+  loginName OperatorLoginName @relation(fields: [operatorId, username], references: [operatorId, username], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([operatorSlug, username])
   @@index([operatorId])
@@ -167,18 +201,25 @@ model OperatorAccount {
 
 /// Login Employee trong tenant: username + password (operator-owned).
 model EmployeeAccount {
-  id           String        @id @default(uuid())
-  operatorId   String        @map("operator_id")
-  username     String
-  passwordHash String        @map("password_hash")
-  role         EmployeeRole
-  status       AccountStatus @default(ACTIVE)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id                         String        @id @default(uuid())
+  operatorId                 String        @map("operator_id")
+  username                   String
+  contactEmail               String?       @map("contact_email")
+  passwordHash               String        @map("password_hash")
+  authEpoch                  Int           @default(0) @map("auth_epoch")
+  version                    Int           @default(0)
+  credentialDeliveryPending  Boolean       @default(false) @map("credential_delivery_pending")
+  passwordChangeRequired     Boolean       @default(false) @map("password_change_required")
+  temporaryPasswordExpiresAt DateTime?     @map("temporary_password_expires_at")
+  role                       EmployeeRole
+  status                     AccountStatus @default(ACTIVE)
+  createdAt                  DateTime      @default(now()) @map("created_at")
+  updatedAt                  DateTime      @updatedAt @map("updated_at")
 
   // RESTRICT, không CASCADE (TASK-IAM-003): hành động cascade của FK chạy với quyền owner và BỎ QUA
   // RLS (kể cả FORCE) — xoá/đổi id một operator_profiles sẽ quét luôn account của tenant đó.
-  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  operator  OperatorProfile   @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  loginName OperatorLoginName @relation(fields: [operatorId, username], references: [operatorId, username], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([operatorId, username])
   @@map("employee_accounts")
@@ -237,6 +278,7 @@ model AuthSession {
   /// SHA-256 của token opaque. KHÔNG scrypt: token là random 32-byte (entropy đã
   /// đầy, không cần làm chậm brute-force), và mỗi lần refresh phải tra O(1).
   refreshTokenHash String               @unique @map("refresh_token_hash")
+  authEpoch        Int                  @default(0) @map("auth_epoch")
   issuedAt         DateTime             @default(now()) @map("issued_at")
   expiresAt        DateTime             @map("expires_at")
   lastUsedAt       DateTime?            @map("last_used_at")

@@ -16,6 +16,7 @@ export const RLS_TABLES = [
   "operator_profiles",
   "operator_accounts",
   "employee_accounts",
+  "operator_login_names",
   "auth_sessions",
   "mfa_credentials",
   "mfa_backup_codes",

@@ -13,6 +13,7 @@ import {
   AuthException,
   invalidCredentials,
   mfaRequired,
+  passwordChangeRequired,
   wrongLoginChannel
 } from "./auth.errors";
 import { CredentialService, DUMMY_PASSWORD_HASH } from "./credential.service";
@@ -20,6 +21,10 @@ import { LoginHistoryService } from "./login-history.service";
 import { MfaService, type MfaChallengeResult } from "./mfa.service";
 import { resolveIdentifier } from "./namespace.resolver";
 import { OtpRateLimiter } from "./otp-rate-limiter";
+import {
+  PasswordChangeService,
+  type PasswordChangeChallenge
+} from "./password-change.service";
 import {
   type AccessTokenClaims,
   type AuthScope,
@@ -42,7 +47,7 @@ export type LoginResult = IssuedAccessToken & {
   refreshExpiresInSeconds: number;
 };
 
-export type CredentialLoginResult = LoginResult | MfaChallengeResult;
+export type CredentialLoginResult = LoginResult | MfaChallengeResult | PasswordChangeChallenge;
 export type MfaLoginResult = LoginResult & { backupCodes?: string[] };
 
 /** Passenger re-auth bằng email OTP; account mật khẩu dùng password hoặc MFA đã enrollment. */
@@ -53,18 +58,23 @@ type SessionClaims = Omit<AccessTokenClaims, "sub" | "sid">;
 type CredentialAccount = {
   id: string;
   passwordHash: string;
+  authEpoch: number;
   role: string;
   status: string;
   /** Bảng nguồn — owner và employee cùng scope `operator` nhưng KHÁC subject (Q2). */
   subjectType: SubjectType;
   operatorId?: string;
   operatorSlug?: string;
+  credentialDeliveryPending: boolean;
+  passwordChangeRequired: boolean;
+  temporaryPasswordExpiresAt?: Date | null;
 };
 
 /** Chủ thể của một phiên, đọc lại từ DB — role/trạng thái có thể đã đổi kể từ lúc login. */
 type SessionOwner = {
   claims: SessionClaims;
   active: boolean;
+  authEpoch: number;
   email?: string;
   passwordHash?: string;
 };
@@ -82,7 +92,8 @@ export class AuthService {
     private readonly otpRateLimiter: OtpRateLimiter,
     private readonly loginHistory: LoginHistoryService,
     private readonly sessions: SessionService,
-    private readonly mfa: MfaService
+    private readonly mfa: MfaService,
+    private readonly passwordChanges: PasswordChangeService
   ) {}
 
   // ── Passenger (Better Auth: email-OTP) ──
@@ -156,6 +167,25 @@ export class AuthService {
 
     await this.verifyOrThrow(password, account, "operator", ctx, !isActive(operator.status));
 
+    // Mật khẩu tạm chỉ chứng minh quyền đổi mật khẩu. Chưa tạo session, chưa cấp token và chưa
+    // lộ secret MFA; sau khi đổi thành công người dùng phải đăng nhập lại từ đầu (IAM-005 Q4).
+    if (account.passwordChangeRequired) {
+      if (
+        !account.temporaryPasswordExpiresAt ||
+        account.temporaryPasswordExpiresAt.getTime() <= Date.now()
+      ) {
+        throw passwordChangeRequired(
+          "Mật khẩu tạm đã hết hạn. Vui lòng liên hệ người cấp tài khoản để đặt lại."
+        );
+      }
+      return this.passwordChanges.begin({
+        subjectType: account.subjectType as Extract<SubjectType, "OPERATOR" | "EMPLOYEE">,
+        subjectId: account.id,
+        operatorId: account.operatorId!,
+        authEpoch: account.authEpoch
+      });
+    }
+
     if (requiresMfa(account.role)) {
       return this.mfa.begin(
         {
@@ -188,9 +218,15 @@ export class AuthService {
       ? {
           id: row.id,
           passwordHash: row.passwordHash,
+          authEpoch: 0,
           role: String(row.role),
           status: String(row.status),
-          subjectType: SubjectType.PLATFORM
+          subjectType: SubjectType.PLATFORM,
+          // Provisioning Platform employee được defer khỏi IAM-005; account seed hiện hữu không
+          // tham gia luồng mật khẩu tạm của Operator/Employee.
+          credentialDeliveryPending: false,
+          passwordChangeRequired: false,
+          temporaryPasswordExpiresAt: null
         }
       : null;
 
@@ -238,10 +274,12 @@ export class AuthService {
         type: verified.subjectType,
         id: verified.subjectId,
         operatorId: verified.operatorId,
+        authEpoch: owner.authEpoch,
         mfaVerified: true
       },
       { ...owner.claims, mfa: true },
-      ctx
+      ctx,
+      (session) => this.assertCredentialSessionStillValid(session, owner.claims.role, owner.passwordHash)
     );
     await this.loginHistory.record({
       scope: owner.claims.scope,
@@ -300,14 +338,14 @@ export class AuthService {
     let claims: SessionClaims | undefined;
     const { session, refreshToken: next } = await this.sessions.rotate(refreshToken, ctx, async (current) => {
       await this.otpRateLimiter.assertCanRotateFamily(current.familyId);
-      // Đọc lại chủ thể TRƯỚC khi commit rotate: role mới nhất vào token mới, và account bị khoá /
-      // tenant bị suspend thì dừng ở đây — chưa có luồng khoá account (IAM-005) nào gọi revoke cả.
+      // Đọc lại chủ thể TRƯỚC khi commit rotate: account bị khoá, tenant suspend hoặc auth_epoch
+      // đã đổi đều dừng; session cũ không được nhận role/credential mới qua refresh.
       // Làm sau commit thì một lỗi tạm thời ở bước này (500/503) đã tiêu mất token cũ: client gửi lại
       // token cũ và bị coi là reuse.
       const owner = await this.loadSessionOwner(current);
-      if (!owner?.active) {
+      if (!owner?.active || owner.authEpoch !== current.authEpoch) {
         await this.sessions.revokeFamily(current.familyId, SessionRevokeReason.ACCOUNT_LOCKED);
-        throw owner ? accountLocked() : sessionExpired();
+        throw owner?.active ? sessionExpired() : owner ? accountLocked() : sessionExpired();
       }
       const mfaVerified = current.mfaVerifiedAt != null;
       if (requiresMfa(owner.claims.role) && !mfaVerified) {
@@ -326,6 +364,14 @@ export class AuthService {
 
   async logout(sid: string): Promise<void> {
     await this.sessions.logout(sid);
+  }
+
+  async changeRequiredPassword(
+    passwordChangeToken: string,
+    newPassword: string,
+    ctx: RequestContext
+  ): Promise<void> {
+    await this.passwordChanges.changeRequiredPassword(passwordChangeToken, newPassword, ctx);
   }
 
   /** FR-IAM-10 (Q3): chỉ cấp bằng chứng `reauth:{sid}` 5 phút — chưa endpoint nghiệp vụ nào đọc. */
@@ -421,10 +467,35 @@ export class AuthService {
   private async issueSession(
     subject: SessionSubject,
     claims: SessionClaims,
-    ctx: RequestContext
+    ctx: RequestContext,
+    afterCreate?: (session: AuthSession) => Promise<void>
   ): Promise<LoginResult> {
     const { session, refreshToken } = await this.sessions.create(subject, ctx);
+    await afterCreate?.(session);
     return this.mintForSession(session, refreshToken, claims);
+  }
+
+  /**
+   * Đóng race với lock/reset/đổi role: mutation account thu hồi trước + sau DB update, còn login
+   * kiểm lại SAU khi session row đã tạo và TRƯỚC khi token được phát. Nếu login tạo trước update,
+   * lần revoke sau bắt nó; nếu tạo sau lần revoke sau, phép kiểm này thấy state mới và tự revoke.
+   */
+  private async assertCredentialSessionStillValid(
+    session: AuthSession,
+    expectedRole: string,
+    expectedPasswordHash: string | undefined
+  ): Promise<void> {
+    const current = await this.loadSessionOwner(session);
+    if (
+      current?.active &&
+      current.authEpoch === session.authEpoch &&
+      current.claims.role === expectedRole &&
+      current.passwordHash === expectedPasswordHash
+    ) {
+      return;
+    }
+    await this.sessions.revokeFamily(session.familyId, SessionRevokeReason.ACCOUNT_LOCKED);
+    throw accountLocked();
   }
 
   private async mintForSession(
@@ -463,7 +534,7 @@ export class AuthService {
       case SubjectType.PASSENGER: {
         const user = await this.prisma.user.findUnique({ where: { id } });
         return user
-          ? { claims: { scope: "passenger", role: PASSENGER_ROLE }, active: true, email: user.email }
+          ? { claims: { scope: "passenger", role: PASSENGER_ROLE }, active: true, authEpoch: 0, email: user.email }
           : null;
       }
       case SubjectType.OPERATOR: {
@@ -482,7 +553,8 @@ export class AuthService {
                 operatorId: account.operatorId,
                 operatorSlug: account.operator.operatorSlug
               },
-              active: isActive(String(account.status)) && isActive(String(account.operator.status)),
+              active: !account.credentialDeliveryPending && !account.passwordChangeRequired && isActive(String(account.status)) && isActive(String(account.operator.status)),
+              authEpoch: account.authEpoch,
               passwordHash: account.passwordHash
             }
           : null;
@@ -502,7 +574,8 @@ export class AuthService {
                 operatorId: account.operatorId,
                 operatorSlug: account.operator.operatorSlug
               },
-              active: isActive(String(account.status)) && isActive(String(account.operator.status)),
+              active: !account.credentialDeliveryPending && !account.passwordChangeRequired && isActive(String(account.status)) && isActive(String(account.operator.status)),
+              authEpoch: account.authEpoch,
               passwordHash: account.passwordHash
             }
           : null;
@@ -513,6 +586,7 @@ export class AuthService {
           ? {
               claims: { scope: "platform", role: String(account.role) },
               active: isActive(String(account.status)),
+              authEpoch: 0,
               passwordHash: account.passwordHash
             }
           : null;
@@ -575,19 +649,21 @@ export class AuthService {
         where: { operatorId_username: { operatorId, username } }
       })
     }));
-    // `operator_slug` trên operator_accounts là bản sao denormalized: nếu nó lệch với
-    // operator_profiles (slug đổi tên ở IAM-005, sửa tay, tenant xoá rồi tạo lại) thì tra theo slug
-    // sẽ trả account của TENANT KHÁC — qua được cả check SUSPENDED lẫn claim tenant. Bắt buộc
-    // đối chiếu operatorId đã resolve, giống nhánh employee bên dưới.
+    // `operator_slug` trên operator_accounts là bản sao denormalized. IAM-005 giữ slug immutable
+    // và thêm FK kép, nhưng vẫn đối chiếu operatorId ở application boundary để defense-in-depth.
     if (owner && owner.operatorId === operatorId) {
       return {
         id: owner.id,
         passwordHash: owner.passwordHash,
+        authEpoch: owner.authEpoch,
         role: String(owner.role),
         status: String(owner.status),
         subjectType: SubjectType.OPERATOR,
         operatorId: owner.operatorId,
-        operatorSlug: owner.operatorSlug
+        operatorSlug: owner.operatorSlug,
+        credentialDeliveryPending: owner.credentialDeliveryPending,
+        passwordChangeRequired: owner.passwordChangeRequired,
+        temporaryPasswordExpiresAt: owner.temporaryPasswordExpiresAt
       };
     }
 
@@ -595,11 +671,15 @@ export class AuthService {
       return {
         id: employee.id,
         passwordHash: employee.passwordHash,
+        authEpoch: employee.authEpoch,
         role: String(employee.role),
         status: String(employee.status),
         subjectType: SubjectType.EMPLOYEE,
         operatorId: employee.operatorId,
-        operatorSlug
+        operatorSlug,
+        credentialDeliveryPending: employee.credentialDeliveryPending,
+        passwordChangeRequired: employee.passwordChangeRequired,
+        temporaryPasswordExpiresAt: employee.temporaryPasswordExpiresAt
       };
     }
     return null;
@@ -644,7 +724,7 @@ export class AuthService {
       });
       throw invalidCredentials();
     }
-    if (!isActive(account.status) || tenantInactive) {
+    if (!isActive(account.status) || account.credentialDeliveryPending || tenantInactive) {
       await this.loginHistory.record({
         scope,
         result: "failure",
@@ -666,9 +746,10 @@ export class AuthService {
     ctx: RequestContext
   ): Promise<LoginResult> {
     const result = await this.issueSession(
-      { type: account.subjectType, id: account.id, operatorId: account.operatorId },
+      { type: account.subjectType, id: account.id, operatorId: account.operatorId, authEpoch: account.authEpoch },
       { scope, role: account.role, operatorId: account.operatorId, operatorSlug },
-      ctx
+      ctx,
+      (session) => this.assertCredentialSessionStillValid(session, account.role, account.passwordHash)
     );
     await this.loginHistory.record({
       scope,

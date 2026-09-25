@@ -11,6 +11,7 @@ import 'package:api_client_dart/src/auth/bearer_auth.dart';
 import 'package:api_client_dart/src/auth/oauth.dart';
 import 'package:api_client_dart/src/api/auth_api.dart';
 import 'package:api_client_dart/src/api/health_api.dart';
+import 'package:api_client_dart/src/api/operator_employees_api.dart';
 
 class ApiClientDart {
   static const String basePath = r'http://localhost';
@@ -116,5 +117,11 @@ class ApiClientDart {
   /// by doing that all interceptors will not be executed
   HealthApi getHealthApi() {
     return HealthApi(dio, serializers);
+  }
+
+  /// Get OperatorEmployeesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  OperatorEmployeesApi getOperatorEmployeesApi() {
+    return OperatorEmployeesApi(dio, serializers);
   }
 }

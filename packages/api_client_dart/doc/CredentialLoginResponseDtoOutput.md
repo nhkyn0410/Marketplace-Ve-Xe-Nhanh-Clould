@@ -20,6 +20,9 @@ Name | Type | Description | Notes
 **enrollmentRequired** | **bool** |  | 
 **challengeExpiresIn** | **int** |  | 
 **otpAuthUri** | **String** |  | [optional] 
+**passwordChangeRequired** | **bool** |  | 
+**passwordChangeToken** | **String** |  | 
+**passwordChangeExpiresIn** | **int** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
