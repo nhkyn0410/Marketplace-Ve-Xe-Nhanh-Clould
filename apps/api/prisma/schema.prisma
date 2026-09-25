@@ -148,6 +148,9 @@ model OperatorProfile {
   employeeAccounts   EmployeeAccount[]
   operatorLoginNames OperatorLoginName[]
   seatMaps           SeatMap[]
+  stopPoints         StopPoint[]
+  stopPointProposals StopPointProposal[]
+  routes             Route[]
   vehicles           Vehicle[]
 
   @@unique([id, operatorSlug])
@@ -379,7 +382,9 @@ model Ward {
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
   province   Province           @relation(fields: [provinceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
-  stopPoints StopPointCatalog[]
+  stopPoints         StopPointCatalog[]
+  privateStopPoints  StopPoint[]
+  stopPointProposals StopPointProposal[]
 
   // Đích của FK ghép từ stop point: DB tự chặn phường không thuộc tỉnh (UC-24 A2).
   @@unique([id, provinceId])
@@ -403,7 +408,9 @@ model StopPointCatalog {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
-  ward Ward @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
+  ward       Ward                @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
+  routeStops RouteStop[]
+  proposals  StopPointProposal[]
 
   @@index([provinceId, status])
   @@index([wardId])
@@ -530,4 +537,145 @@ model VehicleAmenity {
 
   @@id([vehicleId, amenityId])
   @@map("vehicle_amenities")
+}
+
+// ════════════════════════════ Transport — Route & StopPoint (TASK-TRN-002) ════════════════════════════
+// Operator-owned + RLS (migration `add_route`). Đề xuất StopPoint: RLS chỉ cho tenant tạo/ghi `PENDING`
+// và sửa bản `REJECTED` — Operator không tự duyệt được; Admin (scope platform) duyệt ở ADM-001.
+
+/// Trạng thái điểm đón/trả riêng của nhà xe; `INACTIVE` không gắn mới vào route.
+enum StopPointStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// Trạng thái đề xuất đưa điểm vào catalog chuẩn (Admin duyệt ở ADM-001).
+enum StopPointProposalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+/// Trạng thái route; `INACTIVE` không dùng để tạo chuyến mới (TRN-003).
+enum RouteStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// Vai trò điểm trong route — suy ra từ vị trí (đầu / giữa / cuối).
+enum RouteStopRole {
+  ORIGIN
+  INTERMEDIATE
+  DESTINATION
+}
+
+/// Nguồn số liệu khoảng cách/thời gian: Goong thật hay ước lượng đường chim bay (dev, Q8).
+enum RoutingMetricsSource {
+  GOONG
+  ESTIMATE
+}
+
+/// Điểm đón/trả riêng của một nhà xe — dùng ngay trong route của tenant (Q1).
+model StopPoint {
+  id          String          @id @default(uuid())
+  operatorId  String          @map("operator_id")
+  name        String
+  type        StopPointType
+  address     String
+  provinceId  String          @map("province_id")
+  wardId      String          @map("ward_id")
+  latitude    Float
+  longitude   Float
+  description String?
+  status      StopPointStatus @default(ACTIVE)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  operator   OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  ward       Ward            @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
+  routeStops RouteStop[]
+
+  @@unique([operatorId, name])
+  @@unique([id, operatorId])
+  @@index([operatorId, status])
+  @@map("stop_points")
+}
+
+/// Đề xuất của nhà xe đưa một điểm vào catalog chuẩn (FR-OPS-05, UC-13 bước 7–8).
+model StopPointProposal {
+  id                 String                  @id @default(uuid())
+  operatorId         String                  @map("operator_id")
+  name               String
+  type               StopPointType
+  address            String
+  provinceId         String                  @map("province_id")
+  wardId             String                  @map("ward_id")
+  latitude           Float
+  longitude          Float
+  description        String?
+  status             StopPointProposalStatus @default(PENDING)
+  rejectionReason    String?                 @map("rejection_reason")
+  /// Điểm catalog Admin tạo/link khi duyệt (ADM-001).
+  catalogStopPointId String?                 @map("catalog_stop_point_id")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+
+  operator         OperatorProfile   @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  ward             Ward              @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
+  catalogStopPoint StopPointCatalog? @relation(fields: [catalogStopPointId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([operatorId, status])
+  @@index([status])
+  @@map("stop_point_proposals")
+}
+
+/// Tuyến của nhà xe (FR-OPS-04); tổng khoảng cách/thời gian = tổng các chặng đã lưu.
+model Route {
+  id                   String               @id @default(uuid())
+  operatorId           String               @map("operator_id")
+  name                 String
+  status               RouteStatus          @default(ACTIVE)
+  note                 String?
+  totalDistanceMeters  Int                  @map("total_distance_meters")
+  totalDurationSeconds Int                  @map("total_duration_seconds")
+  metricsSource        RoutingMetricsSource @map("metrics_source")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+
+  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  stops    RouteStop[]
+
+  @@unique([operatorId, name])
+  @@unique([id, operatorId])
+  @@index([operatorId, status])
+  @@map("routes")
+}
+
+/// Một điểm theo thứ tự trong route: tham chiếu catalog HOẶC điểm riêng (CHECK trong migration).
+model RouteStop {
+  id                          String        @id @default(uuid())
+  operatorId                  String        @map("operator_id")
+  routeId                     String        @map("route_id")
+  sequence                    Int
+  role                        RouteStopRole
+  catalogStopPointId          String?       @map("catalog_stop_point_id")
+  stopPointId                 String?       @map("stop_point_id")
+  note                        String?
+  /// Toạ độ đã dùng để tính số liệu chặng — so với toạ độ hiện tại của điểm để biết khi nào phải tính lại.
+  latitude                    Float
+  longitude                   Float
+  /// Từ điểm liền trước; điểm đầu để trống (CHECK trong migration).
+  distanceMetersFromPrevious  Int?          @map("distance_meters_from_previous")
+  durationSecondsFromPrevious Int?          @map("duration_seconds_from_previous")
+
+  route            Route             @relation(fields: [routeId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  catalogStopPoint StopPointCatalog? @relation(fields: [catalogStopPointId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  stopPoint        StopPoint?        @relation(fields: [stopPointId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([routeId, sequence])
+  @@unique([routeId, catalogStopPointId])
+  @@unique([routeId, stopPointId])
+  @@index([catalogStopPointId])
+  @@index([stopPointId])
+  @@map("route_stops")
 }

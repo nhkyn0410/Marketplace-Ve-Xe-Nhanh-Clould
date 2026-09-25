@@ -79,6 +79,20 @@ describe("parseAppConfig", () => {
     ).toThrow(/MFA_ENCRYPTION_KEY/);
   });
 
+  it("requires GOONG_API_KEY in production but not in development (TASK-TRN-002 Q8)", () => {
+    const production = {
+      NODE_ENV: "production",
+      BETTER_AUTH_SECRET: "test-secret",
+      BETTER_AUTH_URL: "https://api.example.com",
+      JWT_ACCESS_PRIVATE_KEY: "test-key",
+      MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
+      RESEND_API_KEY: "test-resend-key",
+    };
+    expect(() => parseAppConfig(production)).toThrow(/GOONG_API_KEY/);
+    expect(parseAppConfig({ ...production, GOONG_API_KEY: "k" }).GOONG_API_KEY).toBe("k");
+    expect(parseAppConfig({}).GOONG_API_KEY).toBeUndefined();
+  });
+
   it("treats empty / whitespace strings as unset", () => {
     const config = parseAppConfig({ DATABASE_URL: "   ", PORT: "", SENTRY_DSN: "" });
 

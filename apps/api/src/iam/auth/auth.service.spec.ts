@@ -1025,7 +1025,8 @@ function setupAuthController() {
     BETTER_AUTH_URL: "https://api.example.com",
     JWT_ACCESS_PRIVATE_KEY: "test-key",
     MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
-    RESEND_API_KEY: "test-resend-key"
+    RESEND_API_KEY: "test-resend-key",
+    GOONG_API_KEY: "test-goong-key"
   });
 
   return { controller: new AuthController(authService, config), operatorLogin };

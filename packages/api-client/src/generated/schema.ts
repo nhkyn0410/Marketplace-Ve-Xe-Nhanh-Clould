@@ -500,6 +500,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/operator/stop-points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StopPointController_list"];
+        put?: never;
+        post: operations["StopPointController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/stop-points/{stopPointId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StopPointController_get"];
+        put: operations["StopPointController_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/stop-point-proposals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StopPointProposalController_list"];
+        put?: never;
+        post: operations["StopPointProposalController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/stop-point-proposals/{proposalId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["StopPointProposalController_resubmit"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/routes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RouteController_list"];
+        put?: never;
+        post: operations["RouteController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/routes/{routeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RouteController_get"];
+        put: operations["RouteController_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -878,6 +974,188 @@ export interface components {
                 column: number;
                 /** @enum {string} */
                 type: "SEAT" | "BED";
+            }[];
+        };
+        OperatorStopPointListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+                address: string;
+                /** Format: uuid */
+                provinceId: string;
+                /** Format: uuid */
+                wardId: string;
+                latitude: number;
+                longitude: number;
+                description: string | null;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+                /** @enum {string} */
+                status: "ACTIVE" | "INACTIVE";
+            }[];
+            nextCursor: string | null;
+        };
+        OperatorStopPointResponseDto_Output: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+            address: string;
+            /** Format: uuid */
+            provinceId: string;
+            /** Format: uuid */
+            wardId: string;
+            latitude: number;
+            longitude: number;
+            description: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "INACTIVE";
+        };
+        OperatorStopPointInputDto: {
+            name: string;
+            /** @enum {string} */
+            type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+            address: string;
+            /** Format: uuid */
+            provinceId: string;
+            /** Format: uuid */
+            wardId: string;
+            latitude: number;
+            longitude: number;
+            description: string | null;
+            /** @enum {string} */
+            status: "ACTIVE" | "INACTIVE";
+        };
+        StopPointProposalListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+                address: string;
+                /** Format: uuid */
+                provinceId: string;
+                /** Format: uuid */
+                wardId: string;
+                latitude: number;
+                longitude: number;
+                description: string | null;
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+                /** @enum {string} */
+                status: "PENDING" | "APPROVED" | "REJECTED";
+                rejectionReason: string | null;
+                catalogStopPointId: string | null;
+            }[];
+            nextCursor: string | null;
+        };
+        StopPointProposalInputDto: {
+            name: string;
+            /** @enum {string} */
+            type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+            address: string;
+            /** Format: uuid */
+            provinceId: string;
+            /** Format: uuid */
+            wardId: string;
+            latitude: number;
+            longitude: number;
+            description: string | null;
+        };
+        StopPointProposalResponseDto_Output: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+            address: string;
+            /** Format: uuid */
+            provinceId: string;
+            /** Format: uuid */
+            wardId: string;
+            latitude: number;
+            longitude: number;
+            description: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED";
+            rejectionReason: string | null;
+            catalogStopPointId: string | null;
+        };
+        RouteListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                status: "ACTIVE" | "INACTIVE";
+                totalDistanceMeters: number;
+                totalDurationSeconds: number;
+                /** @enum {string} */
+                metricsSource: "GOONG" | "ESTIMATE";
+                /** Format: date-time */
+                createdAt: string;
+                /** Format: date-time */
+                updatedAt: string;
+                stopCount: number;
+            }[];
+            nextCursor: string | null;
+        };
+        RouteResponseDto_Output: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "INACTIVE";
+            totalDistanceMeters: number;
+            totalDurationSeconds: number;
+            /** @enum {string} */
+            metricsSource: "GOONG" | "ESTIMATE";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            note: string | null;
+            stops: {
+                sequence: number;
+                /** @enum {string} */
+                role: "ORIGIN" | "INTERMEDIATE" | "DESTINATION";
+                catalogStopPointId: string | null;
+                stopPointId: string | null;
+                name: string;
+                address: string;
+                latitude: number;
+                longitude: number;
+                note: string | null;
+                distanceMetersFromPrevious: number | null;
+                durationSecondsFromPrevious: number | null;
+            }[];
+        };
+        RouteInputDto: {
+            name: string;
+            /** @enum {string} */
+            status: "ACTIVE" | "INACTIVE";
+            note: string | null;
+            stops: {
+                catalogStopPointId: string | null;
+                stopPointId: string | null;
+                note: string | null;
             }[];
         };
     };
@@ -2497,6 +2775,713 @@ export interface operations {
             };
             /** @description `SEAT_MAP_NAME_CONFLICT`. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointController_list: {
+        parameters: {
+            query?: {
+                status?: "ACTIVE" | "INACTIVE";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Điểm riêng của nhà xe. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorStopPointListResponseDto_Output"];
+                };
+            };
+            /** @description Query không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorStopPointInputDto"];
+            };
+        };
+        responses: {
+            /** @description Điểm riêng đã tạo. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorStopPointResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_NAME_CONFLICT`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `CATALOG_ITEM_UNAVAILABLE` (tỉnh/phường). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stopPointId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Chi tiết điểm riêng. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorStopPointResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                stopPointId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperatorStopPointInputDto"];
+            };
+        };
+        responses: {
+            /** @description Điểm riêng sau khi thay. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OperatorStopPointResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_NAME_CONFLICT`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `CATALOG_ITEM_UNAVAILABLE` (tỉnh/phường). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointProposalController_list: {
+        parameters: {
+            query?: {
+                status?: "PENDING" | "APPROVED" | "REJECTED";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Đề xuất của nhà xe. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StopPointProposalListResponseDto_Output"];
+                };
+            };
+            /** @description Query không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointProposalController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StopPointProposalInputDto"];
+            };
+        };
+        responses: {
+            /** @description Đề xuất đã gửi (PENDING). */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StopPointProposalResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `CATALOG_ITEM_UNAVAILABLE` (tỉnh/phường). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    StopPointProposalController_resubmit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                proposalId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StopPointProposalInputDto"];
+            };
+        };
+        responses: {
+            /** @description Đề xuất đã gửi lại (PENDING). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StopPointProposalResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_PROPOSAL_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_PROPOSAL_STATE_INVALID` (không phải REJECTED). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `CATALOG_ITEM_UNAVAILABLE` (tỉnh/phường). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    RouteController_list: {
+        parameters: {
+            query?: {
+                status?: "ACTIVE" | "INACTIVE";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Route của nhà xe (không kèm điểm). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteListResponseDto_Output"];
+                };
+            };
+            /** @description Query không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    RouteController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteInputDto"];
+            };
+        };
+        responses: {
+            /** @description Route đã tạo. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ (dưới 2 điểm, điểm lặp...). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTE_NAME_CONFLICT`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_UNAVAILABLE`. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTING_PROVIDER_UNAVAILABLE` — không lưu gì. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    RouteController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                routeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Chi tiết route kèm điểm dừng. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTE_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    RouteController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                routeId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RouteInputDto"];
+            };
+        };
+        responses: {
+            /** @description Route sau khi thay. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RouteResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTE_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTE_NAME_CONFLICT`. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `STOP_POINT_UNAVAILABLE`. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `ROUTING_PROVIDER_UNAVAILABLE` — không đổi gì. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

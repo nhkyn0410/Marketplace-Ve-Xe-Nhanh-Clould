@@ -8,7 +8,8 @@ import type {
   SeatMapListResponse,
   SeatMapResponse,
 } from "./dto/seat-map.dto";
-import { requireTenant, seatMapNameConflict, seatMapNotFound } from "./vehicle.errors";
+import { requireTenant } from "../iam/role/require-tenant";
+import { seatMapNameConflict, seatMapNotFound } from "./vehicle.errors";
 
 const SUMMARY_SELECT = { id: true, name: true, seatCount: true, createdAt: true, updatedAt: true } as const;
 const SEAT_SELECT = { code: true, deck: true, row: true, column: true, type: true } as const;

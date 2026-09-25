@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { platformScope, tenantScope } from "../database/db-scope";
 import { SeatMapInputSchema } from "./dto/seat-map.dto";
 import { PlateNumberSchema, VehicleInputSchema } from "./dto/vehicle.dto";
-import { requireTenant } from "./vehicle.errors";
+import { requireTenant } from "../iam/role/require-tenant";
 
 describe("requireTenant — chỉ grant phạm vi tenant", () => {
   const operatorId = randomUUID();

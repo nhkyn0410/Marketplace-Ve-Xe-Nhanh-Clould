@@ -10,6 +10,8 @@ import { DatabaseModule } from "./database/database.module";
 import { MongoAuditModule } from "./database/mongo-audit.module";
 import { IamModule } from "./iam/iam.module";
 import { QueueModule } from "./queue/queue.module";
+import { RouteModule } from "./route/route.module";
+import { StopPointModule } from "./stop-point/stop-point.module";
 import { VehicleModule } from "./vehicle/vehicle.module";
 
 @Module({
@@ -22,7 +24,9 @@ import { VehicleModule } from "./vehicle/vehicle.module";
     QueueModule,
     IamModule,
     CatalogModule,
-    VehicleModule
+    VehicleModule,
+    StopPointModule,
+    RouteModule
   ],
   controllers: [AppController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor }]

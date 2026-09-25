@@ -93,10 +93,21 @@ Class | Method | HTTP request | Description
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerList**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerlist) | **GET** /v1/operator/employees | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerResetPassword**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerresetpassword) | **POST** /v1/operator/employees/{employeeId}/password-reset | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerUpdate**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerupdate) | **PATCH** /v1/operator/employees/{employeeId} | 
+[*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerCreate**](doc/OperatorRoutesApi.md#routecontrollercreate) | **POST** /v1/operator/routes |
+[*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerGet**](doc/OperatorRoutesApi.md#routecontrollerget) | **GET** /v1/operator/routes/{routeId} |
+[*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerList**](doc/OperatorRoutesApi.md#routecontrollerlist) | **GET** /v1/operator/routes |
+[*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerUpdate**](doc/OperatorRoutesApi.md#routecontrollerupdate) | **PUT** /v1/operator/routes/{routeId} |
 [*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerCreate**](doc/OperatorSeatMapsApi.md#seatmapcontrollercreate) | **POST** /v1/operator/seat-maps | 
 [*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerGet**](doc/OperatorSeatMapsApi.md#seatmapcontrollerget) | **GET** /v1/operator/seat-maps/{seatMapId} | 
 [*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerList**](doc/OperatorSeatMapsApi.md#seatmapcontrollerlist) | **GET** /v1/operator/seat-maps | 
 [*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerUpdate**](doc/OperatorSeatMapsApi.md#seatmapcontrollerupdate) | **PUT** /v1/operator/seat-maps/{seatMapId} | 
+[*OperatorStopPointProposalsApi*](doc/OperatorStopPointProposalsApi.md) | [**stopPointProposalControllerCreate**](doc/OperatorStopPointProposalsApi.md#stoppointproposalcontrollercreate) | **POST** /v1/operator/stop-point-proposals |
+[*OperatorStopPointProposalsApi*](doc/OperatorStopPointProposalsApi.md) | [**stopPointProposalControllerList**](doc/OperatorStopPointProposalsApi.md#stoppointproposalcontrollerlist) | **GET** /v1/operator/stop-point-proposals |
+[*OperatorStopPointProposalsApi*](doc/OperatorStopPointProposalsApi.md) | [**stopPointProposalControllerResubmit**](doc/OperatorStopPointProposalsApi.md#stoppointproposalcontrollerresubmit) | **PUT** /v1/operator/stop-point-proposals/{proposalId} |
+[*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerCreate**](doc/OperatorStopPointsApi.md#stoppointcontrollercreate) | **POST** /v1/operator/stop-points |
+[*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerGet**](doc/OperatorStopPointsApi.md#stoppointcontrollerget) | **GET** /v1/operator/stop-points/{stopPointId} |
+[*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerList**](doc/OperatorStopPointsApi.md#stoppointcontrollerlist) | **GET** /v1/operator/stop-points |
+[*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerUpdate**](doc/OperatorStopPointsApi.md#stoppointcontrollerupdate) | **PUT** /v1/operator/stop-points/{stopPointId} |
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerCreate**](doc/OperatorVehiclesApi.md#vehiclecontrollercreate) | **POST** /v1/operator/vehicles | 
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerGet**](doc/OperatorVehiclesApi.md#vehiclecontrollerget) | **GET** /v1/operator/vehicles/{vehicleId} | 
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerList**](doc/OperatorVehiclesApi.md#vehiclecontrollerlist) | **GET** /v1/operator/vehicles | 
@@ -125,6 +136,10 @@ Class | Method | HTTP request | Description
  - [MongoHealthResponseDtoOutput](doc/MongoHealthResponseDtoOutput.md)
  - [OAuthInitDto](doc/OAuthInitDto.md)
  - [OAuthRedirectResponseDtoOutput](doc/OAuthRedirectResponseDtoOutput.md)
+ - [OperatorStopPointInputDto](doc/OperatorStopPointInputDto.md)
+ - [OperatorStopPointListResponseDtoOutput](doc/OperatorStopPointListResponseDtoOutput.md)
+ - [OperatorStopPointListResponseDtoOutputItemsInner](doc/OperatorStopPointListResponseDtoOutputItemsInner.md)
+ - [OperatorStopPointResponseDtoOutput](doc/OperatorStopPointResponseDtoOutput.md)
  - [OtpRequestDto](doc/OtpRequestDto.md)
  - [OtpVerifyDto](doc/OtpVerifyDto.md)
  - [PasswordChangeChallengeResponse](doc/PasswordChangeChallengeResponse.md)
@@ -139,6 +154,12 @@ Class | Method | HTTP request | Description
  - [RedisHealthResponseDtoOutput](doc/RedisHealthResponseDtoOutput.md)
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
  - [RegisterDto](doc/RegisterDto.md)
+ - [RouteInputDto](doc/RouteInputDto.md)
+ - [RouteInputDtoStopsInner](doc/RouteInputDtoStopsInner.md)
+ - [RouteListResponseDtoOutput](doc/RouteListResponseDtoOutput.md)
+ - [RouteListResponseDtoOutputItemsInner](doc/RouteListResponseDtoOutputItemsInner.md)
+ - [RouteResponseDtoOutput](doc/RouteResponseDtoOutput.md)
+ - [RouteResponseDtoOutputStopsInner](doc/RouteResponseDtoOutputStopsInner.md)
  - [SeatMapInputDto](doc/SeatMapInputDto.md)
  - [SeatMapInputDtoLayout](doc/SeatMapInputDtoLayout.md)
  - [SeatMapInputDtoLayoutDecksInner](doc/SeatMapInputDtoLayoutDecksInner.md)
@@ -153,6 +174,10 @@ Class | Method | HTTP request | Description
  - [SessionListResponseDtoOutputItemsInner](doc/SessionListResponseDtoOutputItemsInner.md)
  - [StopPointListResponseDtoOutput](doc/StopPointListResponseDtoOutput.md)
  - [StopPointListResponseDtoOutputItemsInner](doc/StopPointListResponseDtoOutputItemsInner.md)
+ - [StopPointProposalInputDto](doc/StopPointProposalInputDto.md)
+ - [StopPointProposalListResponseDtoOutput](doc/StopPointProposalListResponseDtoOutput.md)
+ - [StopPointProposalListResponseDtoOutputItemsInner](doc/StopPointProposalListResponseDtoOutputItemsInner.md)
+ - [StopPointProposalResponseDtoOutput](doc/StopPointProposalResponseDtoOutput.md)
  - [VehicleInputDto](doc/VehicleInputDto.md)
  - [VehicleListResponseDtoOutput](doc/VehicleListResponseDtoOutput.md)
  - [VehicleListResponseDtoOutputItemsInner](doc/VehicleListResponseDtoOutputItemsInner.md)
@@ -173,6 +198,5 @@ Authentication schemes defined for the API:
 
 
 ## Author
-
 
 

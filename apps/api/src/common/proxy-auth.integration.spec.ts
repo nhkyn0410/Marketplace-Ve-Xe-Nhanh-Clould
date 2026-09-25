@@ -100,7 +100,8 @@ async function createFixture() {
     BETTER_AUTH_URL: "https://api.example.com",
     JWT_ACCESS_PRIVATE_KEY: "test-key",
     MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
-    RESEND_API_KEY: "test-resend-key"
+    RESEND_API_KEY: "test-resend-key",
+    GOONG_API_KEY: "test-goong-key"
   });
   const history = new LoginHistoryService(audit as never);
   const limiter = new OtpRateLimiter(redis as never);

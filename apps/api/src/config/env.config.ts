@@ -150,6 +150,9 @@ export const envSchema = z
       emptyToUndefined,
       z.email().default("no-reply@vexenhanh.com"),
     ),
+    // Goong REST (ADR-027, TASK-TRN-002): tính khoảng cách/thời gian khi cấu hình route. Thiếu ở dev →
+    // ước lượng đường chim bay (Q8); production bắt buộc để số liệu route không phải ước lượng.
+    GOONG_API_KEY: optionalString,
   })
   .superRefine((env, ctx) => {
     // Production fail-fast: secret/key bắt buộc, base URL phải https non-localhost (sec H1/M4).
@@ -162,6 +165,7 @@ export const envSchema = z
       "JWT_ACCESS_PRIVATE_KEY",
       "MFA_ENCRYPTION_KEY",
       "RESEND_API_KEY",
+      "GOONG_API_KEY",
     ] as const) {
       if (!env[key]) {
         ctx.addIssue({

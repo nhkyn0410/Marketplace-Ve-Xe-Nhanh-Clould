@@ -4,13 +4,9 @@ import { CatalogStatus, type VehicleStatus } from "../database/prisma.types";
 import type { Authorization } from "../iam/role/authorization";
 import { isPrismaUniqueConflict } from "../iam/user/account.errors";
 import type { VehicleInput, VehicleListResponse, VehicleResponse } from "./dto/vehicle.dto";
-import {
-  catalogItemUnavailable,
-  requireTenant,
-  seatMapNotFound,
-  vehicleNotFound,
-  vehiclePlateConflict,
-} from "./vehicle.errors";
+import { catalogItemUnavailable } from "../catalog/catalog.errors";
+import { requireTenant } from "../iam/role/require-tenant";
+import { seatMapNotFound, vehicleNotFound, vehiclePlateConflict } from "./vehicle.errors";
 
 const VEHICLE_SELECT = {
   id: true,

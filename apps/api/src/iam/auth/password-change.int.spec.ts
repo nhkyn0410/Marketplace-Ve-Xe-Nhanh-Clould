@@ -126,6 +126,7 @@ describe.skipIf((!databaseUrl || !redisUrl) && !requireInfrastructure)(
         ? newPassword
         : "another-new-password-for-integration";
       expect(await credentials.verify(winningPassword, stored.passwordHash)).toBe(true);
-    });
+      // Nhiều lần scrypt (cố ý chậm): chạy riêng ~3 s nhưng vượt mặc định 5 s khi cả suite DB chạy song song.
+    }, 20_000);
   },
 );

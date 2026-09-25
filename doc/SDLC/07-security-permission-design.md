@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent   |
 | Người duyệt   | Nguyễn Hồng Khanh             |
 | Ngày tạo      | 11/05/2026                    |
-| Ngày cập nhật | 25/09/2026                    |
+| Ngày cập nhật | 26/09/2026                    |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -24,6 +24,7 @@
 | v0.3      | 25/05/2026 | AI Agent       | Cập nhật tham chiếu SRS v1.15 → v1.20; cập nhật số mục DOMAIN-MAP. Không thay đổi nội dung normative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 5 Rework** — bake **ADR-017/019/020 (Khanh re-confirm CRITICAL 01/06/2026)** + ADR-011/018. §5 auth: Better Auth 3-namespace + Hybrid token (JWT 15min + opaque refresh 30d rotation/family) + §5.2 MFA TOTP + §5.3 OAuth Google/FB/Apple PKCE. §6 TenantGuard + Postgres RLS. §8 payout manual confirm + maker-checker (ADR-022). §9 KYC R2 private presigned (ADR-018) + payment PCI SAQ-A (ADR-019) + cross-border PII. §11 webhook HMAC + OAuth/refresh-reuse threat + SQL injection (Prisma). **Đóng SEC-OQ-01/02/04/06** (per ADR-017/018); refine SEC-OQ-05/07; thêm SEC-OQ-08 (OAuth linking). |
 | v0.5      | 25/09/2026 | AI Agent       | **Hiện thực hóa phần Web của ADR-017 qua TASK-OQ-05/TASK-IAM-006:** bỏ defer cookie; chốt cookie host-only, signed double-submit CSRF, strict Origin/CORS allowlist, dual transport tường minh và chống credential ambiguity. Giữ JSON/Bearer cho Mobile; không thay đổi trạng thái Approved. |
+| v0.6      | 26/09/2026 | AI Agent       | §7 thêm dòng Route/StopPoint theo SRS permission matrix (TASK-TRN-002, Khanh duyệt Q6): quyền `route:manage` chỉ Operator Owner trong tenant. Giữ trạng thái Approved, không tự promote. |
 
 ---
 
@@ -146,6 +147,7 @@ RBAC 8-role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / 
 | Payment                  | Có (guest session) | Có          | Không trực tiếp               | Không                  | Giám sát/đối soát      |
 | Cancel/refund request    | Vé / booking đã xác minh, theo policy | Vé của mình | Vé thuộc Operator theo policy | Không                  | Có                     |
 | Vehicle/SeatMap          | Không              | Không       | Có trong tenant               | Xem nếu được phân công | Giám sát/toàn hệ thống |
+| Route/StopPoint riêng/đề xuất | Không         | Không       | Có trong tenant (`route:manage`, Owner) | Xem theo chuyến được phân công (task sau) | Duyệt đề xuất, quản lý catalog (ADM-001) |
 | Check-in                 | Không              | Không       | Xem kết quả                   | Có theo assignment     | Giám sát               |
 | KYC Operator             | Không              | Không       | Hồ sơ của mình                | Không                  | Duyệt/quản lý          |
 | Policy/commission/payout | Không              | Không       | Xem phần liên quan            | Không                  | Cấu hình               |

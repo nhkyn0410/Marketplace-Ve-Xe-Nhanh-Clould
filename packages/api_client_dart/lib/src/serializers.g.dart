@@ -48,6 +48,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(MongoHealthResponseDtoOutputStatusEnum.serializer)
       ..add(OAuthInitDto.serializer)
       ..add(OAuthRedirectResponseDtoOutput.serializer)
+      ..add(OperatorStopPointInputDto.serializer)
+      ..add(OperatorStopPointInputDtoStatusEnum.serializer)
+      ..add(OperatorStopPointInputDtoTypeEnum.serializer)
+      ..add(OperatorStopPointListResponseDtoOutput.serializer)
+      ..add(OperatorStopPointListResponseDtoOutputItemsInner.serializer)
+      ..add(
+          OperatorStopPointListResponseDtoOutputItemsInnerStatusEnum.serializer)
+      ..add(OperatorStopPointListResponseDtoOutputItemsInnerTypeEnum.serializer)
+      ..add(OperatorStopPointResponseDtoOutput.serializer)
+      ..add(OperatorStopPointResponseDtoOutputStatusEnum.serializer)
+      ..add(OperatorStopPointResponseDtoOutputTypeEnum.serializer)
       ..add(OtpRequestDto.serializer)
       ..add(OtpVerifyDto.serializer)
       ..add(PasswordChangeChallengeResponse.serializer)
@@ -69,6 +80,18 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RedisHealthResponseDtoOutputStatusEnum.serializer)
       ..add(RefreshTokenDto.serializer)
       ..add(RegisterDto.serializer)
+      ..add(RouteInputDto.serializer)
+      ..add(RouteInputDtoStatusEnum.serializer)
+      ..add(RouteInputDtoStopsInner.serializer)
+      ..add(RouteListResponseDtoOutput.serializer)
+      ..add(RouteListResponseDtoOutputItemsInner.serializer)
+      ..add(RouteListResponseDtoOutputItemsInnerMetricsSourceEnum.serializer)
+      ..add(RouteListResponseDtoOutputItemsInnerStatusEnum.serializer)
+      ..add(RouteResponseDtoOutput.serializer)
+      ..add(RouteResponseDtoOutputMetricsSourceEnum.serializer)
+      ..add(RouteResponseDtoOutputStatusEnum.serializer)
+      ..add(RouteResponseDtoOutputStopsInner.serializer)
+      ..add(RouteResponseDtoOutputStopsInnerRoleEnum.serializer)
       ..add(SeatMapInputDto.serializer)
       ..add(SeatMapInputDtoLayout.serializer)
       ..add(SeatMapInputDtoLayoutDecksInner.serializer)
@@ -86,6 +109,16 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(StopPointListResponseDtoOutput.serializer)
       ..add(StopPointListResponseDtoOutputItemsInner.serializer)
       ..add(StopPointListResponseDtoOutputItemsInnerTypeEnum.serializer)
+      ..add(StopPointProposalInputDto.serializer)
+      ..add(StopPointProposalInputDtoTypeEnum.serializer)
+      ..add(StopPointProposalListResponseDtoOutput.serializer)
+      ..add(StopPointProposalListResponseDtoOutputItemsInner.serializer)
+      ..add(
+          StopPointProposalListResponseDtoOutputItemsInnerStatusEnum.serializer)
+      ..add(StopPointProposalListResponseDtoOutputItemsInnerTypeEnum.serializer)
+      ..add(StopPointProposalResponseDtoOutput.serializer)
+      ..add(StopPointProposalResponseDtoOutputStatusEnum.serializer)
+      ..add(StopPointProposalResponseDtoOutputTypeEnum.serializer)
       ..add(VehicleInputDto.serializer)
       ..add(VehicleInputDtoStatusEnum.serializer)
       ..add(VehicleListResponseDtoOutput.serializer)
@@ -102,6 +135,11 @@ Serializers _$serializers = (Serializers().toBuilder()
               const [const FullType(EmployeeListResponseDtoOutputItemsInner)]),
           () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(OperatorStopPointListResponseDtoOutputItemsInner)
+          ]),
+          () => ListBuilder<OperatorStopPointListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(ProvinceListResponseDtoOutputItemsInner)]),
           () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>())
@@ -113,6 +151,18 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(QueueHealthResponseDtoOutputQueuesInner)]),
           () => ListBuilder<QueueHealthResponseDtoOutputQueuesInner>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(RouteInputDtoStopsInner)]),
+          () => ListBuilder<RouteInputDtoStopsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(RouteListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<RouteListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(RouteResponseDtoOutputStopsInner)]),
+          () => ListBuilder<RouteResponseDtoOutputStopsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(SeatMapInputDtoLayoutDecksInner)]),
@@ -141,6 +191,11 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(StopPointListResponseDtoOutputItemsInner)]),
           () => ListBuilder<StopPointListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(StopPointProposalListResponseDtoOutputItemsInner)
+          ]),
+          () => ListBuilder<StopPointProposalListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

@@ -34,6 +34,10 @@ import 'package:api_client_dart/src/model/mfa_verify_response_dto_output.dart';
 import 'package:api_client_dart/src/model/mongo_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/o_auth_init_dto.dart';
 import 'package:api_client_dart/src/model/o_auth_redirect_response_dto_output.dart';
+import 'package:api_client_dart/src/model/operator_stop_point_input_dto.dart';
+import 'package:api_client_dart/src/model/operator_stop_point_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/operator_stop_point_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/operator_stop_point_response_dto_output.dart';
 import 'package:api_client_dart/src/model/otp_request_dto.dart';
 import 'package:api_client_dart/src/model/otp_verify_dto.dart';
 import 'package:api_client_dart/src/model/password_change_challenge_response.dart';
@@ -48,6 +52,12 @@ import 'package:api_client_dart/src/model/reauth_dto.dart';
 import 'package:api_client_dart/src/model/redis_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/refresh_token_dto.dart';
 import 'package:api_client_dart/src/model/register_dto.dart';
+import 'package:api_client_dart/src/model/route_input_dto.dart';
+import 'package:api_client_dart/src/model/route_input_dto_stops_inner.dart';
+import 'package:api_client_dart/src/model/route_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/route_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/route_response_dto_output.dart';
+import 'package:api_client_dart/src/model/route_response_dto_output_stops_inner.dart';
 import 'package:api_client_dart/src/model/seat_map_input_dto.dart';
 import 'package:api_client_dart/src/model/seat_map_input_dto_layout.dart';
 import 'package:api_client_dart/src/model/seat_map_input_dto_layout_decks_inner.dart';
@@ -62,6 +72,10 @@ import 'package:api_client_dart/src/model/session_list_response_dto_output.dart'
 import 'package:api_client_dart/src/model/session_list_response_dto_output_items_inner.dart';
 import 'package:api_client_dart/src/model/stop_point_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/stop_point_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/stop_point_proposal_input_dto.dart';
+import 'package:api_client_dart/src/model/stop_point_proposal_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/stop_point_proposal_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/stop_point_proposal_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_input_dto.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output_items_inner.dart';
@@ -94,6 +108,10 @@ part 'serializers.g.dart';
   MongoHealthResponseDtoOutput,
   OAuthInitDto,
   OAuthRedirectResponseDtoOutput,
+  OperatorStopPointInputDto,
+  OperatorStopPointListResponseDtoOutput,
+  OperatorStopPointListResponseDtoOutputItemsInner,
+  OperatorStopPointResponseDtoOutput,
   OtpRequestDto,
   OtpVerifyDto,
   PasswordChangeChallengeResponse,
@@ -108,6 +126,12 @@ part 'serializers.g.dart';
   RedisHealthResponseDtoOutput,
   RefreshTokenDto,
   RegisterDto,
+  RouteInputDto,
+  RouteInputDtoStopsInner,
+  RouteListResponseDtoOutput,
+  RouteListResponseDtoOutputItemsInner,
+  RouteResponseDtoOutput,
+  RouteResponseDtoOutputStopsInner,
   SeatMapInputDto,
   SeatMapInputDtoLayout,
   SeatMapInputDtoLayoutDecksInner,
@@ -122,6 +146,10 @@ part 'serializers.g.dart';
   SessionListResponseDtoOutputItemsInner,
   StopPointListResponseDtoOutput,
   StopPointListResponseDtoOutputItemsInner,
+  StopPointProposalInputDto,
+  StopPointProposalListResponseDtoOutput,
+  StopPointProposalListResponseDtoOutputItemsInner,
+  StopPointProposalResponseDtoOutput,
   VehicleInputDto,
   VehicleListResponseDtoOutput,
   VehicleListResponseDtoOutputItemsInner,
@@ -137,12 +165,24 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(RouteListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<RouteListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SeatMapResponseDtoOutputSeatsInner)]),
         () => ListBuilder<SeatMapResponseDtoOutputSeatsInner>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(RouteInputDtoStopsInner)]),
+        () => ListBuilder<RouteInputDtoStopsInner>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(EmployeeListResponseDtoOutputItemsInner)]),
         () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(StopPointProposalListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<StopPointProposalListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SeatMapResponseDtoOutputLayoutDecksInner)]),
@@ -169,6 +209,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<SeatMapListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(OperatorStopPointListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<OperatorStopPointListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SeatMapInputDtoSeatsInner)]),
         () => ListBuilder<SeatMapInputDtoSeatsInner>(),
       )
@@ -191,6 +235,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(String)]),
         () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(RouteResponseDtoOutputStopsInner)]),
+        () => ListBuilder<RouteResponseDtoOutputStopsInner>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

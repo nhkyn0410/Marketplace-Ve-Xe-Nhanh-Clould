@@ -19,6 +19,12 @@ import { EmployeeAccountController } from "../iam/user/employee-account.controll
 import { EmployeeAccountService } from "../iam/user/employee-account.service";
 import { QueueHealthService } from "../queue/queue-health.service";
 import { RedisHealthService } from "../redis/redis-health.service";
+import { RouteController } from "../route/route.controller";
+import { RouteService } from "../route/route.service";
+import { StopPointProposalController } from "../stop-point/stop-point-proposal.controller";
+import { StopPointProposalService } from "../stop-point/stop-point-proposal.service";
+import { StopPointController } from "../stop-point/stop-point.controller";
+import { StopPointService } from "../stop-point/stop-point.service";
 import { SeatMapController } from "../vehicle/seat-map.controller";
 import { SeatMapService } from "../vehicle/seat-map.service";
 import { VehicleController } from "../vehicle/vehicle.controller";
@@ -35,6 +41,9 @@ import { VehicleService } from "../vehicle/vehicle.service";
     CatalogController,
     VehicleController,
     SeatMapController,
+    StopPointController,
+    StopPointProposalController,
+    RouteController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
@@ -43,6 +52,9 @@ import { VehicleService } from "../vehicle/vehicle.service";
     { provide: CatalogService, useValue: {} },
     { provide: VehicleService, useValue: {} },
     { provide: SeatMapService, useValue: {} },
+    { provide: StopPointService, useValue: {} },
+    { provide: StopPointProposalService, useValue: {} },
+    { provide: RouteService, useValue: {} },
     // Dependency của AccessTokenGuard (logout, re-auth) — Nest dựng guard lúc khởi tạo module.
     { provide: TokenService, useValue: {} },
     { provide: SessionService, useValue: {} },

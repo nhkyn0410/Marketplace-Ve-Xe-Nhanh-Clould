@@ -1,9 +1,32 @@
+import { readdirSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { NestFactory } from "@nestjs/core";
 import { describe, expect, it } from "vitest";
 import { buildOpenApiDocument, configureApiRoutes } from "./openapi";
 import { OpenApiModule } from "./openapi.module";
 
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      return entry.name === "generated" ? [] : sourceFiles(path);
+    }
+    return entry.name.endsWith(".ts") && !entry.name.endsWith(".spec.ts") ? [path] : [];
+  });
+}
+
 describe("OpenAPI generation", () => {
+  it("tên class Zod DTO là duy nhất trong src/ — trùng tên thì schema OpenAPI bị ghi đè im lặng", () => {
+    // Đã xảy ra thật (TRN-002): `StopPointListResponseDto` của catalog công khai và của điểm riêng Operator
+    // trùng tên → client sinh ra mang sai field cho `/catalog/stop-points` mà spec vẫn "hợp lệ".
+    const names = sourceFiles(resolve(__dirname, "..")).flatMap((file) =>
+      [...readFileSync(file, "utf8").matchAll(/export class (\w+) extends createZodDto/g)].map((match) => match[1]!),
+    );
+    const duplicates = names.filter((name, index) => names.indexOf(name) !== index);
+    expect(duplicates).toEqual([]);
+    expect(names.length).toBeGreaterThan(20);
+  });
+
   it("generates an OpenAPI 3.1 contract from Zod DTO metadata", async () => {
     const app = await NestFactory.create(OpenApiModule, { logger: false });
 
@@ -146,11 +169,21 @@ describe("OpenAPI generation", () => {
       expect(schemas?.StopPointListResponseDto_Output?.required).toEqual(
         expect.arrayContaining(["items", "nextCursor"])
       );
+      // Catalog công khai chỉ có field công khai — không lẫn schema điểm riêng của Operator (status, timestamp).
+      const catalogItem = (
+        schemas?.StopPointListResponseDto_Output?.properties?.items as { items?: Schema } | undefined
+      )?.items;
+      expect(Object.keys(catalogItem?.properties ?? {}).sort()).toEqual(
+        ["address", "description", "id", "latitude", "longitude", "name", "provinceId", "type", "wardId"]
+      );
 
-      // TRN-001 (API §7.3): Vehicle/SeatMap — Bearer, requestBody cho POST/PUT, path param khai báo.
+      // TRN-001/TRN-002 (API §7.3): Vehicle/SeatMap/Route/StopPoint — Bearer, requestBody cho POST/PUT,
+      // path param khai báo.
       for (const [collection, param] of [
         ["/v1/operator/vehicles", "vehicleId"],
-        ["/v1/operator/seat-maps", "seatMapId"]
+        ["/v1/operator/seat-maps", "seatMapId"],
+        ["/v1/operator/routes", "routeId"],
+        ["/v1/operator/stop-points", "stopPointId"]
       ] as const) {
         const item = `${collection}/{${param}}`;
         for (const operation of [
@@ -167,6 +200,20 @@ describe("OpenAPI generation", () => {
         const params = (document.paths[item]?.put?.parameters ?? []).map((p) => ("name" in p ? p.name : ""));
         expect(params, `thiếu @ApiParam ${param}`).toContain(param);
       }
+      // Đề xuất StopPoint: không có GET/{id}; PUT chỉ để gửi lại bản bị từ chối.
+      const proposals = "/v1/operator/stop-point-proposals";
+      for (const operation of [
+        document.paths[proposals]?.get,
+        document.paths[proposals]?.post,
+        document.paths[`${proposals}/{proposalId}`]?.put
+      ]) {
+        expect(operation, `thiếu route ${proposals}`).toBeDefined();
+        expect(operation?.security).toEqual([{ bearer: [] }]);
+      }
+      expect(document.paths[proposals]?.post?.requestBody).toBeDefined();
+      expect(document.paths[`${proposals}/{proposalId}`]?.put?.requestBody).toBeDefined();
+      // Route lỗi Goong phải công bố 503 để client xử lý "thử lại sau".
+      expect(document.paths["/v1/operator/routes"]?.post?.responses?.[503]).toBeDefined();
     } finally {
       await app.close();
     }
