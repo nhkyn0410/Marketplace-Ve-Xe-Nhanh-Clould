@@ -74,10 +74,17 @@ Bắt buộc test: **money math** (BIGINT/Decimal), **idempotency** (payment ded
 
 ## Nhật ký sử dụng AI (bắt buộc, không commit)
 
-Mỗi lần sinh/sửa code đáng kể → ghi 1 dòng bằng lệnh, **KHÔNG đọc/mở/sửa tay** file nhật ký:
+Nhật ký 3 tầng, quy tắc đầy đủ: **`doc/AI-JOURNAL.md`**. **KHÔNG đọc/mở/sửa tay** file trong `.ai-journal/` (đã gitignore — ghi bắt buộc, commit thì KHÔNG).
+
+- **Tầng 1 — hook tự ghi** (Claude Code; Codex qua `.codex/hooks.json` khi repo đã trust): file + tên hàm/class, lệnh, MCP, subagent. Sửa code bằng tool sửa file (Write/Edit/`apply_patch`), **không** sed/heredoc.
+- **Mô tả công dụng**: mỗi class / hàm export / method public **mới** có 1 dòng doc comment tiếng Việt ngay trên khai báo (`/** … */` TS, `///` Dart) — nói nó dùng để làm gì, không giải thích code.
+- **Tầng 2 — khai báo** (mỗi lần sinh/sửa code đáng kể; mỗi khi yêu cầu Khanh làm tay ngoài repo):
 
 ```bash
 node .claude/hooks/ai-journal.mjs add "<Mảng kỹ thuật>" "<AI sử dụng>" "<Mục đích>" "<Phần AI sinh>" "" "<Nhận xét>"
+node .claude/hooks/ai-journal.mjs ops "<Hạng mục>" "<Việc cần làm>" "<RB-xx hoặc bỏ trống>"
 ```
 
-Quy tắc đầy đủ: **`doc/AI-JOURNAL.md`**. `.ai-journal/` đã gitignore — ghi bắt buộc, commit thì KHÔNG. "Phần AI sinh" = đường dẫn + phạm vi, **không dán mã nguồn** (trần 300 ký tự/ô). "Phần SV chỉnh" truyền `""` — Khanh tự điền, agent không bịa.
+- "Phần AI sinh" = đường dẫn + phạm vi, **không dán mã nguồn** (trần 300 ký tự/ô). "Phần SV chỉnh" truyền `""` — Khanh tự điền, agent không bịa. Ghi đúng tool + model.
+- Tool **không có hook** (Copilot, Cursor, hoặc Codex khi hook không chạy): cuối phiên chạy `node .claude/hooks/ai-journal.mjs snapshot <tên-tool>`.
+- **Tầng 3 — sổ tay `doc/runbook/`**: thao tác lặp lại (cài package, migration, deploy…) có thẻ hướng dẫn ngắn; thao tác mới → viết thẻ.

@@ -1,69 +1,101 @@
-# AI-JOURNAL.md — nhật ký sử dụng AI (bắt buộc, KHÔNG commit)
+# AI-JOURNAL.md — nhật ký sử dụng AI (bắt buộc, dữ liệu KHÔNG commit)
 
-Quy tắc ghi nhật ký minh bạch phần nào do AI sinh, phần nào SV (Khanh) tự chỉnh. **Mọi agent** (Claude Code / Codex / Copilot / Cursor) đọc file này và tuân thủ.
+Nhật ký ghi lại minh bạch **mọi hoạt động tự động hoá**: AI tạo/sửa file nào trước, hàm/class nào sinh trước, đã chạy lệnh gì, dùng phần mềm bên thứ 3 nào, đã yêu cầu Khanh làm tay việc gì. Mục đích là **học thuật và rèn kỹ năng**: nhật ký **không giải thích code**, chỉ trỏ tới code (tên hàm/class kèm một dòng công dụng) và tới hướng dẫn thao tác. **Mọi agent** (Claude Code / Codex / Copilot / Cursor) đọc file này và tuân thủ.
 
-## 1. Nơi ghi
+## 1. Ba tầng
 
-`.ai-journal/YYYY-MM.md` — 1 file / tháng, đã `.gitignore` (**KHÔNG commit, KHÔNG push**). File quy tắc này thì commit; dữ liệu nhật ký thì không.
+| Tầng | Ai ghi | Ghi gì | Nơi lưu |
+| --- | --- | --- | --- |
+| **1. Dòng thời gian tự động** | Hook (Claude Code, Codex). Agent **không bỏ qua được** | Theo đúng thứ tự: tạo/sửa/xoá file kèm **tên** hàm/class và dòng mô tả; lệnh shell đã che secret; package; MCP; nguồn web; subagent nào làm; file do lệnh sinh ra | `.ai-journal/activity/YYYY-MM.jsonl` |
+| **2. Nhật ký khai báo** | Agent chạy lệnh | `add`: 1 dòng 6 cột cho mỗi lượt sinh code. `ops`: việc AI yêu cầu Khanh làm tay ngoài repo | `.ai-journal/YYYY-MM.md` + JSONL |
+| **3. Sổ tay thao tác** | Agent viết, Khanh duyệt | Mỗi loại thao tác một thẻ ngắn: cài package, migration, deploy… | [`doc/runbook/`](runbook/README.md) (**commit**) |
 
-> ⚠ Vì nằm ngoài git, thư mục này **không có backup**. `git clean -fdx` sẽ xoá sạch — sao lưu ra ngoài repo trước khi chạy lệnh đó.
+Lệnh `report` ghép cả ba tầng thành một file Markdown để đọc hoặc nộp (xem mục 5).
 
-## 2. Khi nào ghi
+`.ai-journal/` đã gitignore: **KHÔNG commit, KHÔNG push**. Thư mục này luôn nằm ở **checkout chính** của repo, kể cả khi phiên chạy trong git worktree, nên xoá worktree không làm mất nhật ký. Mỗi repo trên máy có `.ai-journal/` riêng.
 
-**Mỗi lần AI sinh code đáng kể** — tức mỗi lượt làm việc có tạo/sửa file nguồn (module, service, schema, migration, test, config CI…). Không ghi cho: đọc file, chạy lệnh, trả lời câu hỏi thuần tuý, sửa chính nhật ký.
+> ⚠ Thư mục này nằm ngoài git nên **không có backup**, và `git clean -fdx` sẽ xoá sạch nó. Hãy sao lưu định kỳ, ví dụ `report all --out <thư mục OneDrive>` hoặc chép cả `.ai-journal/`.
 
-## 3. Cách ghi — dùng lệnh, KHÔNG mở file
+## 2. Tầng 1: hook tự ghi những gì
 
-Agent **không đọc, không mở, không sửa tay** file nhật ký. Chỉ chạy:
+| Sự kiện | Ghi |
+| --- | --- |
+| Bạn gửi yêu cầu | Trích ≤ 200 ký tự (đã che secret) và nhánh git. Mỗi yêu cầu mở một "lượt" trong báo cáo |
+| Write / Edit (Claude), `apply_patch` (Codex) | Tạo / sửa / xoá, đường dẫn, số dòng ±, **tên** hàm/class: `+` thêm, `~` sửa bên trong, `-` xoá. Kèm **dòng mô tả** lấy từ doc comment. Với `package.json` / `pubspec.yaml` thì ghi tên dependency |
+| Lệnh Bash / PowerShell | Lệnh (≤ 300 ký tự, **đã che secret, bỏ phần code nhúng** như heredoc / `node -e`), nhóm lệnh, chạy được hay lỗi. **Không lưu output** |
+| MCP, WebFetch / WebSearch | Server + tool + domain; URL tài liệu đã tra (bỏ query string). Không ghi dữ liệu nhập form |
+| Subagent | Subagent nào chạy. Thao tác bên trong tự gắn tên subagent (`agent_type`) |
+| Cuối lượt (`Stop`) | File đổi mà **không** qua tool sửa file (do lệnh sinh ra như migration, `flutter create`, gen client, hoặc bạn sửa tay), gộp theo thư mục |
+
+Nhóm lệnh gồm: cài/gỡ package · sinh khung/code bằng công cụ · CSDL · kiểm tra/build · chạy dịch vụ · git · deploy/phát hành · công cụ/dịch vụ ngoài · thao tác file · khác · chỉ-đọc. Lệnh **chỉ-đọc** (ls, grep, git status…) chỉ được đếm số lượng, không liệt kê trong báo cáo.
+
+Tên hàm/class được lấy bằng heuristic theo dòng và thụt lề cho TS/JS, Dart, Prisma, SQL, nên **có thể sót hoặc sai** ở cú pháp lạ. Đây không phải trình phân tích cú pháp đầy đủ.
+
+## 3. Luật cho agent
+
+1. **KHÔNG đọc, mở, hay sửa tay** bất kỳ file nào trong `.ai-journal/`. Chỉ ghi thêm bằng các lệnh ở mục 4. Ghi sai thì ghi dòng mới đính chính, để Khanh tự dọn. Luật deny `Edit(/.ai-journal/**)` trong `.claude/settings.json` chặn tool sửa file của Claude.
+2. **Sửa code bằng Write / Edit** (hoặc `apply_patch` với Codex). Không dùng sed, heredoc, `Set-Content` để sửa code, vì như thế hook không lấy được tên hàm. Báo cáo sẽ liệt kê riêng những lần sửa bằng shell.
+3. **Mỗi class / hàm export / method public MỚI** phải có **1 dòng doc comment tiếng Việt nói nó dùng để làm gì**, đặt ngay trên khai báo: `/** … */` cho TS/JS, `///` cho Dart. Chỉ nêu công dụng, không giải thích cách code chạy. Đây là quy ước sẵn có của repo; hook lấy dòng này làm mô tả trong nhật ký.
+   - Không bắt buộc với: helper private, method override / vòng đời (`build`, `initState`, `dispose`, `onModuleInit`…), file test, code sinh tự động (`generated/`, `api_client_dart/`, `*.g.dart`). Code cũ cũng không phải bổ sung.
+4. **KHÔNG dán mã nguồn** vào nhật ký. Mọi ô ≤ 300 ký tự.
+5. **KHÔNG bịa** cột "Phần SV chỉnh" và "Nhận xét": Khanh tự chịu trách nhiệm học thuật hai cột này (xem mục 4).
+6. **Ghi đúng tool + model** đang chạy, ví dụ `Claude Code (Opus 5.5)`, `Codex (gpt-5.6-sol)`, không ghi chung chung "AI".
+7. Tầng 2 chỉ do **agent chính** ghi; agent chính nêu tên subagent đã dùng. Tầng 1 tự tách subagent.
+8. **KHÔNG commit `.ai-journal/`**, kể cả khi Khanh yêu cầu commit phần còn lại.
+
+## 4. Lệnh
 
 ```bash
+# Tầng 2 — mỗi lượt sinh/sửa code đáng kể (module, service, schema, migration, test, config CI…)
 node .claude/hooks/ai-journal.mjs add "<Mảng kỹ thuật>" "<AI sử dụng>" "<Mục đích>" "<Phần AI sinh>" "" "<Nhận xét>"
+
+# Tầng 2 — khi yêu cầu Khanh tự làm việc ngoài repo (tạo tài khoản, env trên dashboard, DNS, store…)
+node .claude/hooks/ai-journal.mjs ops "<Hạng mục>" "<Việc cần làm>" "<RB-xx hoặc bỏ trống>"
+
+# Thay đổi không phải code do AI sinh (chỉ sửa doc…) → bỏ qua kiểm tra tầng 2 một lần
+node .claude/hooks/ai-journal.mjs skip "lý do cụ thể"
+
+# Tool KHÔNG có hook (Copilot, Cursor, hoặc Codex khi hook không chạy) → chạy sau mỗi phiên
+node .claude/hooks/ai-journal.mjs snapshot <tên-tool>
+
+# Báo cáo (mặc định tháng hiện tại → .ai-journal/report/ai-report-YYYY-MM.md)
+node .claude/hooks/ai-journal.mjs report [YYYY-MM|all] [--merge <đường dẫn repo khác>] [--out <thư mục>]
 ```
 
-Script tự tạo mục ngày, tự append vào cuối, tự escape ký tự `|`. Nhờ vậy nhật ký **chỉ lớn thêm, không bao giờ bị đọc lại** — dù sang tháng thứ 10 thì chi phí ghi vẫn bằng 0 token đọc, và agent không có cơ hội sửa/xoá dòng cũ.
-
-| Cột | Ghi gì | Ví dụ |
+| Cột (`add`) | Ghi gì | Ví dụ |
 | --- | --- | --- |
-| **Mảng kỹ thuật** | Lớp/domain đụng tới | `Backend / IAM`, `DB / Prisma`, `Frontend / Operator OS`, `Mobile / Flutter`, `CI` |
-| **AI sử dụng** | Tên tool + model cụ thể | `Claude Code (Opus 5)`, `GitHub Copilot`, `Codex` |
-| **Mục đích** | 1 câu — vì sao dùng AI cho phần này | `Sinh khung service + guard theo LLD §4.2` |
+| **Mảng kỹ thuật** | Lớp/domain đụng tới | `Backend / IAM`, `DB / Prisma`, `Mobile / Flutter`, `CI` |
+| **AI sử dụng** | Tool + model cụ thể; subagent nếu có | `Claude Code (Opus 5.5) + backend-developer` |
+| **Mục đích** | 1 câu: vì sao dùng AI cho phần này | `Sinh khung service + guard theo LLD §4.2` |
 | **Phần AI sinh** | **Đường dẫn + phạm vi**, không hơn | `apps/api/src/modules/iam/auth/*.ts — service, guard, Zod DTO` |
-| **Phần SV chỉnh** | Truyền `""` — Khanh tự điền sau khi review | `Sửa lại logic rotation refresh token` |
+| **Phần SV chỉnh** | Truyền `""`, Khanh tự điền sau khi review | `Sửa lại logic rotation refresh token` |
 | **Nhận xét** | Chất lượng output, lỗi phải sửa, bài học | `Bịa field không có trong schema — phải đối chiếu DB doc` |
 
-**Giới hạn: mỗi ô một dòng, tối đa 300 ký tự** — script từ chối ghi nếu vượt. Đây là thứ chặn việc dán cả block mã nguồn vào cột "Phần AI sinh": nhật ký là **mục lục** trỏ tới code, không phải bản sao của code. Chi tiết dài → trỏ tới commit hoặc file.
+Script tự tạo mục ngày, chỉ ghi thêm vào cuối, và tự escape `|`. Nhờ vậy nhật ký **không bao giờ phải đọc lại** (0 token đọc) và agent không có cơ hội sửa dòng cũ. Script từ chối ô dài hơn 300 ký tự: nhật ký là **mục lục** trỏ tới code, không phải bản sao code.
 
-Cấu trúc file sinh ra (hook tự lo, agent không cần biết):
+## 5. Báo cáo
 
-```markdown
-## 20/09/2026
+Lệnh `report` tạo một file Markdown gồm các phần:
+- **Tổng quan.**
+- **Theo ngày → theo lượt yêu cầu:** bảng các thao tác đúng thứ tự (giờ, agent/subagent, thao tác, file hoặc lệnh, hàm/class kèm công dụng, mã thẻ hướng dẫn), rồi đến dòng khai báo tầng 2.
+- **Phần mềm bên thứ 3:** package, CLI, dịch vụ, MCP, nguồn web; dùng lần đầu khi nào, do agent nào.
+- **Việc AI yêu cầu bạn làm tay.**
+- **Thao tác chưa có hướng dẫn:** danh sách thẻ sổ tay cần viết thêm.
+- **Sửa file bằng lệnh shell.**
 
-| Mảng kỹ thuật | AI sử dụng | Mục đích | Phần AI sinh | Phần SV chỉnh | Nhận xét |
-| --- | --- | --- | --- | --- | --- |
-```
+Báo cáo có thể xoá và sinh lại bất cứ lúc nào. Nếu dùng hai repo, gộp bằng `--merge`, ví dụ từ repo này: `report 2026-09 --merge C:\Code\ve_xe_nhanh`.
 
-## 4. Luật cho agent
+## 6. Cơ chế cưỡng chế
 
-1. **Append-only qua lệnh `add`** (mục 3). KHÔNG `Read`/`cat` file nhật ký, KHÔNG sửa hay xoá dòng cũ — kể cả dòng chính mình vừa ghi sai (ghi dòng mới đính chính, để Khanh tự dọn).
-2. **KHÔNG dán mã nguồn** vào bất kỳ ô nào. "Phần AI sinh" = đường dẫn + phạm vi. Trần 300 ký tự/ô.
-3. **KHÔNG bịa cột "Phần SV chỉnh" và "Nhận xét"**. Agent không biết Khanh sẽ sửa gì → truyền `""`, script tự điền `⟨chờ SV điền⟩`. Hai cột này là phần Khanh tự chịu trách nhiệm học thuật.
-4. **Ghi đúng model mình đang chạy**, không ghi chung chung "AI".
-5. **KHÔNG commit `.ai-journal/`**, kể cả khi Khanh yêu cầu commit phần còn lại.
-6. Chỉ **agent chính** ghi nhật ký. Subagent không tự ghi (tránh ghi đè); agent chính gộp lại và nêu tên subagent đã dùng trong cột "AI sử dụng".
+**Claude Code** (`.claude/settings.json`):
+- `SessionStart`: nhắc luật vào context.
+- `UserPromptSubmit`, `PostToolUse`, `PostToolUseFailure`, `SubagentStart/Stop`: ghi tầng 1. Hook ghi file chạy đồng bộ (khoảng 0,2 giây) để thứ tự luôn đúng; các hook khác chạy nền.
+- `Stop`: đối chiếu file do lệnh sinh ra, rồi **chặn kết thúc lượt** nếu (a) code đã đổi mà chưa có dòng tầng 2 mới, hoặc (b) hàm/class mới thiếu dòng mô tả. Chỉ chặn một lần mỗi lượt; lần sau chỉ cảnh báo. Hook lỗi thì bỏ qua (fail-open), không bao giờ chặn nhầm.
 
-## 5. Cưỡng chế (chỉ Claude Code)
+**Codex** (`.codex/hooks.json`): cùng script với Claude. Codex **chỉ nạp hook khi repo đã được trust**. Tài liệu Codex mô tả hook cho CLI; nếu app Codex không chạy hook thì chạy `snapshot codex` sau mỗi phiên. Codex không gọi hook cho WebSearch, nên phần này không ghi được.
 
-`.claude/settings.json` cài 2 hook chạy `.claude/hooks/ai-journal.mjs`:
+**Copilot / Cursor**: không có hook. Tuân theo mục 3–4 qua `AGENTS.md` / `.github/copilot-instructions.md`, và chạy `snapshot <tool>` sau mỗi phiên.
 
-- **SessionStart** — tạo file tháng + mục ngày hôm nay, nhắc luật vào context.
-- **Stop** — so trạng thái git (`HEAD` + working tree) với mốc lần ghi nhật ký gần nhất. Nếu code đã đổi mà số dòng nhật ký không tăng → **chặn kết thúc lượt** kèm hướng dẫn. Chặn tối đa 1 lần/lượt (lần sau chỉ cảnh báo) để không lặp vô hạn. Không phải git repo / lỗi nội bộ → bỏ qua, không chặn nhầm.
+Mỗi lần `skip` được ghi vào `.ai-journal/.state/skips.log` để đối chiếu. Hoạt động xảy ra **trước** khi có tầng 1 (trước 25/09/2026) chỉ còn trong git history và tầng 2.
 
-Thay đổi không phải code do AI sinh (sửa doc, sửa chính nhật ký) thì bỏ qua mốc bằng:
-
-```bash
-node .claude/hooks/ai-journal.mjs skip "lý do cụ thể"
-```
-
-Mỗi lần skip được ghi vào `.ai-journal/.state/skips.log` để đối chiếu.
-
-Codex / Copilot / Cursor **không có hook** — chỉ tuân theo mục 1-4 qua `AGENTS.md` / `.github/copilot-instructions.md`.
+Test của hệ thống nhật ký: `node --test ".claude/hooks/test/*.test.mjs"`.

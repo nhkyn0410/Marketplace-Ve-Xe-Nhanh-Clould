@@ -187,15 +187,19 @@ Khanh: tiếng Việt mặc định, nghiệp dư ops → giải thích + đề 
 
 ## 9. Nhật ký sử dụng AI — BẮT BUỘC
 
-Mỗi lần sinh/sửa code đáng kể, ghi 1 dòng bằng lệnh — **KHÔNG đọc, KHÔNG mở, KHÔNG sửa tay** file nhật ký:
+Nhật ký 3 tầng — quy tắc đầy đủ: **`doc/AI-JOURNAL.md`**. **KHÔNG đọc, KHÔNG mở, KHÔNG sửa tay** file trong `.ai-journal/`.
+
+1. **Tầng 1 (hook tự ghi)**: mọi file (tên hàm/class + công dụng), lệnh, MCP, web, subagent. Bạn chỉ cần: sửa code bằng **Write/Edit** (không sed/heredoc) và đặt **1 dòng doc comment tiếng Việt** nói công dụng trên mỗi class / hàm export / method public **mới** (`/** … */` TS, `///` Dart).
+2. **Tầng 2 (khai báo)** — mỗi lần sinh/sửa code đáng kể, và mỗi khi yêu cầu Khanh làm tay việc ngoài repo:
 
 ```bash
 node .claude/hooks/ai-journal.mjs add "<Mảng kỹ thuật>" "<AI sử dụng>" "<Mục đích>" "<Phần AI sinh>" "" "<Nhận xét>"
+node .claude/hooks/ai-journal.mjs ops "<Hạng mục>" "<Việc cần làm>" "<RB-xx hoặc bỏ trống>"
 ```
 
-Quy tắc đầy đủ: **`doc/AI-JOURNAL.md`**.
+3. **Tầng 3 (sổ tay `doc/runbook/`)**: thao tác mới lặp lại (cài package, migration, deploy…) → viết/cập nhật thẻ ngắn; `report` liệt kê thao tác chưa có thẻ.
 
 - Thư mục `.ai-journal/` đã gitignore — **KHÔNG commit, KHÔNG push**, nhưng bắt buộc ghi.
 - "Phần AI sinh" = **đường dẫn + phạm vi**, TUYỆT ĐỐI không dán mã nguồn. Trần 300 ký tự/ô, script từ chối nếu vượt.
 - "Phần SV chỉnh" truyền `""` — Khanh tự điền. KHÔNG bịa cột này và cột "Nhận xét".
-- Hook `Stop` (`.claude/settings.json` → `.claude/hooks/ai-journal.mjs`) chặn kết thúc lượt nếu code đổi mà chưa có dòng nhật ký mới.
+- Hook `Stop` (`.claude/settings.json` → `.claude/hooks/ai-journal.mjs`) chặn kết thúc lượt nếu code đổi mà chưa có dòng tầng 2 mới, hoặc hàm/class mới thiếu dòng mô tả.

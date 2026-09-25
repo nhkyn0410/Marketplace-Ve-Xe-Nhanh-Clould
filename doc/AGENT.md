@@ -7,7 +7,8 @@
 ```text
 doc/
 ├── AGENT.md             ← file này
-├── AI-JOURNAL.md        ← quy tắc nhật ký sử dụng AI (dữ liệu ở `.ai-journal/`, KHÔNG commit)
+├── AI-JOURNAL.md        ← quy tắc nhật ký sử dụng AI 3 tầng (dữ liệu ở `.ai-journal/`, KHÔNG commit)
+├── runbook/             ← sổ tay thao tác (tầng 3): thẻ ngắn RB-xx cho thao tác lặp lại
 ├── SDLC/                ← thiết kế (00–12)
 │   ├── 00 chuẩn LTV · 01 SRS · 02 HLD · 03 LLD · 04 DB · 05 API
 │   └── 06 UI · 07 Security · 08 Test · 09 Deploy · 10 ADR · 11 Task · 12 Release Notes
