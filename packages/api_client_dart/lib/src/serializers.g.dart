@@ -69,11 +69,30 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RedisHealthResponseDtoOutputStatusEnum.serializer)
       ..add(RefreshTokenDto.serializer)
       ..add(RegisterDto.serializer)
+      ..add(SeatMapInputDto.serializer)
+      ..add(SeatMapInputDtoLayout.serializer)
+      ..add(SeatMapInputDtoLayoutDecksInner.serializer)
+      ..add(SeatMapInputDtoSeatsInner.serializer)
+      ..add(SeatMapInputDtoSeatsInnerTypeEnum.serializer)
+      ..add(SeatMapListResponseDtoOutput.serializer)
+      ..add(SeatMapListResponseDtoOutputItemsInner.serializer)
+      ..add(SeatMapResponseDtoOutput.serializer)
+      ..add(SeatMapResponseDtoOutputLayout.serializer)
+      ..add(SeatMapResponseDtoOutputLayoutDecksInner.serializer)
+      ..add(SeatMapResponseDtoOutputSeatsInner.serializer)
+      ..add(SeatMapResponseDtoOutputSeatsInnerTypeEnum.serializer)
       ..add(SessionListResponseDtoOutput.serializer)
       ..add(SessionListResponseDtoOutputItemsInner.serializer)
       ..add(StopPointListResponseDtoOutput.serializer)
       ..add(StopPointListResponseDtoOutputItemsInner.serializer)
       ..add(StopPointListResponseDtoOutputItemsInnerTypeEnum.serializer)
+      ..add(VehicleInputDto.serializer)
+      ..add(VehicleInputDtoStatusEnum.serializer)
+      ..add(VehicleListResponseDtoOutput.serializer)
+      ..add(VehicleListResponseDtoOutputItemsInner.serializer)
+      ..add(VehicleListResponseDtoOutputItemsInnerStatusEnum.serializer)
+      ..add(VehicleResponseDtoOutput.serializer)
+      ..add(VehicleResponseDtoOutputStatusEnum.serializer)
       ..add(VehicleTypeListResponseDtoOutput.serializer)
       ..add(VehicleTypeListResponseDtoOutputItemsInner.serializer)
       ..add(WardListResponseDtoOutput.serializer)
@@ -96,6 +115,26 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<QueueHealthResponseDtoOutputQueuesInner>())
       ..addBuilderFactory(
           const FullType(BuiltList,
+              const [const FullType(SeatMapInputDtoLayoutDecksInner)]),
+          () => ListBuilder<SeatMapInputDtoLayoutDecksInner>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(SeatMapInputDtoSeatsInner)]),
+          () => ListBuilder<SeatMapInputDtoSeatsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(SeatMapListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<SeatMapListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(SeatMapResponseDtoOutputLayoutDecksInner)]),
+          () => ListBuilder<SeatMapResponseDtoOutputLayoutDecksInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(SeatMapResponseDtoOutputSeatsInner)]),
+          () => ListBuilder<SeatMapResponseDtoOutputSeatsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
               const [const FullType(SessionListResponseDtoOutputItemsInner)]),
           () => ListBuilder<SessionListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
@@ -105,6 +144,19 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(VehicleListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<VehicleListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
             const FullType(VehicleTypeListResponseDtoOutputItemsInner)

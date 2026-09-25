@@ -48,10 +48,24 @@ import 'package:api_client_dart/src/model/reauth_dto.dart';
 import 'package:api_client_dart/src/model/redis_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/refresh_token_dto.dart';
 import 'package:api_client_dart/src/model/register_dto.dart';
+import 'package:api_client_dart/src/model/seat_map_input_dto.dart';
+import 'package:api_client_dart/src/model/seat_map_input_dto_layout.dart';
+import 'package:api_client_dart/src/model/seat_map_input_dto_layout_decks_inner.dart';
+import 'package:api_client_dart/src/model/seat_map_input_dto_seats_inner.dart';
+import 'package:api_client_dart/src/model/seat_map_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/seat_map_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/seat_map_response_dto_output.dart';
+import 'package:api_client_dart/src/model/seat_map_response_dto_output_layout.dart';
+import 'package:api_client_dart/src/model/seat_map_response_dto_output_layout_decks_inner.dart';
+import 'package:api_client_dart/src/model/seat_map_response_dto_output_seats_inner.dart';
 import 'package:api_client_dart/src/model/session_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/session_list_response_dto_output_items_inner.dart';
 import 'package:api_client_dart/src/model/stop_point_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/stop_point_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/vehicle_input_dto.dart';
+import 'package:api_client_dart/src/model/vehicle_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/vehicle_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/vehicle_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_type_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_type_list_response_dto_output_items_inner.dart';
 import 'package:api_client_dart/src/model/ward_list_response_dto_output.dart';
@@ -94,10 +108,24 @@ part 'serializers.g.dart';
   RedisHealthResponseDtoOutput,
   RefreshTokenDto,
   RegisterDto,
+  SeatMapInputDto,
+  SeatMapInputDtoLayout,
+  SeatMapInputDtoLayoutDecksInner,
+  SeatMapInputDtoSeatsInner,
+  SeatMapListResponseDtoOutput,
+  SeatMapListResponseDtoOutputItemsInner,
+  SeatMapResponseDtoOutput,
+  SeatMapResponseDtoOutputLayout,
+  SeatMapResponseDtoOutputLayoutDecksInner,
+  SeatMapResponseDtoOutputSeatsInner,
   SessionListResponseDtoOutput,
   SessionListResponseDtoOutputItemsInner,
   StopPointListResponseDtoOutput,
   StopPointListResponseDtoOutputItemsInner,
+  VehicleInputDto,
+  VehicleListResponseDtoOutput,
+  VehicleListResponseDtoOutputItemsInner,
+  VehicleResponseDtoOutput,
   VehicleTypeListResponseDtoOutput,
   VehicleTypeListResponseDtoOutputItemsInner,
   WardListResponseDtoOutput,
@@ -107,6 +135,22 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ProvinceListResponseDtoOutputItemsInner)]),
         () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(SeatMapResponseDtoOutputSeatsInner)]),
+        () => ListBuilder<SeatMapResponseDtoOutputSeatsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(EmployeeListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(SeatMapResponseDtoOutputLayoutDecksInner)]),
+        () => ListBuilder<SeatMapResponseDtoOutputLayoutDecksInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(WardListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<WardListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SessionListResponseDtoOutputItemsInner)]),
@@ -121,8 +165,12 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<VehicleTypeListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(EmployeeListResponseDtoOutputItemsInner)]),
-        () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>(),
+        const FullType(BuiltList, [FullType(SeatMapListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<SeatMapListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(SeatMapInputDtoSeatsInner)]),
+        () => ListBuilder<SeatMapInputDtoSeatsInner>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltMap, [FullType(String), FullType(int)]),
@@ -133,12 +181,16 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<QueueHealthResponseDtoOutputQueuesInner>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(String)]),
-        () => ListBuilder<String>(),
+        const FullType(BuiltList, [FullType(VehicleListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<VehicleListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(WardListResponseDtoOutputItemsInner)]),
-        () => ListBuilder<WardListResponseDtoOutputItemsInner>(),
+        const FullType(BuiltList, [FullType(SeatMapInputDtoLayoutDecksInner)]),
+        () => ListBuilder<SeatMapInputDtoLayoutDecksInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(String)]),
+        () => ListBuilder<String>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

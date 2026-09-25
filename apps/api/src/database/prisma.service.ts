@@ -26,6 +26,11 @@ export const RLS_TABLES = [
   "stop_points_catalog",
   "vehicle_types",
   "amenities",
+  // Transport — Vehicle (TASK-TRN-001): tenant_isolation theo operator_id.
+  "seat_maps",
+  "seats",
+  "vehicles",
+  "vehicle_amenities",
 ] as const;
 
 @Injectable()

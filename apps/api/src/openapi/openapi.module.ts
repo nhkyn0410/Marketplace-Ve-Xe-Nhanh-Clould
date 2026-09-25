@@ -19,6 +19,10 @@ import { EmployeeAccountController } from "../iam/user/employee-account.controll
 import { EmployeeAccountService } from "../iam/user/employee-account.service";
 import { QueueHealthService } from "../queue/queue-health.service";
 import { RedisHealthService } from "../redis/redis-health.service";
+import { SeatMapController } from "../vehicle/seat-map.controller";
+import { SeatMapService } from "../vehicle/seat-map.service";
+import { VehicleController } from "../vehicle/vehicle.controller";
+import { VehicleService } from "../vehicle/vehicle.service";
 
 @Module({
   // Mọi controller IAM phải có mặt ở đây, nếu không route biến mất khỏi OpenAPI
@@ -29,12 +33,16 @@ import { RedisHealthService } from "../redis/redis-health.service";
     SessionController,
     EmployeeAccountController,
     CatalogController,
+    VehicleController,
+    SeatMapController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     // Scan-only: chỉ cần metadata route, không cần dependency thật (không Postgres/Redis/Mongo).
     { provide: AuthService, useValue: {} },
     { provide: CatalogService, useValue: {} },
+    { provide: VehicleService, useValue: {} },
+    { provide: SeatMapService, useValue: {} },
     // Dependency của AccessTokenGuard (logout, re-auth) — Nest dựng guard lúc khởi tạo module.
     { provide: TokenService, useValue: {} },
     { provide: SessionService, useValue: {} },

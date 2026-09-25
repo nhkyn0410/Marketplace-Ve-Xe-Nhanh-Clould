@@ -147,6 +147,8 @@ model OperatorProfile {
   operatorAccounts   OperatorAccount[]
   employeeAccounts   EmployeeAccount[]
   operatorLoginNames OperatorLoginName[]
+  seatMaps           SeatMap[]
+  vehicles           Vehicle[]
 
   @@unique([id, operatorSlug])
   @@map("operator_profiles")
@@ -418,6 +420,8 @@ model VehicleType {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
+  vehicles Vehicle[]
+
   @@map("vehicle_types")
 }
 
@@ -430,5 +434,100 @@ model Amenity {
   createdAt DateTime      @default(now()) @map("created_at")
   updatedAt DateTime      @updatedAt @map("updated_at")
 
+  vehicleAmenities VehicleAmenity[]
+
   @@map("amenities")
+}
+
+// ════════════════════════════ Transport — Vehicle (TASK-TRN-001) ════════════════════════════
+// Operator-owned: mọi bảng có `operator_id` + ENABLE/FORCE RLS `tenant_isolation` (migration
+// `add_vehicle`). FK ghép `(…, operator_id)` để DB chặn gắn SeatMap/ghế/tiện ích xe của tenant khác.
+// FK RESTRICT, không CASCADE: cascade chạy quyền owner và bỏ qua RLS.
+
+/// Trạng thái vận hành xe (FR-OPS-02); chỉ `ACTIVE` mới được gán chuyến (TRN-003).
+enum VehicleStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
+/// Loại chỗ trong sơ đồ (UC-12 "loại ghế / giường").
+enum SeatType {
+  SEAT
+  BED
+}
+
+/// Sơ đồ ghế do nhà xe tự cấu hình, dùng làm mẫu chung cho nhiều xe (quyết định Q1).
+model SeatMap {
+  id         String   @id @default(uuid())
+  operatorId String   @map("operator_id")
+  name       String
+  /// `{ decks: [{ deck, rows, columns }] }` — Zod kiểm ở biên API.
+  layout     Json
+  seatCount  Int      @map("seat_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  seats    Seat[]
+  vehicles Vehicle[]
+
+  @@unique([operatorId, name])
+  @@unique([id, operatorId])
+  @@map("seat_maps")
+}
+
+/// Một ghế/giường trong SeatMap; TRN-003 sinh TripSeat từ đây.
+model Seat {
+  id         String   @id @default(uuid())
+  operatorId String   @map("operator_id")
+  seatMapId  String   @map("seat_map_id")
+  code       String
+  deck       Int
+  row        Int
+  column     Int
+  type       SeatType
+
+  seatMap SeatMap @relation(fields: [seatMapId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([seatMapId, code])
+  @@unique([seatMapId, deck, row, column])
+  @@map("seats")
+}
+
+/// Phương tiện của nhà xe (FR-OPS-01..02).
+model Vehicle {
+  id            String        @id @default(uuid())
+  operatorId    String        @map("operator_id")
+  /// Đã chuẩn hoá: chữ hoa, bỏ khoảng trắng / `.` / `-`.
+  plateNumber   String        @map("plate_number")
+  vehicleTypeId String        @map("vehicle_type_id")
+  seatMapId     String?       @map("seat_map_id")
+  status        VehicleStatus @default(ACTIVE)
+  description   String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  operator    OperatorProfile  @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  vehicleType VehicleType      @relation(fields: [vehicleTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  seatMap     SeatMap?         @relation(fields: [seatMapId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  amenities   VehicleAmenity[]
+
+  @@unique([operatorId, plateNumber])
+  @@unique([id, operatorId])
+  @@index([operatorId, status])
+  @@map("vehicles")
+}
+
+/// Tiện ích catalog gắn cho một xe (bảng nối, quyết định Q2).
+model VehicleAmenity {
+  vehicleId  String @map("vehicle_id")
+  amenityId  String @map("amenity_id")
+  operatorId String @map("operator_id")
+
+  vehicle Vehicle @relation(fields: [vehicleId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  amenity Amenity @relation(fields: [amenityId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@id([vehicleId, amenityId])
+  @@map("vehicle_amenities")
 }

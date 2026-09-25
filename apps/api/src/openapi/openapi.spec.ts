@@ -146,6 +146,27 @@ describe("OpenAPI generation", () => {
       expect(schemas?.StopPointListResponseDto_Output?.required).toEqual(
         expect.arrayContaining(["items", "nextCursor"])
       );
+
+      // TRN-001 (API §7.3): Vehicle/SeatMap — Bearer, requestBody cho POST/PUT, path param khai báo.
+      for (const [collection, param] of [
+        ["/v1/operator/vehicles", "vehicleId"],
+        ["/v1/operator/seat-maps", "seatMapId"]
+      ] as const) {
+        const item = `${collection}/{${param}}`;
+        for (const operation of [
+          document.paths[collection]?.get,
+          document.paths[collection]?.post,
+          document.paths[item]?.get,
+          document.paths[item]?.put
+        ]) {
+          expect(operation, `thiếu route ${collection} — nhớ thêm controller vào OpenApiModule`).toBeDefined();
+          expect(operation?.security).toEqual([{ bearer: [] }]);
+        }
+        expect(document.paths[collection]?.post?.requestBody, `POST ${collection} thiếu @ApiBody`).toBeDefined();
+        expect(document.paths[item]?.put?.requestBody, `PUT ${item} thiếu @ApiBody`).toBeDefined();
+        const params = (document.paths[item]?.put?.parameters ?? []).map((p) => ("name" in p ? p.name : ""));
+        expect(params, `thiếu @ApiParam ${param}`).toContain(param);
+      }
     } finally {
       await app.close();
     }

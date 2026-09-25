@@ -8,8 +8,10 @@ export {
   EmployeeRole,
   OperatorRole,
   PlatformRole,
+  SeatType,
   SessionRevokeReason,
   StopPointType,
   SubjectType,
+  VehicleStatus,
 } from "../generated/prisma/client";
 export type { AuthSession } from "../generated/prisma/client";

@@ -93,6 +93,14 @@ Class | Method | HTTP request | Description
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerList**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerlist) | **GET** /v1/operator/employees | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerResetPassword**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerresetpassword) | **POST** /v1/operator/employees/{employeeId}/password-reset | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerUpdate**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerupdate) | **PATCH** /v1/operator/employees/{employeeId} | 
+[*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerCreate**](doc/OperatorSeatMapsApi.md#seatmapcontrollercreate) | **POST** /v1/operator/seat-maps | 
+[*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerGet**](doc/OperatorSeatMapsApi.md#seatmapcontrollerget) | **GET** /v1/operator/seat-maps/{seatMapId} | 
+[*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerList**](doc/OperatorSeatMapsApi.md#seatmapcontrollerlist) | **GET** /v1/operator/seat-maps | 
+[*OperatorSeatMapsApi*](doc/OperatorSeatMapsApi.md) | [**seatMapControllerUpdate**](doc/OperatorSeatMapsApi.md#seatmapcontrollerupdate) | **PUT** /v1/operator/seat-maps/{seatMapId} | 
+[*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerCreate**](doc/OperatorVehiclesApi.md#vehiclecontrollercreate) | **POST** /v1/operator/vehicles | 
+[*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerGet**](doc/OperatorVehiclesApi.md#vehiclecontrollerget) | **GET** /v1/operator/vehicles/{vehicleId} | 
+[*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerList**](doc/OperatorVehiclesApi.md#vehiclecontrollerlist) | **GET** /v1/operator/vehicles | 
+[*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerUpdate**](doc/OperatorVehiclesApi.md#vehiclecontrollerupdate) | **PUT** /v1/operator/vehicles/{vehicleId} | 
 
 
 ## Documentation For Models
@@ -131,10 +139,24 @@ Class | Method | HTTP request | Description
  - [RedisHealthResponseDtoOutput](doc/RedisHealthResponseDtoOutput.md)
  - [RefreshTokenDto](doc/RefreshTokenDto.md)
  - [RegisterDto](doc/RegisterDto.md)
+ - [SeatMapInputDto](doc/SeatMapInputDto.md)
+ - [SeatMapInputDtoLayout](doc/SeatMapInputDtoLayout.md)
+ - [SeatMapInputDtoLayoutDecksInner](doc/SeatMapInputDtoLayoutDecksInner.md)
+ - [SeatMapInputDtoSeatsInner](doc/SeatMapInputDtoSeatsInner.md)
+ - [SeatMapListResponseDtoOutput](doc/SeatMapListResponseDtoOutput.md)
+ - [SeatMapListResponseDtoOutputItemsInner](doc/SeatMapListResponseDtoOutputItemsInner.md)
+ - [SeatMapResponseDtoOutput](doc/SeatMapResponseDtoOutput.md)
+ - [SeatMapResponseDtoOutputLayout](doc/SeatMapResponseDtoOutputLayout.md)
+ - [SeatMapResponseDtoOutputLayoutDecksInner](doc/SeatMapResponseDtoOutputLayoutDecksInner.md)
+ - [SeatMapResponseDtoOutputSeatsInner](doc/SeatMapResponseDtoOutputSeatsInner.md)
  - [SessionListResponseDtoOutput](doc/SessionListResponseDtoOutput.md)
  - [SessionListResponseDtoOutputItemsInner](doc/SessionListResponseDtoOutputItemsInner.md)
  - [StopPointListResponseDtoOutput](doc/StopPointListResponseDtoOutput.md)
  - [StopPointListResponseDtoOutputItemsInner](doc/StopPointListResponseDtoOutputItemsInner.md)
+ - [VehicleInputDto](doc/VehicleInputDto.md)
+ - [VehicleListResponseDtoOutput](doc/VehicleListResponseDtoOutput.md)
+ - [VehicleListResponseDtoOutputItemsInner](doc/VehicleListResponseDtoOutputItemsInner.md)
+ - [VehicleResponseDtoOutput](doc/VehicleResponseDtoOutput.md)
  - [VehicleTypeListResponseDtoOutput](doc/VehicleTypeListResponseDtoOutput.md)
  - [VehicleTypeListResponseDtoOutputItemsInner](doc/VehicleTypeListResponseDtoOutputItemsInner.md)
  - [WardListResponseDtoOutput](doc/WardListResponseDtoOutput.md)
