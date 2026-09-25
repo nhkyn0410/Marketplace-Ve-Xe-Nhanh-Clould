@@ -4,12 +4,12 @@
 > **Nguồn thiết kế:** **ADR-013** (Next.js 16 + monorepo; component lib chốt **Shadcn/ui + Tailwind CSS 4** ngày 17/09/2026) · 06 UI/UX §4–§5 (kênh + information architecture) · OQ-20 (marketplace trung lập).
 > **Dependency:** `TASK-FND-001` ✓ Done (scaffold 3 app Next).
 > **Tham chiếu giao diện:** FE cũ `Ve_Xe_Nhanh_testing/frontend` (Vite + React 18 + antd) — chỉ lấy **token, font, logo, bố cục**; KHÔNG copy code.
-> **Làm ở:** worktree `C:\Code\Ve_Xe_Nhanh-fe`, branch `TASK-FND-010` (tạo từ `develop`, không upstream). Chưa commit.
+> **Lịch sử triển khai:** branch `TASK-FND-010`, commit `1bbde18`; PR #4 merge vào `develop` bằng commit `9a94c07` ngày 18/09/2026.
 
-## Trạng thái (17/09/2026)
+## Trạng thái (25/09/2026)
 
-- 🟡 **Code xong, chờ Khanh review** — chưa commit.
-- **Đo được 17/09/2026**: `pnpm turbo run lint typecheck test build --filter=<3 app web + ui>` **15/15** · `packages/ui` Vitest **3/3** · kiểm bằng trình duyệt: 3 app đều render đúng font, màu, logo trên desktop 1280px và mobile 375px, menu trượt mobile mở được, highlight đúng route con, không có thanh cuộn ngang.
+- 🟢 **Done** — PR #4 đã merge vào `develop`; Khanh xác nhận CI xanh ngày 25/09/2026.
+- **Đo lại 25/09/2026**: lint + typecheck + test **12/12** · `packages/ui` Vitest **3/3** · production build **3/3 app**. Kiểm tra trình duyệt ngày 17/09/2026: 3 app render đúng font, màu, logo trên desktop 1280px và mobile 375px; menu trượt mobile mở được, highlight đúng route con, không có thanh cuộn ngang.
 
 ## Phạm vi & ranh giới
 
@@ -71,9 +71,10 @@ ADR-013 (chốt Shadcn/ui + Tailwind 4), 06 UI §3, 11 Task (thêm FND-010, v0.6
 
 **Success:** lint + typecheck + build 3 app pass; kiểm bằng trình duyệt ở desktop và mobile. ✅
 
-### ⬜ #4 — Review + đóng task
+### ✅ #4 — Review + đóng task
 
-- [ ] Khanh review giao diện (`pnpm --filter @vexenhanh/<app> dev`: marketplace :3001, operator-os :3002, admin :3003) và các giả định ở trên.
-- [ ] `code-reviewer` trước khi đóng (CLAUDE.md §6.3).
-- [ ] Commit (khi Khanh yêu cầu), cập nhật `PROJECT-STATE §7` lúc đóng task. **Chưa sửa PROJECT-STATE** vì branch `TASK-IAM-002` cũng đang sửa file này, sửa song song dễ conflict khi gộp.
-- [ ] Chạy CI thật khi mở PR vào `develop`.
+- [x] Khanh review và merge PR #4 vào `develop` ngày 18/09/2026.
+- [x] Commit triển khai `1bbde18`; merge commit `9a94c07`.
+- [x] Khanh xác nhận CI xanh ngày 25/09/2026.
+- [x] Kiểm tra lại local: lint + typecheck + test **12/12**, `packages/ui` **3/3 test**, build **3/3 app**.
+- [x] Cập nhật `TASK-FND-010` → Done trong Task Breakdown và `PROJECT-STATE §7`.
