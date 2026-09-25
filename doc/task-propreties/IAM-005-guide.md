@@ -15,7 +15,7 @@
 
 ## 1. Migrate và cấp quyền role app
 
-**Trước khi áp migration `20260922010000_add_account_lifecycle` trên DB cũ:** chạy truy vấn read-only `apps/api/prisma/preflight-iam005-owner-slug.sql` bằng migration role (qua `psql -f` hoặc Supabase SQL Editor). Nếu có row, xét từng Owner: migration cũ chuẩn hóa slug và có thể mở lại đường login của account vốn `ACTIVE` nhưng trước đó đăng nhập không được vì slug lệch. Khóa có lý do khi cần; không sửa hàng loạt và không suy diễn `LOCKED` cũ là chờ gửi mail. Nếu migration đó đã chạy, không còn đủ thông tin trong DB hiện tại để truy vết slug cũ: đối chiếu backup/log trước migration và xử lý từng account. Migration corrective `20260923010000_add_credential_delivery_state` giữ nguyên checksum migration cũ.
+**Trước khi áp migration `20260922010000_add_account_lifecycle` trên DB cũ:** chạy truy vấn read-only preflight Owner slug bằng migration role. _Đã chạy trên Supabase 24/09/2026 (0 Owner, 0 lệch); file `apps/api/prisma/preflight-iam005-owner-slug.sql` đã xóa 25/09/2026 vì mọi DB có dữ liệu đã qua migration này. Cần cho DB cũ khác thì lấy lại từ commit `81ff903` và chạy `SELECT set_config('app.scope', 'system', false);` trước truy vấn — `operator_accounts` bật FORCE RLS nên thiếu dòng này có thể trả 0 row sai._ Nếu có row, xét từng Owner: migration cũ chuẩn hóa slug và có thể mở lại đường login của account vốn `ACTIVE` nhưng trước đó đăng nhập không được vì slug lệch. Khóa có lý do khi cần; không sửa hàng loạt và không suy diễn `LOCKED` cũ là chờ gửi mail. Nếu migration đó đã chạy, không còn đủ thông tin trong DB hiện tại để truy vết slug cũ: đối chiếu backup/log trước migration và xử lý từng account. Migration corrective `20260923010000_add_credential_delivery_state` giữ nguyên checksum migration cũ.
 
 ```powershell
 pnpm --filter @vexenhanh/api run prisma:migrate:deploy
@@ -198,7 +198,7 @@ Remove-Variable adminToken, ownerToken, body, employee -ErrorAction SilentlyCont
 
 ## 11. Production rollout
 
-Thứ tự dự kiến: backup → **preflight Owner slug** → xử lý từng mismatch → migrate bằng owner → `db:app-role` → deploy API/worker → smoke role app → bật UI/client. Migration IAM-005 giữ khóa bảng account qua backfill/constraint validation; đo số row và chạy trong maintenance window đủ dài, không chạy khi có giao dịch dài. Không chạy app bằng owner để “vượt” lỗi RLS. Temp credential chỉ gửi qua adapter production đã cấu hình; console notifier phải từ chối ở production. Mỗi request Operator/Employee thêm một transaction đọc account để kiểm `authEpoch`/trạng thái; chấp nhận cho v1 nhưng theo dõi latency và tải DB.
+Thứ tự dự kiến (đã thực hiện trên production 24/09/2026): backup → **preflight Owner slug** → xử lý từng mismatch → migrate bằng owner → `db:app-role` → deploy API/worker → smoke role app → bật UI/client. Migration IAM-005 giữ khóa bảng account qua backfill/constraint validation; đo số row và chạy trong maintenance window đủ dài, không chạy khi có giao dịch dài. Không chạy app bằng owner để “vượt” lỗi RLS. Temp credential chỉ gửi qua adapter production đã cấu hình; console notifier phải từ chối ở production. Mỗi request Operator/Employee thêm một transaction đọc account để kiểm `authEpoch`/trạng thái; chấp nhận cho v1 nhưng theo dõi latency và tải DB.
 
 ## Lưu ý phạm vi
 

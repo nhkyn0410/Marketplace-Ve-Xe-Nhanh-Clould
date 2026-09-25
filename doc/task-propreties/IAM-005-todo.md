@@ -4,14 +4,14 @@
 > **Dependency:** TASK-IAM-003 đã Done (CI đã được Khanh xác nhận); RBAC + TenantGuard + RLS là nền của task này.
 > **Cách dùng:** Q1–Q8 đã được Khanh chốt ngày 22/09/2026. Guide chạy tay: `IAM-005-guide.md`. Nghiệm thu: `IAM-005-verification-checklist.md`.
 
-## Trạng thái (24/09/2026) — 🟡 **ĐÃ XONG CORE LOCAL, CHỜ QUERY-PLAN/SMOKE/CI**
+## Trạng thái (25/09/2026) — ✅ **DONE**
 
 - ✅ TASK-IAM-004 đã đóng sau xác nhận CI xanh.
 - ✅ Đã đối chiếu task row với SRS, HLD/LLD, DB, API, Security, Test, ADR-017, DOMAIN-MAP, GLOSSARY và code IAM-001..004.
 - ✅ Khanh duyệt toàn bộ Q1–Q8 theo khuyến nghị ngày 22/09/2026, gồm endpoint quản lý phiên mới và contract mật khẩu tạm.
 - ✅ Phạm vi defer KYC workflow, Platform employee, MFA reset và UI được giữ nguyên; không mở self-registration.
 - ✅ Code/migration/OpenAPI và test local đã hoàn tất hardening; PostgreSQL/Redis/Mongo thật đạt 433/433 test, không skip.
-- ⏳ Chưa đóng task trước khi smoke rollout và CI branch được Khanh xác nhận.
+- ✅ Khanh xác nhận CI 5/5 job xanh ngày 25/09/2026; PR #10 đã merge vào `develop`; migrate + `db:app-role` trên Supabase và deploy Render xong ngày 24/09/2026; task row đã chuyển `Done`.
 
 ---
 
@@ -157,11 +157,11 @@ Unit + Postgres/Redis/Mongo integration bằng role app; Supertest; tenant-RLS/I
 
 **Success:** 24/09/2026 — `REQUIRE_DB_TESTS=1` đạt 48/48 file, 433/433 test với role app + PostgreSQL/Redis/Mongo thật; có HTTP, RLS/IDOR, provision/create/password-change/limiter race và regression IAM-001..004, không skip im lặng.
 
-### ⬜ #10 — [IAM-005.10] Review, smoke, CI và đóng task
+### ✅ #10 — [IAM-005.10] Review, smoke, CI và đóng task
 
 Chạy `code-reviewer` + `security-auditor`, guide, lint/typecheck/test/build/gen-client; chỉ sau CI user xác nhận mới đổi task row `Done`.
 
-**Success:** không finding blocking/high; CI xanh; PROJECT-STATE/task row cập nhật đúng gate; có AI journal cho phần code.
+**Success:** không finding blocking/high; CI xanh; PROJECT-STATE/task row cập nhật đúng gate; có AI journal cho phần code. — ✅ Khanh xác nhận CI 5/5 job xanh ngày 25/09/2026; task row đã chuyển `Done`.
 
 ---
 
@@ -175,4 +175,4 @@ Chạy `code-reviewer` + `security-auditor`, guide, lint/typecheck/test/build/ge
 - Cross-tenant IDOR qua path id hoặc query thiếu `operatorId`.
 - Temp password/change token/session hash lọt vào Pino, Mongo audit, Sentry, OpenAPI example hoặc response.
 - Bỏ re-auth ở một nhánh PATCH/reset hoặc audit ghi before/after chứa password hash.
-- Slug legacy lệch profile trước migration có thể được chuẩn hóa và vô tình mở lại đường login: phải chạy preflight và xét từng Owner, không tự suy diễn `LOCKED` cũ là delivery pending.
+- Slug legacy lệch profile trước migration có thể được chuẩn hóa và vô tình mở lại đường login: phải chạy preflight và xét từng Owner, không tự suy diễn `LOCKED` cũ là delivery pending. — ✅ Đã xử lý 24/09/2026: preflight trên Supabase trả 0 Owner, 0 lệch; file preflight đã xóa 25/09/2026.
