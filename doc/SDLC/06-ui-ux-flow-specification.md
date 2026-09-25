@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent |
 | Người duyệt   | Nguyễn Hồng Khanh           |
 | Ngày tạo      | 11/05/2026                  |
-| Ngày cập nhật | 23/09/2026                  |
+| Ngày cập nhật | 25/09/2026                  |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -23,6 +23,7 @@
 | v0.2      | 01/06/2026 | AI Agent       | **Rework** đồng bộ stack/quyết định (UI vốn tech-independent, chỉ chỉnh touchpoint): §4 kênh = Marketplace/Operator OS/Admin (Next.js) + 2 app Expo (Passenger/Employee) (ADR-013/014); §6.1 thêm flow đăng nhập Passenger (Email OTP + OAuth Google/FB/Apple, ADR-020); §6.2 payment = VNPay/MoMo redirect + seat hold timer 10 phút; §7/§9 login `{slug}/{username}` + `platform/{username}` + TOTP (ADR-017); §9 thêm flow payout confirm (manual + bank ref, ADR-022); KYC upload R2 (ADR-018). Đổi "User" → "Passenger". **Đóng UX-OQ-01** (guest checkout per SRS), **UX-OQ-02** (cookie+Bearer per ADR-017), **UX-OQ-05** (brand trung lập per OQ-20). |
 | v0.3      | 17/09/2026 | AI Agent       | §3: component lib đã chốt **Shadcn/ui + Tailwind CSS 4** cho cả 3 app web (ADR-013, Khanh chốt). |
 | v0.4      | 23/09/2026 | AI Agent       | **Viết lại §6 Passenger/Guest theo Figma** (section _Giao diện dành cho Khách hàng_, 24 frame): §6.1 danh mục 35 màn `SCR-PSG-NN` (24 Review = có frame; 11 Draft = AI bổ sung); §6.2 luồng; §6.3 mỗi màn 1 bảng 5 trạng thái (Ideal / Empty / Loading / Partial-Edge / Error) đánh dấu Review/Draft; §10.1 thêm quy tắc 5 Key UI States áp cho mọi màn §6–§9; §6.4 8 điểm Figma lệch ADR/SRS (auth mật khẩu, phương thức thanh toán, hold 15', bản đồ OSM, SMS, copy hoàn/đổi vé, loyalty, add-on). §5 IA Passenger theo nav Figma. §11 mở UX-OQ-06..09. Trạng thái doc Approved → **Review** (còn OQ ảnh hưởng code, 00a §3.2). §7–§9 chưa đổi. |
+| v0.5      | 25/09/2026 | AI Agent       | **TASK-IAM-006:** bổ sung §7/§9 state machine đăng nhập web, first-login đổi mật khẩu, TOTP, bootstrap cookie session, refresh single-flight và logout. Giữ trạng thái Review. |
 
 ---
 
@@ -517,7 +518,15 @@ Mỗi màn hình là một bảng đủ 5 trạng thái theo §10.1. Cột **Thi
 
 ## 7. Flow Operator
 
-Login `{operatorSlug}/{username}` + password; Owner bắt buộc TOTP (ADR-017).
+Login `{operatorSlug}/{username}` + password; Owner bắt buộc TOTP (ADR-017). Trước mọi màn nghiệp vụ, Operator OS chạy state machine: lấy CSRF → bootstrap `/auth/me`; 401 thì refresh single-flight một lần rồi retry; không refresh được thì về login. First login: mật khẩu tạm → đổi bắt buộc → login lại → TOTP enrollment/verify → hiển thị 10 backup code đúng một lần → vào app. Challenge chỉ giữ trong memory; reload giữa flow thì bắt đầu lại từ login.
+
+| Trạng thái auth | UI bắt buộc |
+| --------------- | ----------- |
+| Loading/bootstrap | Full-page loading, chưa render sidebar/dữ liệu bảo vệ |
+| Login | Identifier `{slug}/{username}`, password; lỗi generic không lộ account tồn tại |
+| Password change | Mật khẩu mới + xác nhận; thành công quay lại login, không tự vào app |
+| MFA | QR/secret enrollment khi cần, TOTP hoặc backup code; backup code chỉ hiện một lần |
+| Session expired/error | Thử refresh đúng một lần; thất bại clear state và về login; giữ safe return URL nội bộ |
 
 | Flow            | Màn hình chính                                                           | Ghi chú                                                      |
 | --------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -548,7 +557,7 @@ App `apps/employee_mobile`; login `{operatorSlug}/{username}` (ADR-028/017).
 
 ## 9. Flow Admin
 
-Login `platform/{username}` + password + **TOTP bắt buộc** (ADR-017).
+Login `platform/{username}` + password + **TOTP bắt buộc** (ADR-017). Dùng cùng bootstrap/cookie/CSRF/refresh/logout state machine của §7; Admin không có public enrollment. Chỉ render shell Admin sau khi `/auth/me` trả đúng scope `platform` và role được phép; sai namespace/role thì logout và về đúng cổng đăng nhập.
 
 | Flow                      | Màn hình chính                                                              | Ghi chú                                                                                  |
 | ------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |

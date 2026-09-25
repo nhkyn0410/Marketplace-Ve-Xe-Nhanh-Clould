@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent   |
 | Người duyệt   | Nguyễn Hồng Khanh             |
 | Ngày tạo      | 11/05/2026                    |
-| Ngày cập nhật | 12/09/2026                    |
+| Ngày cập nhật | 25/09/2026                    |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -23,6 +23,7 @@
 | v0.2      | 25/05/2026 | AI Agent       | Bổ sung tham chiếu DOMAIN-MAP / GLOSSARY / PROJECT-STATE; chốt email OTP v1; chốt phone mask `0*** *** 789`; đóng SEC-OQ-03 và SEC-OQ-05 (storage)                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | v0.3      | 25/05/2026 | AI Agent       | Cập nhật tham chiếu SRS v1.15 → v1.20; cập nhật số mục DOMAIN-MAP. Không thay đổi nội dung normative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 5 Rework** — bake **ADR-017/019/020 (Khanh re-confirm CRITICAL 01/06/2026)** + ADR-011/018. §5 auth: Better Auth 3-namespace + Hybrid token (JWT 15min + opaque refresh 30d rotation/family) + §5.2 MFA TOTP + §5.3 OAuth Google/FB/Apple PKCE. §6 TenantGuard + Postgres RLS. §8 payout manual confirm + maker-checker (ADR-022). §9 KYC R2 private presigned (ADR-018) + payment PCI SAQ-A (ADR-019) + cross-border PII. §11 webhook HMAC + OAuth/refresh-reuse threat + SQL injection (Prisma). **Đóng SEC-OQ-01/02/04/06** (per ADR-017/018); refine SEC-OQ-05/07; thêm SEC-OQ-08 (OAuth linking). |
+| v0.5      | 25/09/2026 | AI Agent       | **Hiện thực hóa phần Web của ADR-017 qua TASK-OQ-05/TASK-IAM-006:** bỏ defer cookie; chốt cookie host-only, signed double-submit CSRF, strict Origin/CORS allowlist, dual transport tường minh và chống credential ambiguity. Giữ JSON/Bearer cho Mobile; không thay đổi trạng thái Approved. |
 
 ---
 
@@ -95,11 +96,15 @@ Auth library = **Better Auth** + custom NestJS adapter (ADR-017).
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | Access token  | JWT RS256, TTL **15 phút** (claims `sub`, `scope`, `role`, `operatorSlug`)                          |
 | Refresh token | Opaque 32-byte, TTL **30 ngày**, rotation mỗi lần refresh + family invalidation khi phát hiện reuse |
-| Token storage | Web = JWT trong httpOnly cookie (+ CSRF token); Mobile = `flutter_secure_storage`. ⚠️ **v1 defer phần Web**: API trả token trong **body JSON** cho cả hai phía (chốt 16/09/2026, TASK-IAM-002 Q1) — `apps/marketplace`, `operator-os`, `admin` còn rỗng nên cookie + CSRF sẽ là code không ai dùng. Mở lại khi dựng app web đầu tiên. |
+| Token storage | Web Operator OS/Admin = `vxn_access` + `vxn_refresh` httpOnly cookie; Mobile = JSON/Bearer trong `flutter_secure_storage`. Web opt-in bằng `X-Auth-Transport: cookie`; thiếu header giữ hành vi Mobile. Phần Web trước đây defer ở TASK-IAM-002 được mở lại trong TASK-IAM-006. |
 | Session store | `auth_sessions` (Postgres) + Redis cache metadata                                                   |
 | Multi-device  | Mỗi login = 1 session family; revoke theo family hoặc revoke all                                    |
 | Force logout  | Khi khóa account, reset password, thu hồi quyền hoặc phát hiện rủi ro → revoke family               |
 | Login history | actor, thời điểm, device/IP nếu có, kết quả                                                         |
+
+Cookie Web là host-only, không khai `Domain`: access `SameSite=Lax`, path `/v1`, 15 phút; refresh `SameSite=Strict`, path `/v1/auth/refresh`, 30 ngày; `Secure` bắt buộc staging/production và chỉ được false trên local HTTP. Mọi lần xóa cookie phải dùng đúng tên/path/flags đã cấp.
+
+CSRF dùng signed double-submit `vxn_csrf` + header `X-CSRF-Token`. Token được cấp/khôi phục qua `GET /v1/auth/csrf`, rotate khi session được cấp/refresh/đổi mật khẩu và clear khi logout/current family bị revoke. Mọi unsafe method dùng cookie bắt buộc token hợp lệ **và** `Origin` thuộc exact allowlist; Bearer mode không dùng CSRF. Request đồng thời mang Bearer và access cookie bị từ chối `AUTH_TRANSPORT_AMBIGUOUS` thay vì chọn ngầm.
 
 ### 5.2. MFA (ADR-017)
 
@@ -199,7 +204,9 @@ AuditLog ghi vào Mongo `audit_event` (cluster RIÊNG, append-only via REVOKE, A
 | IDOR                  | Backend ownership check + tenant filter + Postgres RLS, test case bắt buộc                                                     |
 | SQL/NoSQL Injection   | Prisma parameterized query (Postgres); Mongoose schema validation (Mongo audit); Zod input validation; không truyền filter raw |
 | XSS                   | Escape/sanitize nội dung user-generated, CSP TBD                                                                               |
-| CSRF                  | Web dùng httpOnly cookie → CSRF token bắt buộc; Mobile Bearer không cần                                                        |
+| CSRF                  | Web cookie dùng signed double-submit `vxn_csrf` + `X-CSRF-Token` và exact `Origin`; rotate theo session/refresh; Mobile Bearer không áp dụng |
+| CORS                  | Credentialed exact-origin allowlist theo môi trường; không wildcard; reject unsafe cookie request thiếu/sai Origin             |
+| Credential confusion  | Bearer và access cookie cùng xuất hiện → `400 AUTH_TRANSPORT_AMBIGUOUS`; không ưu tiên ngầm                                     |
 | OAuth abuse           | PKCE + `state` param; verify email ownership chống account-linking takeover (ADR-020)                                          |
 | Refresh token reuse   | Rotation + family invalidation (ADR-017)                                                                                       |
 | Brute force login/OTP | Rate limit, lock tạm, monitoring (SEC-OQ-07)                                                                                   |
@@ -213,7 +220,7 @@ AuditLog ghi vào Mongo `audit_event` (cluster RIÊNG, append-only via REVOKE, A
 
 | ID        | Câu hỏi                                                                                 | Tác động                | Trạng thái                                                                                                                           |
 | --------- | --------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| SEC-OQ-01 | Web dùng Bearer token hay cookie session?                                               | CSRF/token storage      | **Đóng theo ADR-017**: Web = httpOnly cookie (+ CSRF); Mobile = Bearer (`flutter_secure_storage`)                                           |
+| SEC-OQ-01 | Web dùng Bearer token hay cookie session?                                               | CSRF/token storage      | **Đóng theo ADR-017 + TASK-OQ-05 (25/09/2026)**: Web Operator/Admin dùng host-only httpOnly cookie + signed double-submit CSRF/Origin allowlist; Mobile giữ JSON/Bearer (`flutter_secure_storage`) |
 | SEC-OQ-02 | Có bật MFA cho Admin/Operator ở v1 không?                                               | Auth flow               | **Đóng theo ADR-017**: TOTP **bắt buộc** Owner/PlatformAdmin/PlatformSupport + backup code; optional Driver/TicketStaff/SupportStaff |
 | SEC-OQ-03 | Mask số điện thoại cụ thể theo rule nào?                                                | UI/API/report           | Đóng 11/05/2026 theo OQ-11: `0*** *** 789`                                                                                           |
 | SEC-OQ-04 | KYC document lưu provider nào?                                                          | Object storage security | **Đóng theo ADR-018**: Cloudflare R2 private bucket, presigned TTL 5min + audit. Production location → **OQ-21** (mở)                |

@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent      |
 | Người duyệt   | Nguyễn Hồng Khanh                |
 | Ngày tạo      | 11/05/2026                       |
-| Ngày cập nhật | 08/09/2026                       |
+| Ngày cập nhật | 25/09/2026                       |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -23,6 +23,7 @@
 | v0.2      | 25/05/2026 | AI Agent       | Bổ sung observability/operation cho escrow, payout T+3, KYC                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | v0.3      | 25/05/2026 | AI Agent       | Rebrand `Marketplace-Ve-Xe-Nhanh`; gỡ tham chiếu `TECH-STACK.md`. Không thay đổi normative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 4 Rework** — bake Phase 4 DevOps **ADR-023..026** + stack ADR. §4 môi trường: Render (SG) + Postgres Supabase/Neon + Mongo Atlas; §5 build Turborepo + Docker + EAS mobile; §6 secret theo vendor đã chốt (VNPay/MoMo/Resend/Expo/OAuth/Goong/R2/Sentry); §7 Prisma Migrate + Mongo + RLS; §8 observability Sentry + Pino + OTel; §10 Render rollback; §11 checklist BullMQ/Postgres/Mongo. **Đóng OPS-OQ-01** (Render ADR-023) + **OPS-OQ-02** (Render env + GitHub secrets ADR-026) + **OPS-OQ-03** (Sentry ADR-026) + **OPS-OQ-05** (EAS ADR-014); refine OPS-OQ-04. |
+| v0.5      | 25/09/2026 | AI Agent       | **TASK-OQ-05 / TASK-IAM-006:** chốt topology same-site API/Operator/Admin cho staging/production, exact CORS allowlist, cookie Secure và CSRF secret/config fail-fast; thêm smoke auth web vào release checklist. Không đổi trạng thái Approved. |
 
 ---
 
@@ -70,6 +71,16 @@ Tài liệu này quy định triển khai và vận hành hệ thống từ loca
 | Staging    | E2E, UAT, provider sandbox    | Render (SG); sandbox VNPay + MoMo + Resend + FCM/APNs                                                                                               |
 | Production | Vận hành thật                 | Render (SG) HTTPS; Supabase/Neon Postgres + Atlas Mongo + Upstash Redis + R2; Sentry; **blocker OQ-21 (KYC storage) + OQ-22 (TGTT license)**        |
 
+Topology web auth bắt buộc cùng **schemeful site** để giữ `SameSite=Lax/Strict`; không dùng preview domain ngẫu nhiên cho cookie mode:
+
+| Môi trường | API | Operator OS | Admin |
+| ---------- | --- | ----------- | ----- |
+| Local | `http://localhost:3000` | `http://localhost:3002` | `http://localhost:3003` |
+| Staging | `https://api.staging.vexenhanh.vn` | `https://operator.staging.vexenhanh.vn` | `https://admin.staging.vexenhanh.vn` |
+| Production | `https://api.vexenhanh.vn` | `https://operator.vexenhanh.vn` | `https://admin.vexenhanh.vn` |
+
+Local thống nhất `localhost`, không trộn `127.0.0.1`. Staging phải gắn custom domain; không hạ `SameSite=None` để hỗ trợ domain preview.
+
 ---
 
 ## 5. Build và release
@@ -95,6 +106,7 @@ Monorepo Turborepo + pnpm (ADR-013). Build qua `turbo run build --filter=...` (c
 | REL-05 | Env var/secret đã cấu hình đúng môi trường (Render env group)                           |
 | REL-06 | Backup trước deploy production (Postgres PITR + Mongo)                                  |
 | REL-07 | Smoke test sau Render auto-deploy; Sentry không error spike                             |
+| REL-08 | Smoke Web auth: CORS credentialed, cookie flags, CSRF reject/accept, `/auth/me`, refresh/logout trên Operator OS + Admin |
 
 ---
 
@@ -107,6 +119,7 @@ Secret quản lý qua **Render env group** + **GitHub Actions secrets** (ADR-026
 | Database       | Postgres URI (Supabase/Neon), Mongo URI (Atlas)                                  | Không commit; env theo môi trường (ADR-011)   |
 | Redis/Queue    | Upstash `REDIS_URL` (ioredis)                                                    | Cache + lock + BullMQ (ADR-015/016)           |
 | Auth           | Better Auth secret, JWT RS256 private/public key                                 | Rotation policy; refresh opaque (ADR-017)     |
+| Web auth       | `CORS_ALLOWED_ORIGINS`, `WEB_CSRF_SECRET` (base64 32 byte)                        | Exact HTTPS origin; staging/prod thiếu/sai → fail startup; không tái dùng OAuth callback list |
 | Payment        | VNPay TmnCode/HashSecret (SHA512); MoMo partnerCode/accessKey/secretKey (SHA256) | Chỉ staging/production secret store (ADR-019) |
 | Notification   | Resend API key; Firebase (FCM service account JSON + APNs auth key)              | SMS defer (chỉ adapter) (ADR-020/028)         |
 | OAuth          | Google/Facebook/Apple client id + secret                                         | Passenger-only (ADR-020)                      |
@@ -114,6 +127,8 @@ Secret quản lý qua **Render env group** + **GitHub Actions secrets** (ADR-026
 | Object storage | R2 account id/access key/secret/bucket (public + private)                        | `@aws-sdk/client-s3` (ADR-018)                |
 | Payout         | Manual (không credential v1); bank info trong DB verified                        | Auto-disbursement defer v1.x (ADR-022)        |
 | Monitoring     | Sentry DSN (BE/FE/Mobile); OTel endpoint                                         | Không log secret (ADR-026)                    |
+
+`CORS_ALLOWED_ORIGINS` local mặc định đúng hai origin Operator/Admin ở bảng §4; staging/production bắt buộc khai tường minh. API bật `credentials: true`, echo exact origin, `Vary: Origin`, không wildcard. Cookie `Secure=true` ở staging/production; chỉ local HTTP được false. `WEB_CSRF_SECRET` tách khỏi JWT/Better Auth/MFA key và không log.
 
 ---
 

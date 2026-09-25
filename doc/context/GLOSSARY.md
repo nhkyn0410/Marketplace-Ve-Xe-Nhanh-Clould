@@ -92,3 +92,12 @@ Rules:
 | OQ      | Câu hỏi mở          | Open Question. Either still open or marked as decided.                      |
 | MQ      | Câu hỏi marketplace | Marketplace-strategic decision question; subset of OQ but tracked separately.|
 | ADR     | Bản ghi quyết định kiến trúc | Architecture Decision Record.                                       |
+
+## 6. Auth error codes
+
+| Code | Nghĩa | HTTP |
+| ---- | ----- | ---- |
+| `AUTH_TRANSPORT_INVALID` | `X-Auth-Transport` không thuộc `cookie \| bearer`. | 400 |
+| `AUTH_TRANSPORT_AMBIGUOUS` | Request đồng thời mang Bearer và access cookie; hệ thống không chọn ngầm. | 400 |
+| `AUTH_CSRF_INVALID` | CSRF token thiếu, sai chữ ký, không khớp cookie/session hoặc đã rotate. | 403 |
+| `AUTH_ORIGIN_FORBIDDEN` | Unsafe cookie request thiếu `Origin` hoặc origin không thuộc allowlist. | 403 |

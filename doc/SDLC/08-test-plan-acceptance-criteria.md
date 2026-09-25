@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent        |
 | Người duyệt   | Nguyễn Hồng Khanh                |
 | Ngày tạo      | 11/05/2026                       |
-| Ngày cập nhật | 08/09/2026                       |
+| Ngày cập nhật | 25/09/2026                       |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -21,6 +21,7 @@
 | --------- | ---------- | -------------- | ----------------------------------------- |
 | v0.1      | 11/05/2026 | AI Agent       | Tạo bản nháp Test Plan & Acceptance Criteria |
 | v0.2      | 01/06/2026 | AI Agent       | **Sprint 4 Rework** — bake **ADR-025** test framework (Vitest + Supertest + Playwright + Maestro) + stack ADR. §4 strategy map tool cụ thể; §6 môi trường Postgres/Mongo Testcontainers + VNPay/MoMo sandbox; §8/§9 thêm mandatory test money BIGINT/idempotency dedup/tenant RLS/webhook HMAC/OAuth (ADR-009/011/015/017/019). Đóng TEST-OQ-02 (sandbox VNPay+MoMo+Resend+Expo per ADR-019/020); refine TEST-OQ-01. |
+| v0.3      | 25/09/2026 | AI Agent       | **TASK-OQ-05 / TASK-IAM-006:** thêm acceptance + Supertest/Playwright cho dual transport, cookie flags, CSRF/CORS, `/auth/me`, first-login/TOTP, refresh single-flight và hồi quy Mobile JSON/Bearer. Giữ trạng thái Draft. |
 
 ---
 
@@ -65,7 +66,7 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 
 | Nhóm | Trong scope | Mức ưu tiên |
 | ---- | ----------- | ----------- |
-| IAM | Đăng ký, login 3-namespace, OTP/OAuth, refresh rotation, TOTP, session revoke | Cao |
+| IAM | Đăng ký, login 3-namespace, OTP/OAuth, refresh rotation, TOTP, session revoke; Web cookie/CSRF/CORS/bootstrap và hồi quy Mobile Bearer | Cao |
 | Marketplace | Search, filter, trip detail, seat map, booking, ticket | Cao |
 | Booking/Payment | SeatHold (Redis), create booking, VNPay/MoMo callback, refund, escrow | Rất cao |
 | Operator OS | KYC, vehicle, route, trip, booking list, finance, payout | Cao |
@@ -114,6 +115,7 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 | Money correctness | Mọi tính tiền dùng BIGINT/Decimal; commission/refund/payout không sai số làm tròn (ADR-009/011). |
 | Refund | User/Admin hủy vé đúng policy snapshot, refund state rõ, audit ghi. |
 | Tenant isolation | Operator chỉ xem/quản lý dữ liệu tenant mình; RLS chặn cả khi app guard miss (ADR-011/017). |
+| Web auth | Operator OS/Admin hoàn tất first-login/TOTP, nhận cookie đúng flags, reload bootstrap được; CSRF/origin sai bị chặn; Mobile JSON/Bearer không đổi. |
 | Employee | Employee chỉ check-in chuyến được phân công, không xem dữ liệu ngoài scope. |
 | Admin | Admin xử lý KYC/refund/dispute/payout có re-auth/TOTP/audit với quyền phù hợp. |
 | Notification | Ticket vẫn xem được dù email/push thất bại; delivery retry ghi nhận (BullMQ DLQ). |
@@ -137,6 +139,12 @@ Mandatory (rủi ro cao, ADR-025): money math, idempotency, tenant RLS, seat-hol
 | TC-REF-001 | Hủy vé trước hạn tạo refund đúng policy snapshot | E2E | Cao |
 | TC-SEC-001 | Operator A không xem booking Operator B (RLS) | Security | Rất cao |
 | TC-SEC-002 | Refresh token reuse bị family invalidation | Security | Cao |
+| TC-SEC-003 | Bearer/default Mobile giữ nguyên JSON schema, không có `Set-Cookie`; cookie mode không lộ token thô | Contract/Security | Rất cao |
+| TC-SEC-004 | Cookie access/refresh/CSRF đúng HttpOnly/Secure/SameSite/Path/TTL; logout/revoke current family xóa đúng attributes | Security | Rất cao |
+| TC-SEC-005 | CSRF thiếu/sai/cũ và unsafe request có Origin ngoài allowlist/`null` bị từ chối; preflight hợp lệ không qua auth | Security | Rất cao |
+| TC-SEC-006 | Bearer và access cookie đồng thời bị `AUTH_TRANSPORT_AMBIGUOUS`; transport lạ bị `AUTH_TRANSPORT_INVALID` | Security | Cao |
+| TC-SEC-007 | `/auth/me` không trả secret/không tự refresh; access hết hạn → web refresh single-flight rồi retry | API/E2E Web | Cao |
+| TC-SEC-008 | Playwright Operator: temp password → đổi → login lại → TOTP enrollment → backup code một lần → reload/protected route; Admin password → TOTP → protected route | E2E Web | Rất cao |
 | TC-EMP-001 | Employee check-in ticket hợp lệ được phân công (Maestro) | E2E | Cao |
 | TC-EMP-002 | Employee không check-in chuyến ngoài assignment | Security | Cao |
 | TC-ADM-001 | Admin refund/payout thủ công yêu cầu re-auth/TOTP + audit | E2E/Security | Cao |

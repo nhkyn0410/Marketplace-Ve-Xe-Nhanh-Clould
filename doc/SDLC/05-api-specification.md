@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent |
 | Người duyệt   | Nguyễn Hồng Khanh           |
 | Ngày tạo      | 11/05/2026                  |
-| Ngày cập nhật | 23/09/2026                  |
+| Ngày cập nhật | 25/09/2026                  |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -24,6 +24,7 @@
 | v0.3      | 19/09/2026 | AI Agent       | **§7.1 làm rõ khi hiện thực TASK-IAM-004 (MFA)**: `/auth/operator/login` + `/auth/platform/login` với role bắt buộc TOTP (Owner/PlatformAdmin/PlatformSupport) trả **challenge** (`mfaRequired: true`, `challengeToken`, `challengeExpiresIn: 300`, `otpAuthUri` chỉ ở lần enrollment đầu) thay vì token; `/auth/mfa/verify` được xác thực bằng `challengeToken` (không phải Bearer) và là endpoint duy nhất cấp token cho các role đó; `/auth/re-auth` nhận đúng một trong `password` / `otp` / `mfaCode`. Không thêm endpoint. Hợp đồng chi tiết = OpenAPI sinh từ Zod (ADR-012). |
 | v0.4      | 22/09/2026 | AI Agent       | **TASK-IAM-005 Q1–Q8 do Khanh duyệt:** §7.1 bổ sung first-login password-change challenge và session family list/revoke; §7.3 chốt Employee CRUD/lifecycle tối thiểu. Provision Operator+Owner là service primitive cho OPR-001, chưa có HTTP KYC giả. OpenAPI sinh từ Zod là contract chi tiết. Giữ trạng thái Approved, không tự promote. |
 | v0.5      | 23/09/2026 | AI Agent       | Hardening IAM-005: cờ chờ giao mật khẩu riêng trạng thái khóa, challenge vô hiệu theo `authEpoch`, quota/cooldown email mật khẩu tạm (429), recovery khi gửi mail lỗi. Giữ quyết định Q8 re-auth bằng mật khẩu hoặc MFA theo Khanh; không đổi trạng thái Approved. |
+| v0.6      | 25/09/2026 | AI Agent       | **Đóng TASK-OQ-05 / mở khóa TASK-IAM-006:** chốt dual transport bằng `X-Auth-Transport`; cookie `vxn_access`/`vxn_refresh`; signed double-submit CSRF `vxn_csrf`; CORS credentialed allowlist; thêm `GET /auth/csrf` + `GET /auth/me`. Giữ nguyên JSON/Bearer mặc định cho Mobile; không thay đổi trạng thái Approved. |
 
 ---
 
@@ -58,7 +59,7 @@ Tài liệu tham chiếu: `01-srs`, `02-hld`, `03-lld`, `04-database-design`, `1
 | Base path          | `/v1` (URL versioning; breaking change → `/v2`, ADR-012)                                                                |
 | Spec               | OpenAPI 3.1 auto-gen từ Zod schema (sticky 3.0 v1 cho tới khi tool ecosystem support 3.1, ADR-012)                      |
 | Format             | JSON; error = `application/problem+json` (RFC 7807)                                                                     |
-| Auth               | Web = JWT access trong httpOnly cookie; Mobile = `Authorization: Bearer <jwt>` (token từ `flutter_secure_storage`) (ADR-017/028) |
+| Auth               | Web Operator OS/Admin opt-in `X-Auth-Transport: cookie`; Mobile mặc định/`bearer` giữ JSON + `Authorization: Bearer <jwt>` (ADR-017/028, TASK-IAM-006) |
 | Timezone hiển thị  | `Asia/Ho_Chi_Minh`                                                                                                      |
 | Time lưu trữ       | UTC                                                                                                                     |
 | Currency           | VND (amount = integer đồng)                                                                                             |
@@ -148,6 +149,8 @@ Path dưới đây tương đối với base `/v1`.
 | POST   | `/auth/platform/login`   | Admin, Platform    | Login `platform/{username}` + password; nhận MFA challenge thay vì token |
 | POST   | `/auth/mfa/verify`       | Có `challengeToken` từ login (không Bearer) | Xác thực TOTP / backup code (lần đầu = enrollment) → cấp token |
 | POST   | `/auth/password/change-required` | Có `passwordChangeToken` từ login (không Bearer) | Đổi mật khẩu tạm một lần; token TTL 5 phút; phải login lại trước MFA/token |
+| GET    | `/auth/csrf`             | Web Operator/Admin | Cấp signed double-submit CSRF token; đặt cookie `vxn_csrf`; `no-store` |
+| GET    | `/auth/me`               | Authenticated      | Bootstrap phiên hiện tại từ access cookie hoặc Bearer; không tự refresh, không trả token thô |
 | POST   | `/auth/refresh`          | Authenticated      | Refresh token (rotation + family)         |
 | POST   | `/auth/logout`           | Authenticated      | Logout + revoke session                   |
 | POST   | `/auth/re-auth`          | Authenticated      | Re-auth thao tác nhạy cảm (password / OTP / mã MFA) |
@@ -155,6 +158,30 @@ Path dưới đây tương đối với base `/v1`.
 | DELETE | `/auth/sessions/{sessionId}` | Authenticated   | Revoke đúng family của chính subject, idempotent 204; foreign/missing 404 |
 
 Operator/Employee login bằng mật khẩu tạm còn hạn trả `passwordChangeRequired`, `passwordChangeToken`, `passwordChangeExpiresIn` thay vì access/refresh token hay MFA secret. Khi `credentialDeliveryPending` hoặc `status` không `ACTIVE`, login bị chặn. Challenge cấp trước reset/retry bị vô hiệu bởi `authEpoch`; lệnh đổi mật khẩu kiểm lại epoch và `ACTIVE`. Password change thành công không tự đăng nhập. V1 không hard-cap số phiên.
+
+#### 7.1.1. Dual transport Web / Mobile (TASK-OQ-05 — đóng 25/09/2026)
+
+- Client chọn tường minh bằng `X-Auth-Transport: cookie | bearer`; **không sniff User-Agent**. Thiếu header = `bearer` để giữ tương thích Mobile. Giá trị khác → `400 AUTH_TRANSPORT_INVALID`.
+- Header áp dụng cho login Operator/Platform, MFA verify, đổi mật khẩu bắt buộc, refresh, logout và re-auth. Challenge `passwordChangeToken`/`challengeToken` vẫn ở JSON và web chỉ giữ trong memory; chưa cấp cookie auth trước khi hoàn tất login/MFA.
+- `bearer`: response token giữ nguyên `{accessToken, refreshToken, tokenType, expiresIn, refreshExpiresIn, scope, role}`; không có `Set-Cookie`.
+- `cookie`: response cấp session **không chứa** access/refresh token thô; trả metadata `{authenticated, scope, role, expiresIn, refreshExpiresIn}` và `backupCodes` đúng một lần nếu vừa enrollment MFA. CSRF token mới trả qua header `X-CSRF-Token`.
+- Protected endpoint nhận đúng một credential: `Authorization: Bearer` **hoặc** `vxn_access`. Có cả hai → `400 AUTH_TRANSPORT_AMBIGUOUS`; không có ưu tiên ngầm.
+
+| Cookie        | HttpOnly | Secure                              | SameSite | Path               | Domain    | Max-Age |
+| ------------- | -------- | ----------------------------------- | -------- | ------------------ | --------- | ------- |
+| `vxn_access`  | Có       | Có ở staging/prod; local HTTP = false | `Lax`  | `/v1`              | host-only | 900s    |
+| `vxn_refresh` | Có       | Như trên                            | `Strict` | `/v1/auth/refresh` | host-only | 30 ngày |
+| `vxn_csrf`    | Không    | Như trên                            | `Strict` | `/v1`              | host-only | 30 ngày, rotate |
+
+Gửi cả `Max-Age` và `Expires`; logout/reuse/revoke current family phải xóa bằng đúng attributes. Không đặt `Domain=.vexenhanh.vn`, không chia sẻ auth credential giữa các app web.
+
+#### 7.1.2. CSRF, CORS và bootstrap
+
+- CSRF dùng **signed double-submit cookie**: web gọi `GET /auth/csrf`, nhận cookie `vxn_csrf` và body `{csrfToken}`; giữ token trong memory, gửi `X-CSRF-Token`.
+- Bắt buộc CSRF + `Origin` hợp allowlist cho mọi `POST/PUT/PATCH/DELETE` dùng cookie trong `/v1/**`, gồm login/MFA/password-change/refresh/logout/re-auth/session revoke và mutation nghiệp vụ. `GET/HEAD/OPTIONS` và Bearer mode được miễn; các method an toàn không được tạo side effect.
+- Rotate CSRF khi cấp session, refresh hoặc đổi mật khẩu thành công; clear khi logout/current family bị revoke. Thiếu/sai/cũ → `403 AUTH_CSRF_INVALID`; origin sai/thiếu ở unsafe cookie request → `403 AUTH_ORIGIN_FORBIDDEN`.
+- CORS: `credentials: true`, echo đúng exact origin từ `CORS_ALLOWED_ORIGINS`, `Vary: Origin`, tuyệt đối không `*`; `OPTIONS` không qua auth/CSRF. Cho phép `Content-Type`, `Authorization`, `X-Auth-Transport`, `X-CSRF-Token`, `X-Request-Id`, `Idempotency-Key`; expose `X-CSRF-Token`, `X-Request-Id`, `Deprecation`.
+- `GET /auth/me` trả `subjectId`, `scope`, `role`, `username`, `sessionId`, `accessExpiresAt`, `mfaVerified`; Operator thêm `operatorId`, `operatorSlug`. Response `no-store`, không trả access/refresh token, MFA secret hay backup code và **không tự refresh**. Web nhận 401 thì chạy đúng một refresh single-flight rồi retry `/auth/me`.
 
 ### 7.2. Marketplace
 
@@ -275,7 +302,7 @@ Transport realtime (Socket.IO / SSE / polling) **chưa thuộc 15-layer selectio
 
 | ID        | Câu hỏi                                              | Tác động           | Trạng thái                                                                                     |
 | --------- | ---------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------- |
-| API-OQ-01 | Auth token lưu/cấp qua Bearer hay cookie cho web?    | FE/API/Security    | **Đóng theo ADR-017**: Web = httpOnly cookie; Mobile = Bearer (token từ `flutter_secure_storage`)     |
+| API-OQ-01 | Auth token lưu/cấp qua Bearer hay cookie cho web?    | FE/API/Security    | **Đóng theo ADR-017 + TASK-OQ-05 (25/09/2026)**: Web Operator/Admin opt-in cookie qua `X-Auth-Transport`; Mobile mặc định giữ JSON/Bearer; contract §7.1.1–§7.1.2 |
 | API-OQ-02 | Guest checkout có nằm trong v1 không?                | Booking API        | **Đóng theo SRS/GLOSSARY**: Guest có guest session cho hold/book/pay/lookup                    |
 | API-OQ-03 | Provider payment đầu tiên là gì?                     | Webhook contract   | **Đóng theo ADR-019**: VNPay (HMAC-SHA512) + MoMo (HMAC-SHA256)                                |
 | API-OQ-04 | Chuẩn pagination dùng page hay cursor cho từng list? | API consistency    | Mở; chốt per-endpoint khi LLD                                                                  |

@@ -17,7 +17,7 @@
 | -------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | Tailwind 4 + token VXN + token ngữ nghĩa Shadcn (`packages/ui`)      | Màn hình nghiệp vụ (search, booking, KYC, payout…) → TRN/BTP/OPR/ADM |
 | Component Shadcn **chỉ những cái khung đang dùng**: `button`, `sheet` | Component khác: thêm bằng `shadcn add` khi màn hình cần              |
-| Font Be Vietnam Pro, logo dùng chung                                 | Đăng nhập, guard route, token web → IAM (cần chốt lưu token web)     |
+| Font Be Vietnam Pro, logo dùng chung                                 | Đăng nhập, guard route, cookie/CSRF/CORS web → `TASK-IAM-006`         |
 | Sidebar + footer Marketplace (theo `CustomerShell` FE cũ); sidebar Operator OS + Admin; mục điều hướng theo 06 §5 | API client, mock data, Zod form                                       |
 | —                                                                    | **Phần Employee** (Khanh loại khỏi phạm vi)                            |
 
