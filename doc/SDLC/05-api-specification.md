@@ -25,6 +25,7 @@
 | v0.4      | 22/09/2026 | AI Agent       | **TASK-IAM-005 Q1–Q8 do Khanh duyệt:** §7.1 bổ sung first-login password-change challenge và session family list/revoke; §7.3 chốt Employee CRUD/lifecycle tối thiểu. Provision Operator+Owner là service primitive cho OPR-001, chưa có HTTP KYC giả. OpenAPI sinh từ Zod là contract chi tiết. Giữ trạng thái Approved, không tự promote. |
 | v0.5      | 23/09/2026 | AI Agent       | Hardening IAM-005: cờ chờ giao mật khẩu riêng trạng thái khóa, challenge vô hiệu theo `authEpoch`, quota/cooldown email mật khẩu tạm (429), recovery khi gửi mail lỗi. Giữ quyết định Q8 re-auth bằng mật khẩu hoặc MFA theo Khanh; không đổi trạng thái Approved. |
 | v0.6      | 25/09/2026 | AI Agent       | **Đóng TASK-OQ-05 / mở khóa TASK-IAM-006:** chốt dual transport bằng `X-Auth-Transport`; cookie `vxn_access`/`vxn_refresh`; signed double-submit CSRF `vxn_csrf`; CORS credentialed allowlist; thêm `GET /auth/csrf` + `GET /auth/me`. Giữ nguyên JSON/Bearer mặc định cho Mobile; không thay đổi trạng thái Approved. |
+| v0.7      | 25/09/2026 | AI Agent       | **TASK-CAT-001 Q1 do Khanh duyệt:** thêm §7.6 — 5 endpoint đọc catalog công khai `/catalog/*` (provinces, wards, stop-points, vehicle-types, amenities), chỉ item `ACTIVE`. Ghi catalog vẫn ở `/admin/catalog/*` (ADM-001). Giữ trạng thái Approved, không tự promote. |
 
 ---
 
@@ -247,6 +248,18 @@ Thao tác phức tạp dùng `POST` + sub-resource (ADR-012).
 | POST         | `/admin/payouts/{payoutId}/confirm`         | Admin | Confirm payout + nhập bank ref (ADR-022) |
 | GET/PUT      | `/admin/disputes`                           | Admin | Dispute workflow (final arbiter)         |
 | GET          | `/admin/audit-logs`                         | Admin | Truy xuất audit (Mongo)                  |
+
+### 7.6. Catalog (đọc công khai)
+
+Dữ liệu chuẩn Platform (DB §5.2 nhóm Catalog) cho Marketplace search và Operator OS cấu hình xe/tuyến. Không cần token; chỉ trả item `ACTIVE` và field công khai (Security §6 "Public catalog"). Ghi/vô hiệu hóa catalog vẫn qua `/admin/catalog/*` (§7.5).
+
+| Method | Path                     | Actor                   | Mục đích                                                                                   |
+| ------ | ------------------------ | ----------------------- | ------------------------------------------------------------------------------------------ |
+| GET    | `/catalog/provinces`     | Guest, User, Operator   | Danh sách tỉnh / thành                                                                     |
+| GET    | `/catalog/wards`         | Guest, User, Operator   | Phường / xã của một tỉnh (`provinceId` bắt buộc)                                           |
+| GET    | `/catalog/stop-points`   | Guest, User, Operator   | Điểm đón / trả chuẩn; lọc `provinceId`, `wardId`, `type`; cursor mặc định 20 / tối đa 100 |
+| GET    | `/catalog/vehicle-types` | Guest, User, Operator   | Loại phương tiện chuẩn                                                                     |
+| GET    | `/catalog/amenities`     | Guest, User, Operator   | Tiện ích chuẩn                                                                             |
 
 ---
 

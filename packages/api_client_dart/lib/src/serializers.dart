@@ -15,6 +15,7 @@ import 'package:api_client_dart/src/date_serializer.dart';
 import 'package:api_client_dart/src/model/date.dart';
 
 import 'package:api_client_dart/src/model/account_mutation_response_dto_output.dart';
+import 'package:api_client_dart/src/model/amenity_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/auth_token_response_dto_output.dart';
 import 'package:api_client_dart/src/model/credential_login_dto.dart';
 import 'package:api_client_dart/src/model/credential_login_response_dto_output.dart';
@@ -39,6 +40,8 @@ import 'package:api_client_dart/src/model/password_change_challenge_response.dar
 import 'package:api_client_dart/src/model/password_change_required_dto.dart';
 import 'package:api_client_dart/src/model/postgres_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/problem_details_dto.dart';
+import 'package:api_client_dart/src/model/province_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/province_list_response_dto_output_items_inner.dart';
 import 'package:api_client_dart/src/model/queue_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/queue_health_response_dto_output_queues_inner.dart';
 import 'package:api_client_dart/src/model/reauth_dto.dart';
@@ -47,11 +50,18 @@ import 'package:api_client_dart/src/model/refresh_token_dto.dart';
 import 'package:api_client_dart/src/model/register_dto.dart';
 import 'package:api_client_dart/src/model/session_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/session_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/stop_point_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/stop_point_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/vehicle_type_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/vehicle_type_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/ward_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/ward_list_response_dto_output_items_inner.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
   AccountMutationResponseDtoOutput,
+  AmenityListResponseDtoOutput,
   AuthTokenResponseDtoOutput,
   CredentialLoginDto,
   CredentialLoginResponseDtoOutput,
@@ -76,6 +86,8 @@ part 'serializers.g.dart';
   PasswordChangeRequiredDto,
   PostgresHealthResponseDtoOutput,
   ProblemDetailsDto,
+  ProvinceListResponseDtoOutput,
+  ProvinceListResponseDtoOutputItemsInner,
   QueueHealthResponseDtoOutput,
   QueueHealthResponseDtoOutputQueuesInner,
   ReauthDto,
@@ -84,11 +96,29 @@ part 'serializers.g.dart';
   RegisterDto,
   SessionListResponseDtoOutput,
   SessionListResponseDtoOutputItemsInner,
+  StopPointListResponseDtoOutput,
+  StopPointListResponseDtoOutputItemsInner,
+  VehicleTypeListResponseDtoOutput,
+  VehicleTypeListResponseDtoOutputItemsInner,
+  WardListResponseDtoOutput,
+  WardListResponseDtoOutputItemsInner,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ProvinceListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SessionListResponseDtoOutputItemsInner)]),
         () => ListBuilder<SessionListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(StopPointListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<StopPointListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(VehicleTypeListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<VehicleTypeListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(EmployeeListResponseDtoOutputItemsInner)]),
@@ -105,6 +135,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(String)]),
         () => ListBuilder<String>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(WardListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<WardListResponseDtoOutputItemsInner>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

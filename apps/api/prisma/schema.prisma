@@ -332,3 +332,103 @@ model MfaBackupCode {
   @@index([credentialId, usedAt])
   @@map("mfa_backup_codes")
 }
+
+// ════════════════════════════ Catalog (TASK-CAT-001) ════════════════════════════
+// Dữ liệu chuẩn Platform (DB §5.2): KHÔNG `operator_id`. RLS: ai cũng đọc, chỉ scope platform/system
+// được ghi (migration `add_catalog`). Không xoá cứng — vô hiệu hoá bằng `status` (UC-24 A1).
+// FK RESTRICT, không CASCADE: cascade chạy quyền owner và bỏ qua RLS.
+
+/// Trạng thái catalog item; API công khai chỉ trả `ACTIVE`.
+enum CatalogStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// Loại điểm đón / trả chuẩn (AS-15, DP-08).
+enum StopPointType {
+  BUS_STATION
+  OFFICE
+  REST_STOP
+  PICKUP_POINT
+}
+
+/// Tỉnh / thành — `code` theo danh mục hành chính chính thức.
+model Province {
+  id        String        @id @default(uuid())
+  code      String        @unique
+  name      String
+  status    CatalogStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  wards Ward[]
+
+  @@map("provinces")
+}
+
+/// Phường / xã thuộc một tỉnh — `code` theo danh mục hành chính chính thức.
+model Ward {
+  id         String        @id @default(uuid())
+  provinceId String        @map("province_id")
+  code       String        @unique
+  name       String
+  status     CatalogStatus @default(ACTIVE)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
+
+  province   Province           @relation(fields: [provinceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  stopPoints StopPointCatalog[]
+
+  // Đích của FK ghép từ stop point: DB tự chặn phường không thuộc tỉnh (UC-24 A2).
+  @@unique([id, provinceId])
+  @@index([provinceId])
+  @@map("wards")
+}
+
+/// Điểm đón / trả chuẩn Platform; tách khỏi `stop_points` riêng của Operator (TRN-002).
+/// Toạ độ `double precision` + CHECK phạm vi trong migration; chưa PostGIS.
+model StopPointCatalog {
+  id          String        @id @default(uuid())
+  name        String
+  type        StopPointType
+  address     String
+  provinceId  String        @map("province_id")
+  wardId      String        @map("ward_id")
+  latitude    Float
+  longitude   Float
+  description String?
+  status      CatalogStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  ward Ward @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([provinceId, status])
+  @@index([wardId])
+  @@map("stop_points_catalog")
+}
+
+/// Loại phương tiện chuẩn (GLOSSARY: seater, sleeper, limousine, cabin).
+model VehicleType {
+  id          String        @id @default(uuid())
+  code        String        @unique
+  name        String
+  description String?
+  status      CatalogStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@map("vehicle_types")
+}
+
+/// Tiện ích chuẩn gắn cho phương tiện (TRN-001).
+model Amenity {
+  id        String        @id @default(uuid())
+  code      String        @unique
+  name      String
+  status    CatalogStatus @default(ACTIVE)
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  @@map("amenities")
+}

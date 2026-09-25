@@ -4,10 +4,12 @@
  * `src/database/` — kể cả `import type` — để Prisma không rò khắp domain.
  */
 export {
+  CatalogStatus,
   EmployeeRole,
   OperatorRole,
   PlatformRole,
   SessionRevokeReason,
+  StopPointType,
   SubjectType,
 } from "../generated/prisma/client";
 export type { AuthSession } from "../generated/prisma/client";

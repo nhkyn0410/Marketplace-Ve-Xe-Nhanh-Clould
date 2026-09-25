@@ -20,6 +20,12 @@ export const RLS_TABLES = [
   "auth_sessions",
   "mfa_credentials",
   "mfa_backup_codes",
+  // Catalog Platform (TASK-CAT-001): không tenant, nhưng RLS chặn ghi ngoài platform/system.
+  "provinces",
+  "wards",
+  "stop_points_catalog",
+  "vehicle_types",
+  "amenities",
 ] as const;
 
 @Injectable()

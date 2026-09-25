@@ -20,6 +20,7 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:catalog": "tsx prisma/catalog-seed.ts",
     "db:app-role": "node scripts/db-app-role.mjs",
     "db:app-role:cleanup": "node scripts/db-app-role.mjs --cleanup-legacy-pooler-role",
     "postinstall": "prisma generate"

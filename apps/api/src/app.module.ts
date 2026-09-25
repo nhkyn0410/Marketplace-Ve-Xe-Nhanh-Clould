@@ -4,6 +4,7 @@ import { SentryModule } from "@sentry/nestjs/setup";
 import { ZodSerializerInterceptor } from "nestjs-zod";
 import { AppController } from "./app.controller";
 import { AuditModule } from "./audit/audit.module";
+import { CatalogModule } from "./catalog/catalog.module";
 import { AppConfigModule } from "./config/app-config.module";
 import { DatabaseModule } from "./database/database.module";
 import { MongoAuditModule } from "./database/mongo-audit.module";
@@ -18,7 +19,8 @@ import { QueueModule } from "./queue/queue.module";
     MongoAuditModule,
     AuditModule,
     QueueModule,
-    IamModule
+    IamModule,
+    CatalogModule
   ],
   controllers: [AppController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor }]

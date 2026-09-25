@@ -9,6 +9,7 @@ part of 'serializers.dart';
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(AccountMutationResponseDtoOutput.serializer)
       ..add(AccountMutationResponseDtoOutputStatusEnum.serializer)
+      ..add(AmenityListResponseDtoOutput.serializer)
       ..add(AuthTokenResponseDtoOutput.serializer)
       ..add(AuthTokenResponseDtoOutputScopeEnum.serializer)
       ..add(AuthTokenResponseDtoOutputTokenTypeEnum.serializer)
@@ -57,6 +58,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(PostgresHealthResponseDtoOutputServiceEnum.serializer)
       ..add(PostgresHealthResponseDtoOutputStatusEnum.serializer)
       ..add(ProblemDetailsDto.serializer)
+      ..add(ProvinceListResponseDtoOutput.serializer)
+      ..add(ProvinceListResponseDtoOutputItemsInner.serializer)
       ..add(QueueHealthResponseDtoOutput.serializer)
       ..add(QueueHealthResponseDtoOutputQueuesInner.serializer)
       ..add(QueueHealthResponseDtoOutputStatusEnum.serializer)
@@ -68,10 +71,25 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RegisterDto.serializer)
       ..add(SessionListResponseDtoOutput.serializer)
       ..add(SessionListResponseDtoOutputItemsInner.serializer)
+      ..add(StopPointListResponseDtoOutput.serializer)
+      ..add(StopPointListResponseDtoOutputItemsInner.serializer)
+      ..add(StopPointListResponseDtoOutputItemsInnerTypeEnum.serializer)
+      ..add(VehicleTypeListResponseDtoOutput.serializer)
+      ..add(VehicleTypeListResponseDtoOutputItemsInner.serializer)
+      ..add(WardListResponseDtoOutput.serializer)
+      ..add(WardListResponseDtoOutputItemsInner.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(EmployeeListResponseDtoOutputItemsInner)]),
           () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(ProvinceListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(ProvinceListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<ProvinceListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(QueueHealthResponseDtoOutputQueuesInner)]),
@@ -81,8 +99,21 @@ Serializers _$serializers = (Serializers().toBuilder()
               const [const FullType(SessionListResponseDtoOutputItemsInner)]),
           () => ListBuilder<SessionListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(StopPointListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<StopPointListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(VehicleTypeListResponseDtoOutputItemsInner)
+          ]),
+          () => ListBuilder<VehicleTypeListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(WardListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<WardListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
           const FullType(
               BuiltMap, const [const FullType(String), const FullType(int)]),

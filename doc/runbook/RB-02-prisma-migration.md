@@ -7,7 +7,7 @@ match:
   - db:app-role
   - prisma:generate
   - prisma generate
-  - db:seed
+  - /db:seed(?!:catalog)/
 ---
 
 # RB-02 — Tạo & áp migration Prisma

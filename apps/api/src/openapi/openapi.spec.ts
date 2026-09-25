@@ -125,6 +125,27 @@ describe("OpenAPI generation", () => {
         oauthParams.some((param) => "name" in param && param.name === "provider"),
         "thiếu @ApiParam cho {provider}"
       ).toBe(true);
+
+      // CAT-001 (API §7.6): catalog đọc công khai — có route, KHÔNG security, query khai tường minh
+      // (tsx không có `design:paramtypes` nên `@Query()` DTO không tự sinh param).
+      const catalogQueries: Record<string, string[]> = {
+        "/v1/catalog/provinces": [],
+        "/v1/catalog/wards": ["provinceId"],
+        "/v1/catalog/stop-points": ["provinceId", "wardId", "type", "cursor", "limit"],
+        "/v1/catalog/vehicle-types": [],
+        "/v1/catalog/amenities": []
+      };
+      for (const [path, names] of Object.entries(catalogQueries)) {
+        const get = document.paths[path]?.get;
+        expect(get, `thiếu GET ${path} — nhớ thêm CatalogController vào OpenApiModule`).toBeDefined();
+        expect(get?.security, `${path} là route công khai`).toBeUndefined();
+        expect(get?.responses?.[200]).toBeDefined();
+        const declared = (get?.parameters ?? []).map((param) => ("name" in param ? param.name : ""));
+        expect(declared.sort(), `${path} thiếu @ApiQuery`).toEqual([...names].sort());
+      }
+      expect(schemas?.StopPointListResponseDto_Output?.required).toEqual(
+        expect.arrayContaining(["items", "nextCursor"])
+      );
     } finally {
       await app.close();
     }

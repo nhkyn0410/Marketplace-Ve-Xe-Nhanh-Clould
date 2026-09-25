@@ -79,6 +79,11 @@ Class | Method | HTTP request | Description
 [*AuthApi*](doc/AuthApi.md) | [**authControllerVerifyOtp**](doc/AuthApi.md#authcontrollerverifyotp) | **POST** /v1/auth/otp/verify | 
 [*AuthApi*](doc/AuthApi.md) | [**sessionControllerList**](doc/AuthApi.md#sessioncontrollerlist) | **GET** /v1/auth/sessions | 
 [*AuthApi*](doc/AuthApi.md) | [**sessionControllerRevoke**](doc/AuthApi.md#sessioncontrollerrevoke) | **DELETE** /v1/auth/sessions/{sessionId} | 
+[*CatalogApi*](doc/CatalogApi.md) | [**catalogControllerListAmenities**](doc/CatalogApi.md#catalogcontrollerlistamenities) | **GET** /v1/catalog/amenities | 
+[*CatalogApi*](doc/CatalogApi.md) | [**catalogControllerListProvinces**](doc/CatalogApi.md#catalogcontrollerlistprovinces) | **GET** /v1/catalog/provinces | 
+[*CatalogApi*](doc/CatalogApi.md) | [**catalogControllerListStopPoints**](doc/CatalogApi.md#catalogcontrollerliststoppoints) | **GET** /v1/catalog/stop-points | 
+[*CatalogApi*](doc/CatalogApi.md) | [**catalogControllerListVehicleTypes**](doc/CatalogApi.md#catalogcontrollerlistvehicletypes) | **GET** /v1/catalog/vehicle-types | 
+[*CatalogApi*](doc/CatalogApi.md) | [**catalogControllerListWards**](doc/CatalogApi.md#catalogcontrollerlistwards) | **GET** /v1/catalog/wards | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerHealth**](doc/HealthApi.md#appcontrollerhealth) | **GET** /v1/health | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerMongo**](doc/HealthApi.md#appcontrollermongo) | **GET** /v1/health/mongo | 
 [*HealthApi*](doc/HealthApi.md) | [**appControllerPostgres**](doc/HealthApi.md#appcontrollerpostgres) | **GET** /v1/health/postgres | 
@@ -93,6 +98,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [AccountMutationResponseDtoOutput](doc/AccountMutationResponseDtoOutput.md)
+ - [AmenityListResponseDtoOutput](doc/AmenityListResponseDtoOutput.md)
  - [AuthTokenResponseDtoOutput](doc/AuthTokenResponseDtoOutput.md)
  - [CredentialLoginDto](doc/CredentialLoginDto.md)
  - [CredentialLoginResponseDtoOutput](doc/CredentialLoginResponseDtoOutput.md)
@@ -117,6 +123,8 @@ Class | Method | HTTP request | Description
  - [PasswordChangeRequiredDto](doc/PasswordChangeRequiredDto.md)
  - [PostgresHealthResponseDtoOutput](doc/PostgresHealthResponseDtoOutput.md)
  - [ProblemDetailsDto](doc/ProblemDetailsDto.md)
+ - [ProvinceListResponseDtoOutput](doc/ProvinceListResponseDtoOutput.md)
+ - [ProvinceListResponseDtoOutputItemsInner](doc/ProvinceListResponseDtoOutputItemsInner.md)
  - [QueueHealthResponseDtoOutput](doc/QueueHealthResponseDtoOutput.md)
  - [QueueHealthResponseDtoOutputQueuesInner](doc/QueueHealthResponseDtoOutputQueuesInner.md)
  - [ReauthDto](doc/ReauthDto.md)
@@ -125,6 +133,12 @@ Class | Method | HTTP request | Description
  - [RegisterDto](doc/RegisterDto.md)
  - [SessionListResponseDtoOutput](doc/SessionListResponseDtoOutput.md)
  - [SessionListResponseDtoOutputItemsInner](doc/SessionListResponseDtoOutputItemsInner.md)
+ - [StopPointListResponseDtoOutput](doc/StopPointListResponseDtoOutput.md)
+ - [StopPointListResponseDtoOutputItemsInner](doc/StopPointListResponseDtoOutputItemsInner.md)
+ - [VehicleTypeListResponseDtoOutput](doc/VehicleTypeListResponseDtoOutput.md)
+ - [VehicleTypeListResponseDtoOutputItemsInner](doc/VehicleTypeListResponseDtoOutputItemsInner.md)
+ - [WardListResponseDtoOutput](doc/WardListResponseDtoOutput.md)
+ - [WardListResponseDtoOutputItemsInner](doc/WardListResponseDtoOutputItemsInner.md)
 
 
 ## Documentation For Authorization

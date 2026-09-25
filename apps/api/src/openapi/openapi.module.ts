@@ -2,6 +2,8 @@ import { Module } from "@nestjs/common";
 import { APP_INTERCEPTOR } from "@nestjs/core";
 import { ZodSerializerInterceptor } from "nestjs-zod";
 import { AppController } from "../app.controller";
+import { CatalogController } from "../catalog/catalog.controller";
+import { CatalogService } from "../catalog/catalog.service";
 import { APP_CONFIG } from "../config/env.config";
 import { DatabaseHealthService } from "../database/database-health.service";
 import { MongoHealthService } from "../database/mongo-health.service";
@@ -21,11 +23,18 @@ import { RedisHealthService } from "../redis/redis-health.service";
 @Module({
   // Mọi controller IAM phải có mặt ở đây, nếu không route biến mất khỏi OpenAPI
   // và `gen:api-client` sinh client thiếu toàn bộ auth mà CI vẫn xanh (ADR-012).
-  controllers: [AppController, AuthController, SessionController, EmployeeAccountController],
+  controllers: [
+    AppController,
+    AuthController,
+    SessionController,
+    EmployeeAccountController,
+    CatalogController,
+  ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     // Scan-only: chỉ cần metadata route, không cần dependency thật (không Postgres/Redis/Mongo).
     { provide: AuthService, useValue: {} },
+    { provide: CatalogService, useValue: {} },
     // Dependency của AccessTokenGuard (logout, re-auth) — Nest dựng guard lúc khởi tạo module.
     { provide: TokenService, useValue: {} },
     { provide: SessionService, useValue: {} },

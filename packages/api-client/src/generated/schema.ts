@@ -356,6 +356,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/catalog/provinces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CatalogController_listProvinces"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/wards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CatalogController_listWards"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/stop-points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CatalogController_listStopPoints"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/vehicle-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CatalogController_listVehicleTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/catalog/amenities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CatalogController_listAmenities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -581,6 +661,59 @@ export interface components {
         AccountMutationResponseDto_Output: {
             /** @constant */
             status: "ok";
+        };
+        ProvinceListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                code: string;
+                name: string;
+            }[];
+        };
+        WardListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                code: string;
+                name: string;
+                /** Format: uuid */
+                provinceId: string;
+            }[];
+        };
+        StopPointListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                type: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+                address: string;
+                /** Format: uuid */
+                provinceId: string;
+                /** Format: uuid */
+                wardId: string;
+                latitude: number;
+                longitude: number;
+                description: string | null;
+            }[];
+            nextCursor: string | null;
+        };
+        VehicleTypeListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                code: string;
+                name: string;
+                description: string | null;
+            }[];
+        };
+        AmenityListResponseDto_Output: {
+            items: {
+                /** Format: uuid */
+                id: string;
+                code: string;
+                name: string;
+            }[];
         };
     };
     responses: never;
@@ -1590,6 +1723,132 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    CatalogController_listProvinces: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tỉnh/thành đang hoạt động. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProvinceListResponseDto_Output"];
+                };
+            };
+        };
+    };
+    CatalogController_listWards: {
+        parameters: {
+            query: {
+                provinceId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Phường/xã đang hoạt động của tỉnh. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WardListResponseDto_Output"];
+                };
+            };
+            /** @description Thiếu hoặc sai `provinceId`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    CatalogController_listStopPoints: {
+        parameters: {
+            query?: {
+                provinceId?: string;
+                wardId?: string;
+                type?: "BUS_STATION" | "OFFICE" | "REST_STOP" | "PICKUP_POINT";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Điểm đón/trả chuẩn đang hoạt động. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StopPointListResponseDto_Output"];
+                };
+            };
+            /** @description Query không hợp lệ. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    CatalogController_listVehicleTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Loại phương tiện đang hoạt động. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VehicleTypeListResponseDto_Output"];
+                };
+            };
+        };
+    };
+    CatalogController_listAmenities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tiện ích đang hoạt động. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AmenityListResponseDto_Output"];
                 };
             };
         };
