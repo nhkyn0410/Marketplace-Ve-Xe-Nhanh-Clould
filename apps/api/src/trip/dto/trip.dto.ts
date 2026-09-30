@@ -14,8 +14,12 @@ const optionalText = (max: number) =>
     .nullable()
     .transform((value) => value || null);
 
-// Nhận ISO 8601 có múi giờ (vd `+07:00`) hoặc `Z`; lưu UTC.
-const instant = z.iso.datetime({ offset: true }).transform((value) => new Date(value));
+// Nhận ISO 8601 có múi giờ (vd `+07:00`) hoặc `Z`; lưu UTC. Chặn năm UTC > 9999 (vd `9999-12-31T23:00-07:00`):
+// `toISOString()` khi đó ra `+010000-…`, response schema từ chối → GET/list của tenant trả 500.
+const instant = z.iso
+  .datetime({ offset: true })
+  .transform((value) => new Date(value))
+  .refine((date) => date.getUTCFullYear() <= 9999, "Năm phải từ 9999 trở xuống.");
 
 // Không `.default()`: POST và PUT (thay toàn bộ) phải gửi đủ trường. Trạng thái không nằm trong body —
 // TRN-003 chỉ tạo/sửa chuyến `DRAFT`; mở bán/khoá/huỷ thuộc TRN-006.

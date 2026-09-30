@@ -1,8 +1,11 @@
 -- TASK-TRN-003 — Trip + TripStop + TripSeat (DB §5.2/§7, FR-OPS-06, BR-14, UC-14).
 -- Operator-owned: mọi bảng có `operator_id` + RLS. FK ghép `(…, operator_id)` chặn gắn route/xe/điểm của tenant khác.
 
--- btree_gist: cho phép `vehicle_id WITH =` trong ràng buộc EXCLUDE dùng GiST (có sẵn trong contrib Postgres 16 / Supabase).
-CREATE EXTENSION IF NOT EXISTS btree_gist;
+-- btree_gist: cho phép `… WITH =` trên cột TEXT trong ràng buộc EXCLUDE dùng GiST (contrib Postgres 16 / Supabase).
+-- Đặt ở schema `extensions` (khuyến nghị Supabase, không rải object vào `public`); Postgres tìm operator class
+-- mặc định không phụ thuộc search_path nên ràng buộc bên dưới vẫn dùng được.
+CREATE SCHEMA IF NOT EXISTS extensions;
+CREATE EXTENSION IF NOT EXISTS btree_gist WITH SCHEMA extensions;
 
 -- CreateEnum
 CREATE TYPE "TripStatus" AS ENUM ('DRAFT', 'OPEN_FOR_SALE', 'SOLD_OUT', 'LOCKED', 'BOARDING', 'DEPARTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'INCIDENT');
@@ -107,7 +110,11 @@ ALTER TABLE "trips" ADD CONSTRAINT "trips_arrival_after_departure" CHECK ("arriv
 -- BR-14: một xe không chạy hai chuyến chồng giờ. Khoảng bận `[departure_at, arrival_at)` — chuyến sau được
 -- khởi hành đúng lúc chuyến trước đến (Khanh chốt 30/09/2026: không có thời gian đệm quay đầu). Chuyến đã
 -- huỷ không giữ xe. Ràng buộc ở DB nên hai request đồng thời cũng chỉ một bên thành công.
+-- Có `operator_id`: EXCLUDE kiểm trước FK ghép (FK chạy cuối câu lệnh) và bỏ qua RLS — thiếu cột tenant thì
+-- một dòng gắn nhầm xe của tenant khác sẽ báo "trùng lịch" thay vì lỗi FK, lộ lịch xe tenant đó. Không làm
+-- yếu BR-14: xe thuộc đúng một tenant (FK ghép, ON UPDATE RESTRICT).
 ALTER TABLE "trips" ADD CONSTRAINT "trips_vehicle_no_overlap" EXCLUDE USING gist (
+  "operator_id" WITH =,
   "vehicle_id" WITH =,
   tsrange("departure_at", "arrival_at", '[)') WITH &&
 ) WHERE ("vehicle_id" IS NOT NULL AND "status" <> 'CANCELLED');

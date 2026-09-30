@@ -221,6 +221,30 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
       expect(vehicleCross.text).toMatch(/trips_vehicle_id_operator_id_fkey|Foreign key/i);
     });
 
+    it("xe của B đang có chuyến: dòng A gắn xe đó (đường system) báo lỗi FK, KHÔNG báo trùng lịch (không lộ lịch B)", async () => {
+      const { vehicle: vehicleB } = await vehicleWithSeats(authzB);
+      const start = nextDay();
+      await trips.create(
+        authzB,
+        tripInput({ routeId: routeB, vehicleId: vehicleB.id, departureAt: at(start, 1), arrivalAt: at(start, 4) }),
+      );
+      const cross = await rejectionOf(
+        prisma.withSystem((tx) =>
+          tx.trip.create({
+            data: {
+              operatorId: tenantA,
+              routeId: route3,
+              vehicleId: vehicleB.id,
+              departureAt: new Date(start + 2 * HOUR),
+              arrivalAt: new Date(start + 3 * HOUR),
+            },
+          }),
+        ),
+      );
+      expect(cross.text).toMatch(/trips_vehicle_id_operator_id_fkey|Foreign key/i);
+      expect(cross.text).not.toMatch(/trips_vehicle_no_overlap|23P01/);
+    });
+
     it("CHECK: giờ đến phải sau giờ đi (kể cả ghi thẳng DB)", async () => {
       const start = nextDay();
       const invalid = await rejectionOf(
@@ -388,6 +412,27 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
       const detached = await trips.update(authzA, trip.id, tripInput({ routeId: route2, vehicleId: null, ...base }));
       expect(detached.seats).toEqual([]);
       expect(detached.vehicleId).toBeNull();
+    });
+
+    it("hai PUT đồng thời (đổi xe ↔ giữ xe): ghế cuối cùng luôn khớp sơ đồ của xe cuối cùng", async () => {
+      const { vehicle: small } = await vehicleWithSeats(authzA, 2);
+      const { vehicle: large } = await vehicleWithSeats(authzA, 6);
+      const seatsOf = new Map([
+        [small.id, 2],
+        [large.id, 6],
+      ]);
+      // Race phụ thuộc thời điểm: nhiều vòng để bản đọc-không-khoá (lỗi M1 security review) đỏ ổn định.
+      for (let round = 0; round < 30; round++) {
+        const start = nextDay();
+        const base = { routeId: route3, departureAt: at(start, 1), arrivalAt: at(start, 3) };
+        const trip = await trips.create(authzA, tripInput({ ...base, vehicleId: small.id }));
+        await Promise.allSettled([
+          trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: large.id })),
+          trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: small.id, note: "giữ xe" })),
+        ]);
+        const final = await trips.get(authzA, trip.id);
+        expect(final.seatCount, `vòng ${round}`).toBe(seatsOf.get(final.vehicleId!));
+      }
     });
 
     it("route/xe ĐANG gắn đã ngừng dùng vẫn sửa được chuyến; route/xe MỚI thì phải hợp lệ", async () => {

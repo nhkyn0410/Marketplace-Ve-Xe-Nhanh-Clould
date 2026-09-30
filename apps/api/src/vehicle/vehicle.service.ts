@@ -107,6 +107,9 @@ export class VehicleService {
     const { db, operatorId } = requireTenant(authz);
     const row = await this.withPlateConflict(() =>
       this.prisma.withScope(db, async (tx) => {
+        // Khoá dòng xe TRƯỚC khi đọc: `current.seatMapId` quyết định có kiểm UC-12 A3 hay không, đọc giá trị
+        // cũ (PUT khác vừa đổi sơ đồ) thì bỏ sót kiểm. Khoá này cũng xếp hàng với tạo chuyến (`FOR SHARE`).
+        await tx.$queryRaw`SELECT 1 FROM vehicles WHERE id = ${vehicleId} AND operator_id = ${operatorId} FOR NO KEY UPDATE`;
         const current = await tx.vehicle.findFirst({
           where: { id: vehicleId, operatorId },
           select: { vehicleTypeId: true, seatMapId: true, amenities: { select: { amenityId: true } } },
@@ -132,7 +135,8 @@ export class VehicleService {
           },
         });
         // UC-12 A3: xe đang chạy chuyến chưa kết thúc không đổi sơ đồ ghế (ghế chuyến lấy từ sơ đồ này).
-        // Kiểm SAU lệnh ghi (đã khoá dòng xe) — cùng lý do như PUT sơ đồ ghế.
+        // Dòng xe đã khoá từ đầu transaction nên chuyến tạo đồng thời (khoá `FOR SHARE` cùng dòng) đã commit
+        // trước — thấy ở đây — hoặc phải chờ và đọc sơ đồ mới.
         if (input.seatMapId !== current.seatMapId) {
           const inUse = await tx.trip.count({ where: { operatorId, vehicleId, ...unfinishedTripWhere(new Date()) } });
           if (inUse > 0) {

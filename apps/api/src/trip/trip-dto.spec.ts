@@ -33,6 +33,7 @@ describe("TripInputSchema", () => {
     ["khởi hành trong quá khứ", { departureAt: "2020-01-01T00:00:00Z", arrivalAt: "2020-01-01T05:00:00Z" }],
     ["chuyến dài quá 7 ngày", { arrivalAt: future(7 * 24 + 1) }],
     ["giờ không có múi giờ", { departureAt: "2031-01-01T07:00:00" }],
+    ["năm UTC vượt 9999", { departureAt: "9999-12-31T20:00:00-07:00", arrivalAt: "9999-12-31T23:00:00-07:00" }],
     ["điểm đầu lệch giờ đi", { stopTimes: [future(1), future(8)] }],
     ["điểm cuối lệch giờ đến", { stopTimes: [future(0), future(7)] }],
     ["giờ các điểm giảm dần", { stopTimes: [future(0), future(5), future(4), future(8)] }],

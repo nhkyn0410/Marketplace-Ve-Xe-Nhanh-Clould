@@ -147,17 +147,19 @@ export class TripService {
 
   /**
    * Thay toàn bộ chuyến `DRAFT`. Route/xe ĐANG gắn được giữ dù đã ngừng dùng (mẫu TRN-001/002); chỉ route/xe
-   * MỚI chọn phải hợp lệ. Điểm dừng luôn chép lại từ route; ghế chỉ sinh lại khi đổi xe. Ghi dòng chuyến
-   * TRƯỚC (khoá dòng, điều kiện `DRAFT`) rồi mới thay điểm/ghế → hai PUT đồng thời không trộn.
+   * MỚI chọn phải hợp lệ. Điểm dừng luôn chép lại từ route; ghế chỉ sinh lại khi đổi xe. Khoá dòng chuyến
+   * NGAY KHI ĐỌC: "đổi xe hay không" và "route/xe đang gắn" phải tính trên giá trị mới nhất, nếu không hai
+   * PUT đồng thời (đổi xe ↔ giữ xe) để lại ghế của xe này trên chuyến của xe kia.
    */
   async update(authz: Authorization, tripId: string, input: TripInput): Promise<TripResponse> {
     const { db, operatorId } = requireTenant(authz);
     const row = await this.withOverlapConflict(() =>
       this.prisma.withScope(db, async (tx) => {
-        const current = await tx.trip.findFirst({
-          where: { id: tripId, operatorId },
-          select: { routeId: true, vehicleId: true, status: true },
-        });
+        const [current] = await tx.$queryRaw<{ routeId: string; vehicleId: string | null; status: TripStatus }[]>`
+          SELECT route_id AS "routeId", vehicle_id AS "vehicleId", status::text AS "status"
+          FROM trips
+          WHERE id = ${tripId} AND operator_id = ${operatorId}
+          FOR NO KEY UPDATE`;
         if (!current) {
           throw tripNotFound();
         }
@@ -179,7 +181,7 @@ export class TripService {
           },
         });
         if (updated.count === 0) {
-          // Chuyến vừa bị chuyển khỏi DRAFT bởi request khác giữa lúc đọc và ghi.
+          // Chốt phòng thủ: dòng đã khoá từ lúc đọc nên không đổi trạng thái giữa chừng được.
           throw tripNotEditable();
         }
         await tx.tripStop.deleteMany({ where: { tripId, operatorId } });
