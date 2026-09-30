@@ -127,7 +127,7 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare â€” Postgres + Mongo thá
     prisma = new PrismaService(parseAppConfig({ DATABASE_URL: url }));
     ({ audit, close: closeAudit } = await connectAuditForTest(mongoUrl!));
     fares = new FareService(prisma, audit);
-    trips = new TripService(prisma);
+    trips = new TripService(prisma, audit);
     routes = new RouteService(prisma, new FakeRouting());
     seatMaps = new SeatMapService(prisma);
     vehicles = new VehicleService(prisma);
@@ -424,7 +424,7 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare â€” Postgres + Mongo thá
       const sleeper = await vehicleOfType(typeSleeper);
       const limo = await vehicleOfType(typeLimo);
       const start = nextDay();
-      const base = { routeId: route, departureAt: at(start, 1), arrivalAt: at(start, 5), stopTimes: null, note: null };
+      const base = { routeId: route, departureAt: at(start, 1), arrivalAt: at(start, 5), stopTimes: null, onlineSaleCutoffMinutes: 60, note: null };
       const trip = await trips.create(authzA, TripInputSchema.parse({ ...base, vehicleId: sleeper.id }));
       const prices = (seats: { code: string; price: number | null }[]) => seats.map((seat) => [seat.code, seat.price]);
       expect(prices(trip.seats)).toEqual([
@@ -462,6 +462,7 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare â€” Postgres + Mongo thá
         departureAt: at(start, 1),
         arrivalAt: at(start, 5),
         stopTimes: null,
+        onlineSaleCutoffMinutes: 60,
         note: null,
       });
       const trip = await trips.create(authzA, input);

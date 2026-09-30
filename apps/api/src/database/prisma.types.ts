@@ -8,6 +8,7 @@ export {
   EmployeeRole,
   FareStatus,
   OperatorRole,
+  OperatorStatus,
   PlatformRole,
   RouteStatus,
   RouteStopRole,

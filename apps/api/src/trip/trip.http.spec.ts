@@ -10,6 +10,7 @@ import { type AccessTokenClaims, TokenService } from "../iam/auth/token.service"
 import { SessionService } from "../iam/session/session.service";
 import { configureApiRoutes } from "../openapi/openapi";
 import { TripController } from "./trip.controller";
+import { tripNotReadyForSale } from "./trip.errors";
 import { TripService } from "./trip.service";
 
 /** Route thật + chuỗi guard `@Authorize("trip:manage")` thật; nghiệp vụ kiểm ở test DB. */
@@ -27,6 +28,8 @@ describe("Trip routes — HTTP", () => {
     arrivalAt: now,
     status: "DRAFT",
     seatCount: 0,
+    onlineSaleCutoffMinutes: 60,
+    statusReason: null,
     note: null,
     stops: [],
     seats: [],
@@ -38,6 +41,8 @@ describe("Trip routes — HTTP", () => {
     get: vi.fn(async () => trip),
     create: vi.fn(async () => trip),
     update: vi.fn(async () => trip),
+    changeStatus: vi.fn(async () => trip),
+    setSeatStatus: vi.fn(async () => trip),
   };
   let app: INestApplication;
   let base: string;
@@ -105,6 +110,7 @@ describe("Trip routes — HTTP", () => {
     departureAt: "2031-01-01T07:00:00+07:00",
     arrivalAt: "2031-01-01T15:00:00+07:00",
     stopTimes: null,
+    onlineSaleCutoffMinutes: 60,
     note: null,
   };
 
@@ -113,6 +119,8 @@ describe("Trip routes — HTTP", () => {
     ["GET", `/trips/${id}`, undefined, 200],
     ["POST", "/trips", tripBody, 201],
     ["PUT", `/trips/${id}`, tripBody, 200],
+    ["PUT", `/trips/${id}/status`, { status: "OPEN_FOR_SALE", reason: null }, 200],
+    ["PUT", `/trips/${id}/seats/status`, { seatCodes: ["A1"], status: "BLOCKED", note: null }, 200],
   ] as [string, string, object | undefined, number][])(
     "%s %s: Owner được, không token 401, Employee/Platform 403",
     async (method, path, body, ok) => {
@@ -141,6 +149,34 @@ describe("Trip routes — HTTP", () => {
     expect(input).not.toHaveProperty("status");
   });
 
+  it("đổi trạng thái / khóa ghế: người thực hiện lấy từ token, tenant từ JWT, mã ghế chuẩn hoá", async () => {
+    const owner = await token("OPERATOR_OWNER");
+    await call("PUT", `/trips/${id}/status`, owner, { status: "CANCELLED", reason: " Xe hỏng ", operatorId: randomUUID() });
+    const [actor, authz, tripId, input] = service.changeStatus.mock.calls[0] as unknown as [
+      { sub: string; role: string },
+      { db: { operatorId: string } },
+      string,
+      Record<string, unknown>,
+    ];
+    expect(actor.role).toBe("OPERATOR_OWNER");
+    expect(authz.db.operatorId).toBe(operatorId);
+    expect(tripId).toBe(id);
+    expect(input).toEqual({ status: "CANCELLED", reason: "Xe hỏng" });
+    await call("PUT", `/trips/${id}/seats/status`, owner, { seatCodes: ["a1"], status: "AVAILABLE", note: "" });
+    const [, , , seatInput] = service.setSeatStatus.mock.calls[0] as unknown as [unknown, unknown, string, object];
+    expect(seatInput).toEqual({ seatCodes: ["A1"], status: "AVAILABLE", note: null });
+  });
+
+  it("422 TRIP_NOT_READY_FOR_SALE trả `reasons` theo RFC 7807 (API §6.2)", async () => {
+    service.changeStatus.mockRejectedValueOnce(tripNotReadyForSale(["VEHICLE_MISSING", "FARE_MISSING"]));
+    const response = await call("PUT", `/trips/${id}/status`, await token("OPERATOR_OWNER"), {
+      status: "OPEN_FOR_SALE",
+      reason: null,
+    });
+    expect(response.status).toBe(422);
+    expect(response.body).toMatchObject({ code: "TRIP_NOT_READY_FOR_SALE", reasons: ["VEHICLE_MISSING", "FARE_MISSING"] });
+  });
+
   it("query list: giờ có múi giờ đổi về Date, limit mặc định 20", async () => {
     const from = "2031-01-01T00:00:00+07:00";
     expect((await call("GET", `/trips?departureFrom=${encodeURIComponent(from)}`, await token("OPERATOR_OWNER"))).status).toBe(200);
@@ -156,6 +192,11 @@ describe("Trip routes — HTTP", () => {
     ["GET", "/trips?status=UNKNOWN", undefined],
     ["GET", "/trips?limit=101", undefined],
     ["GET", "/trips?departureFrom=hom-nay", undefined],
+    ["POST", "/trips", { ...tripBody, onlineSaleCutoffMinutes: 1441 }],
+    ["PUT", `/trips/${id}/status`, { status: "CANCELLED", reason: null }],
+    ["PUT", `/trips/${id}/status`, { status: "SOLD_OUT", reason: null }],
+    ["PUT", `/trips/${id}/seats/status`, { seatCodes: [], status: "BLOCKED", note: null }],
+    ["PUT", `/trips/${id}/seats/status`, { seatCodes: ["A1"], status: "BOOKED", note: null }],
   ])("%s %s dữ liệu sai → 400, service không bị gọi", async (method, path, body) => {
     const response = await call(method, path, await token("OPERATOR_OWNER"), body);
     expect(response.status).toBe(400);

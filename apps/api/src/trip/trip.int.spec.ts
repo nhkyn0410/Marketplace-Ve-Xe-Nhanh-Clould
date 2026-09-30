@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { AuditService } from "../audit/audit.service";
 import { parseAppConfig } from "../config/env.config";
 import { tenantScope } from "../database/db-scope";
 import { PrismaService } from "../database/prisma.service";
@@ -35,6 +36,12 @@ async function rejectionOf(promise: Promise<unknown>): Promise<{ status?: number
     };
   }
 }
+
+const noAudit = {
+  recordAuditEvent: async () => {
+    throw new Error("Test TRN-003 không được ghi audit.");
+  },
+} as unknown as AuditService;
 
 class FakeRouting implements RoutingProvider {
   readonly source = "GOONG" as const;
@@ -72,7 +79,7 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
   }
 
   const tripInput = (overrides: Record<string, unknown>) =>
-    TripInputSchema.parse({ vehicleId: null, stopTimes: null, note: null, ...overrides });
+    TripInputSchema.parse({ vehicleId: null, stopTimes: null, onlineSaleCutoffMinutes: 60, note: null, ...overrides });
   const at = (start: number, hours: number) => new Date(start + hours * HOUR).toISOString();
 
   /** Tạo sơ đồ `seats` ghế + xe gắn sơ đồ đó cho tenant. */
@@ -106,7 +113,9 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
   }
 
   async function setTripStatus(tripId: string, status: "OPEN_FOR_SALE" | "CANCELLED" | "COMPLETED" | "IN_PROGRESS") {
-    await prisma.withSystem((tx) => tx.trip.update({ where: { id: tripId }, data: { status } }));
+    // Chuyến hủy phải có lý do (CHECK `trips_cancel_requires_reason`, TRN-006).
+    const statusReason = status === "CANCELLED" ? "Hủy trong test" : undefined;
+    await prisma.withSystem((tx) => tx.trip.update({ where: { id: tripId }, data: { status, statusReason } }));
   }
 
   /** Đưa chuyến về quá khứ (ghi thẳng DB) để thử nhánh "nháp quá hạn". */
@@ -153,7 +162,8 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
 
   beforeAll(async () => {
     prisma = new PrismaService(parseAppConfig({ DATABASE_URL: url }));
-    trips = new TripService(prisma);
+    // Test TRN-003 không đổi trạng thái / khóa ghế nên không cần Mongo; audit thật ở `trip-sale.int.spec.ts`.
+    trips = new TripService(prisma, noAudit);
     routes = new RouteService(prisma, new FakeRouting());
     seatMaps = new SeatMapService(prisma);
     vehicles = new VehicleService(prisma);
@@ -448,9 +458,16 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
       const sameVehicle = await trips.update(authzA, trip.id, tripInput({ routeId: route2, vehicleId: vehicle.id, ...base }));
       expect(sameVehicle.stops.map((stop) => stop.role)).toEqual(["ORIGIN", "DESTINATION"]);
       expect(sameVehicle.seats.find((seat) => seat.code === "A1")?.status).toBe("BLOCKED");
+      // TRN-006 Q5: đổi xe giữ ghế khóa theo mã ghế; xe mới thiếu ghế đã khóa (ở đây: bỏ xe) → 409.
       const swapped = await trips.update(authzA, trip.id, tripInput({ routeId: route2, vehicleId: bigger.id, ...base }));
       expect(swapped.seatCount).toBe(6);
-      expect(new Set(swapped.seats.map((seat) => seat.status))).toEqual(new Set(["AVAILABLE"]));
+      expect(swapped.seats.filter((seat) => seat.status === "BLOCKED").map((seat) => seat.code)).toEqual(["A1"]);
+      expect(
+        (await rejectionOf(trips.update(authzA, trip.id, tripInput({ routeId: route2, vehicleId: null, ...base })))).code,
+      ).toBe("TRIP_BLOCKED_SEATS_MISSING");
+      await prisma.withTenant(tenantA, (tx) =>
+        tx.tripSeat.updateMany({ where: { tripId: trip.id, seatCode: "A1" }, data: { status: "AVAILABLE" } }),
+      );
       const detached = await trips.update(authzA, trip.id, tripInput({ routeId: route2, vehicleId: null, ...base }));
       expect(detached.seats).toEqual([]);
       expect(detached.vehicleId).toBeNull();

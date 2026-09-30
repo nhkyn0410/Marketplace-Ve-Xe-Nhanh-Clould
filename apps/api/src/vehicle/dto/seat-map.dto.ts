@@ -19,13 +19,16 @@ export const SeatMapLayoutSchema = z.object({
 });
 export type SeatMapLayout = z.infer<typeof SeatMapLayoutSchema>;
 
+// `pipe`: OpenAPI không công bố regex chữ hoa, client gửi `a1` vẫn hợp lệ (server chuẩn hoá).
+/** Mã ghế: chữ + số 1–8 ký tự, chuẩn hoá chữ hoa (dùng chung cho sơ đồ ghế và khóa ghế của chuyến). */
+export const SeatCodeSchema = z
+  .string()
+  .max(20)
+  .transform((value) => value.trim().toUpperCase())
+  .pipe(z.string().regex(/^[A-Z0-9]{1,8}$/, "Mã ghế chỉ gồm chữ và số, 1–8 ký tự."));
+
 const SeatSchema = z.object({
-  // `pipe`: OpenAPI không công bố regex chữ hoa, client gửi `a1` vẫn hợp lệ (server chuẩn hoá).
-  code: z
-    .string()
-    .max(20)
-    .transform((value) => value.trim().toUpperCase())
-    .pipe(z.string().regex(/^[A-Z0-9]{1,8}$/, "Mã ghế chỉ gồm chữ và số, 1–8 ký tự.")),
+  code: SeatCodeSchema,
   deck: z.int().min(1).max(MAX_DECKS),
   row: z.int().min(1).max(MAX_ROWS),
   column: z.int().min(1).max(MAX_COLUMNS),

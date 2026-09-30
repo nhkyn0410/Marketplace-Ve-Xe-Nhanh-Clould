@@ -16,6 +16,7 @@ export type ProblemDetails = {
   detail: string;
   instance: string;
   code: string;
+  reasons?: string[];
   requestId?: string;
   traceId?: string;
 };
@@ -29,6 +30,7 @@ type HttpExceptionResponse = {
   message?: unknown;
   error?: unknown;
   code?: unknown;
+  reasons?: unknown;
 };
 
 type RequestInfo = Pick<Request, "originalUrl" | "url">;
@@ -65,6 +67,7 @@ export function buildProblemDetails(exception: unknown, request: RequestInfo): P
     detail: getProblemDetail(status, exception, response),
     instance: request.originalUrl || request.url,
     code: getProblemCode(status, response, title),
+    ...getProblemReasons(response),
     requestId: getRequestId(),
     traceId: getCurrentTraceId()
   };
@@ -152,6 +155,12 @@ function getProblemCode(
   }
 
   return toErrorCode(STATUS_CODES[status] ?? title);
+}
+
+// Member mở rộng RFC 7807 (API §6.2): chỉ nhận mảng chuỗi để không lộ object nội bộ ra client.
+function getProblemReasons(response: HttpExceptionResponse | undefined): { reasons?: string[] } {
+  const reasons = response?.reasons;
+  return Array.isArray(reasons) && reasons.every((reason) => typeof reason === "string") ? { reasons } : {};
 }
 
 function toErrorCode(value: string): string {

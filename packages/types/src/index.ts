@@ -46,6 +46,8 @@ export const ProblemDetailsSchema = z.object({
   detail: z.string(),
   instance: z.string(),
   code: z.string(),
+  /** Member mở rộng RFC 7807: mọi nguyên nhân khi một lỗi có nhiều (vd điều kiện mở bán chưa đạt — API §6.2). */
+  reasons: z.array(z.string()).optional(),
   requestId: z.string().optional(),
   traceId: z.string().optional()
 });

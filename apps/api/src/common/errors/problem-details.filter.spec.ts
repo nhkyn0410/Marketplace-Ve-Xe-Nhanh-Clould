@@ -57,6 +57,21 @@ describe("buildProblemDetails", () => {
     expect(problem.code).toBe("BAD_REQUEST");
   });
 
+  it("keeps the `reasons` extension only when it is an array of strings", () => {
+    const withReasons = buildProblemDetails(
+      new HttpException({ code: "TRIP_NOT_READY_FOR_SALE", detail: "x", reasons: ["VEHICLE_MISSING", "FARE_MISSING"] }, 422),
+      request
+    );
+    expect(withReasons.reasons).toEqual(["VEHICLE_MISSING", "FARE_MISSING"]);
+
+    const withObject = buildProblemDetails(
+      new HttpException({ code: "X", detail: "x", reasons: [{ internal: "secret" }] }, 422),
+      request
+    );
+    expect(withObject).not.toHaveProperty("reasons");
+    expect(buildProblemDetails(new ServiceUnavailableException("down"), request)).not.toHaveProperty("reasons");
+  });
+
   it("does not leak unknown exception messages", () => {
     const problem = buildProblemDetails(new Error("database password leaked"), request);
 

@@ -717,17 +717,21 @@ enum TripSeatStatus {
 
 /// Chuyến cụ thể của một route vào một ngày giờ, có thể chưa gắn xe khi còn `DRAFT` (FR-OPS-06, UC-14).
 model Trip {
-  id          String     @id @default(uuid())
-  operatorId  String     @map("operator_id")
-  routeId     String     @map("route_id")
-  vehicleId   String?    @map("vehicle_id")
+  id                      String     @id @default(uuid())
+  operatorId              String     @map("operator_id")
+  routeId                 String     @map("route_id")
+  vehicleId               String?    @map("vehicle_id")
   /// Giờ đi / giờ đến dự kiến (UTC). Xe bận trong `[departure_at, arrival_at)`.
-  departureAt DateTime   @map("departure_at")
-  arrivalAt   DateTime   @map("arrival_at")
-  status      TripStatus @default(DRAFT)
-  note        String?
-  createdAt   DateTime   @default(now()) @map("created_at")
-  updatedAt   DateTime   @updatedAt @map("updated_at")
+  departureAt             DateTime   @map("departure_at")
+  arrivalAt               DateTime   @map("arrival_at")
+  status                  TripStatus @default(DRAFT)
+  /// Số phút trước giờ khởi hành thì ngừng bán online (AS-20, TRN-006): 0–1440 (CHECK ở migration).
+  onlineSaleCutoffMinutes Int        @default(60) @map("online_sale_cutoff_minutes")
+  /// Lý do lần đổi trạng thái gần nhất (hủy bắt buộc — CHECK ở migration).
+  statusReason            String?    @map("status_reason")
+  note                    String?
+  createdAt               DateTime   @default(now()) @map("created_at")
+  updatedAt               DateTime   @updatedAt @map("updated_at")
 
   operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   route    Route           @relation(fields: [routeId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
