@@ -17,6 +17,8 @@ export {
   StopPointStatus,
   StopPointType,
   SubjectType,
+  TripSeatStatus,
+  TripStatus,
   VehicleStatus,
 } from "../generated/prisma/client";
 export type { AuthSession } from "../generated/prisma/client";

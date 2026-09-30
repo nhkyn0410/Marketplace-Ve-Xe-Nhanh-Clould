@@ -224,13 +224,14 @@ describe("OpenAPI generation", () => {
         ["address", "description", "id", "latitude", "longitude", "name", "provinceId", "type", "wardId"]
       );
 
-      // TRN-001/TRN-002 (API §7.3): Vehicle/SeatMap/Route/StopPoint — Bearer, requestBody cho POST/PUT,
-      // path param khai báo.
+      // TRN-001/TRN-002/TRN-003 (API §7.3): Vehicle/SeatMap/Route/StopPoint/Trip — Bearer, requestBody cho
+      // POST/PUT, path param khai báo.
       for (const [collection, param] of [
         ["/v1/operator/vehicles", "vehicleId"],
         ["/v1/operator/seat-maps", "seatMapId"],
         ["/v1/operator/routes", "routeId"],
-        ["/v1/operator/stop-points", "stopPointId"]
+        ["/v1/operator/stop-points", "stopPointId"],
+        ["/v1/operator/trips", "tripId"]
       ] as const) {
         const item = `${collection}/{${param}}`;
         for (const operation of [
@@ -261,6 +262,18 @@ describe("OpenAPI generation", () => {
       expect(document.paths[`${proposals}/{proposalId}`]?.put?.requestBody).toBeDefined();
       // Route lỗi Goong phải công bố 503 để client xử lý "thử lại sau".
       expect(document.paths["/v1/operator/routes"]?.post?.responses?.[503]).toBeDefined();
+      // TRN-003: trùng xe (409) và route/xe không dùng được (422) phải có trong hợp đồng; list lọc theo giờ đi.
+      for (const operation of [
+        document.paths["/v1/operator/trips"]?.post,
+        document.paths["/v1/operator/trips/{tripId}"]?.put
+      ]) {
+        expect(operation?.responses?.[409]).toBeDefined();
+        expect(operation?.responses?.[422]).toBeDefined();
+      }
+      const tripQuery = (document.paths["/v1/operator/trips"]?.get?.parameters ?? []).map((p) => ("name" in p ? p.name : ""));
+      expect(tripQuery).toEqual(
+        expect.arrayContaining(["routeId", "vehicleId", "status", "departureFrom", "departureTo", "cursor", "limit"])
+      );
     } finally {
       await app.close();
     }

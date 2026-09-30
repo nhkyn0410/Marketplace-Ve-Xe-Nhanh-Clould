@@ -26,6 +26,8 @@ import { StopPointProposalController } from "../stop-point/stop-point-proposal.c
 import { StopPointProposalService } from "../stop-point/stop-point-proposal.service";
 import { StopPointController } from "../stop-point/stop-point.controller";
 import { StopPointService } from "../stop-point/stop-point.service";
+import { TripController } from "../trip/trip.controller";
+import { TripService } from "../trip/trip.service";
 import { SeatMapController } from "../vehicle/seat-map.controller";
 import { SeatMapService } from "../vehicle/seat-map.service";
 import { VehicleController } from "../vehicle/vehicle.controller";
@@ -45,6 +47,7 @@ import { VehicleService } from "../vehicle/vehicle.service";
     StopPointController,
     StopPointProposalController,
     RouteController,
+    TripController,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
@@ -56,6 +59,7 @@ import { VehicleService } from "../vehicle/vehicle.service";
     { provide: StopPointService, useValue: {} },
     { provide: StopPointProposalService, useValue: {} },
     { provide: RouteService, useValue: {} },
+    { provide: TripService, useValue: {} },
     // Dependency của AccessTokenGuard (logout, re-auth) — Nest dựng guard lúc khởi tạo module.
     { provide: TokenService, useValue: {} },
     { provide: SessionService, useValue: {} },

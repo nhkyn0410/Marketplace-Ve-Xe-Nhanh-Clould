@@ -9,7 +9,8 @@ import type {
   SeatMapResponse,
 } from "./dto/seat-map.dto";
 import { requireTenant } from "../iam/role/require-tenant";
-import { seatMapNameConflict, seatMapNotFound } from "./vehicle.errors";
+import { unfinishedTripWhere } from "../trip/trip-usage";
+import { seatMapInUse, seatMapNameConflict, seatMapNotFound } from "./vehicle.errors";
 
 const SUMMARY_SELECT = { id: true, name: true, seatCount: true, createdAt: true, updatedAt: true } as const;
 const SEAT_SELECT = { code: true, deck: true, row: true, column: true, type: true } as const;
@@ -76,7 +77,7 @@ export class SeatMapService {
 
   /**
    * Thay toàn bộ tên, bố cục và ghế trong MỘT transaction: lỗi giữa chừng thì ghế cũ còn nguyên.
-   * TRN-003 phải chặn thao tác này khi SeatMap đã được chuyến dùng (UC-12 A3).
+   * Bị chặn khi SeatMap đang gắn với xe của chuyến chưa kết thúc (UC-12 A3, TRN-003).
    */
   async update(authz: Authorization, seatMapId: string, input: SeatMapInput): Promise<SeatMapResponse> {
     const { db, operatorId } = requireTenant(authz);
@@ -88,6 +89,14 @@ export class SeatMapService {
         });
         if (updated.count === 0) {
           throw seatMapNotFound();
+        }
+        // Kiểm SAU lệnh ghi (đã khoá dòng sơ đồ): tạo chuyến khoá `FOR SHARE` cùng dòng này, nên chuyến tạo
+        // đồng thời hoặc đã commit trước → thấy ở đây; hoặc phải chờ và đọc bố cục mới.
+        const inUse = await tx.trip.count({
+          where: { operatorId, vehicle: { seatMapId }, ...unfinishedTripWhere(new Date()) },
+        });
+        if (inUse > 0) {
+          throw seatMapInUse();
         }
         await tx.seat.deleteMany({ where: { seatMapId, operatorId } });
         await tx.seat.createMany({ data: seatRows(input, operatorId, seatMapId) });

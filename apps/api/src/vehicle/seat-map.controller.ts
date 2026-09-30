@@ -66,7 +66,11 @@ export class SeatMapController {
   @ZodResponse({ status: 200, description: "SeatMap sau khi thay.", type: SeatMapResponseDto })
   @ApiResponse({ status: 400, description: "Bố cục/ghế không hợp lệ.", content: problemContent })
   @ApiResponse({ status: 404, description: "`SEAT_MAP_NOT_FOUND` (kể cả khác tenant).", content: problemContent })
-  @ApiResponse({ status: 409, description: "`SEAT_MAP_NAME_CONFLICT`.", content: problemContent })
+  @ApiResponse({
+    status: 409,
+    description: "`SEAT_MAP_NAME_CONFLICT` / `SEAT_MAP_IN_USE` (xe dùng sơ đồ đang có chuyến chưa kết thúc).",
+    content: problemContent,
+  })
   update(
     @Authz() authz: Authorization,
     @Param("seatMapId") seatMapId: string,

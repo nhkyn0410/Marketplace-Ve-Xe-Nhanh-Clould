@@ -22,6 +22,15 @@ export function seatMapNotFound(): HttpException {
   return problem(HttpStatus.NOT_FOUND, "SEAT_MAP_NOT_FOUND", "Không tìm thấy sơ đồ ghế.");
 }
 
+/** UC-12 A3: sơ đồ ghế đang được chuyến chưa kết thúc dùng — không sửa bố cục / đổi sơ đồ của xe. */
+export function seatMapInUse(): HttpException {
+  return problem(
+    HttpStatus.CONFLICT,
+    "SEAT_MAP_IN_USE",
+    "Sơ đồ ghế đang được chuyến chưa kết thúc sử dụng, không thay đổi được.",
+  );
+}
+
 /** Tên SeatMap đã dùng trong nhà xe. */
 export function seatMapNameConflict(): HttpException {
   return problem(HttpStatus.CONFLICT, "SEAT_MAP_NAME_CONFLICT", "Tên sơ đồ ghế đã tồn tại trong nhà xe.");

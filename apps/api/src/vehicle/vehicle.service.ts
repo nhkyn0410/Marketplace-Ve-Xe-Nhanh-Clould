@@ -6,7 +6,8 @@ import { isPrismaUniqueConflict } from "../iam/user/account.errors";
 import type { VehicleInput, VehicleListResponse, VehicleResponse } from "./dto/vehicle.dto";
 import { catalogItemUnavailable } from "../catalog/catalog.errors";
 import { requireTenant } from "../iam/role/require-tenant";
-import { seatMapNotFound, vehicleNotFound, vehiclePlateConflict } from "./vehicle.errors";
+import { unfinishedTripWhere } from "../trip/trip-usage";
+import { seatMapInUse, seatMapNotFound, vehicleNotFound, vehiclePlateConflict } from "./vehicle.errors";
 
 const VEHICLE_SELECT = {
   id: true,
@@ -108,7 +109,7 @@ export class VehicleService {
       this.prisma.withScope(db, async (tx) => {
         const current = await tx.vehicle.findFirst({
           where: { id: vehicleId, operatorId },
-          select: { vehicleTypeId: true, amenities: { select: { amenityId: true } } },
+          select: { vehicleTypeId: true, seatMapId: true, amenities: { select: { amenityId: true } } },
         });
         if (!current) {
           throw vehicleNotFound();
@@ -130,6 +131,14 @@ export class VehicleService {
             description: input.description,
           },
         });
+        // UC-12 A3: xe đang chạy chuyến chưa kết thúc không đổi sơ đồ ghế (ghế chuyến lấy từ sơ đồ này).
+        // Kiểm SAU lệnh ghi (đã khoá dòng xe) — cùng lý do như PUT sơ đồ ghế.
+        if (input.seatMapId !== current.seatMapId) {
+          const inUse = await tx.trip.count({ where: { operatorId, vehicleId, ...unfinishedTripWhere(new Date()) } });
+          if (inUse > 0) {
+            throw seatMapInUse();
+          }
+        }
         await tx.vehicleAmenity.deleteMany({ where: { vehicleId, operatorId } });
         await tx.vehicleAmenity.createMany({
           data: input.amenityIds.map((amenityId) => ({ vehicleId, amenityId, operatorId })),

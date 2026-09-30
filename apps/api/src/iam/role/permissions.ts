@@ -14,6 +14,7 @@ export const PERMISSIONS = [
   "vehicle:manage", // §7 Vehicle/SeatMap
   "vehicle:read", // §7 Vehicle/SeatMap — "xem nếu được phân công"
   "route:manage", // §7 Route/StopPoint (TASK-TRN-002, SRS permission matrix) — route, điểm riêng, đề xuất
+  "trip:manage", // §7 Trip/fare/inventory (TASK-TRN-003) — tạo/sửa chuyến của nhà xe
   "checkin:perform", // §7 Check-in
   "checkin:read", // §7 Check-in — "xem kết quả" / "giám sát"
   "kyc:submit", // §7 KYC — "hồ sơ của mình"
@@ -68,6 +69,7 @@ export const ROLE_GRANTS: Readonly<Record<Role, Grants>> = {
     "vehicle:manage": "tenant",
     "vehicle:read": "tenant",
     "route:manage": "tenant",
+    "trip:manage": "tenant",
     "checkin:read": "tenant",
     "kyc:submit": "tenant",
     "finance:read": "tenant",

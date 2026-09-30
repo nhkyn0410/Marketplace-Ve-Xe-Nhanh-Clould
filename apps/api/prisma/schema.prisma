@@ -152,6 +152,7 @@ model OperatorProfile {
   stopPointProposals StopPointProposal[]
   routes             Route[]
   vehicles           Vehicle[]
+  trips              Trip[]
 
   @@unique([id, operatorSlug])
   @@map("operator_profiles")
@@ -410,6 +411,7 @@ model StopPointCatalog {
 
   ward       Ward                @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
   routeStops RouteStop[]
+  tripStops  TripStop[]
   proposals  StopPointProposal[]
 
   @@index([provinceId, status])
@@ -519,6 +521,7 @@ model Vehicle {
   vehicleType VehicleType      @relation(fields: [vehicleTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   seatMap     SeatMap?         @relation(fields: [seatMapId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
   amenities   VehicleAmenity[]
+  trips       Trip[]
 
   @@unique([operatorId, plateNumber])
   @@unique([id, operatorId])
@@ -594,6 +597,7 @@ model StopPoint {
   operator   OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   ward       Ward            @relation(fields: [wardId, provinceId], references: [id, provinceId], onDelete: Restrict, onUpdate: Restrict)
   routeStops RouteStop[]
+  tripStops  TripStop[]
 
   @@unique([operatorId, name])
   @@unique([id, operatorId])
@@ -644,6 +648,7 @@ model Route {
 
   operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   stops    RouteStop[]
+  trips    Trip[]
 
   @@unique([operatorId, name])
   @@unique([id, operatorId])
@@ -678,4 +683,99 @@ model RouteStop {
   @@index([catalogStopPointId])
   @@index([stopPointId])
   @@map("route_stops")
+}
+
+// ════════════════════════════ Trip & Inventory — Trip (TASK-TRN-003) ════════════════════════════
+// Operator-owned + RLS (migration `add_trip`). Chống một xe chạy hai chuyến chồng giờ bằng ràng buộc
+// EXCLUDE (btree_gist) trong migration — Prisma không mô tả được, xem migration.sql.
+
+/// Trạng thái chuyến (SRS §17.3, GLOSSARY). TRN-003 chỉ ghi `DRAFT`; mở bán/khoá/huỷ ở TRN-006.
+enum TripStatus {
+  DRAFT
+  OPEN_FOR_SALE
+  SOLD_OUT
+  LOCKED
+  BOARDING
+  DEPARTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  INCIDENT
+}
+
+/// Trạng thái ghế theo chuyến (SRS §17.4, GLOSSARY). TRN-003 chỉ sinh `AVAILABLE`.
+enum TripSeatStatus {
+  AVAILABLE
+  HOLDING
+  BOOKED
+  CHECKED_IN
+  BLOCKED
+}
+
+/// Chuyến cụ thể của một route vào một ngày giờ, có thể chưa gắn xe khi còn `DRAFT` (FR-OPS-06, UC-14).
+model Trip {
+  id          String     @id @default(uuid())
+  operatorId  String     @map("operator_id")
+  routeId     String     @map("route_id")
+  vehicleId   String?    @map("vehicle_id")
+  /// Giờ đi / giờ đến dự kiến (UTC). Xe bận trong `[departure_at, arrival_at)`.
+  departureAt DateTime   @map("departure_at")
+  arrivalAt   DateTime   @map("arrival_at")
+  status      TripStatus @default(DRAFT)
+  note        String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  route    Route           @relation(fields: [routeId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  vehicle  Vehicle?        @relation(fields: [vehicleId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  stops    TripStop[]
+  seats    TripSeat[]
+
+  @@unique([id, operatorId])
+  @@index([operatorId, departureAt])
+  @@index([routeId])
+  // Tra theo `vehicle_id` dùng index GiST của ràng buộc EXCLUDE (migration) — không cần btree riêng.
+  @@map("trips")
+}
+
+/// Điểm dừng của chuyến: chép từ RouteStop lúc tạo/sửa chuyến, kèm giờ dự kiến tại điểm.
+model TripStop {
+  id                 String        @id @default(uuid())
+  operatorId         String        @map("operator_id")
+  tripId             String        @map("trip_id")
+  sequence           Int
+  role               RouteStopRole
+  catalogStopPointId String?       @map("catalog_stop_point_id")
+  stopPointId        String?       @map("stop_point_id")
+  note               String?
+  plannedAt          DateTime      @map("planned_at")
+
+  trip             Trip              @relation(fields: [tripId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  catalogStopPoint StopPointCatalog? @relation(fields: [catalogStopPointId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  stopPoint        StopPoint?        @relation(fields: [stopPointId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([tripId, sequence])
+  @@index([catalogStopPointId])
+  @@index([stopPointId])
+  @@map("trip_stops")
+}
+
+/// Ghế của chuyến: bản chụp Seat của SeatMap lúc gắn xe; tham chiếu theo `seat_code` (DB §7).
+model TripSeat {
+  id         String         @id @default(uuid())
+  operatorId String         @map("operator_id")
+  tripId     String         @map("trip_id")
+  seatCode   String         @map("seat_code")
+  deck       Int
+  row        Int
+  column     Int
+  type       SeatType
+  status     TripSeatStatus @default(AVAILABLE)
+
+  trip Trip @relation(fields: [tripId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+
+  @@unique([tripId, seatCode])
+  @@index([tripId, status])
+  @@map("trip_seats")
 }

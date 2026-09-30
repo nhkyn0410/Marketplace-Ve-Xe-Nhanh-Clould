@@ -71,7 +71,11 @@ export class VehicleController {
   @ZodResponse({ status: 200, description: "Xe sau khi thay.", type: VehicleResponseDto })
   @ApiResponse({ status: 400, description: "Dữ liệu không hợp lệ.", content: problemContent })
   @ApiResponse({ status: 404, description: "`VEHICLE_NOT_FOUND` / `SEAT_MAP_NOT_FOUND`.", content: problemContent })
-  @ApiResponse({ status: 409, description: "`VEHICLE_PLATE_CONFLICT`.", content: problemContent })
+  @ApiResponse({
+    status: 409,
+    description: "`VEHICLE_PLATE_CONFLICT` / `SEAT_MAP_IN_USE` (đổi sơ đồ khi xe có chuyến chưa kết thúc).",
+    content: problemContent,
+  })
   @ApiResponse({ status: 422, description: "`CATALOG_ITEM_UNAVAILABLE`.", content: problemContent })
   update(
     @Authz() authz: Authorization,
