@@ -68,7 +68,7 @@ Khi làm Admin khóa chuyến (task Admin), cần phân biệt "ai khóa" để 
 | `OPEN_FOR_SALE` / `LOCKED` | `DRAFT` | **Thu hồi về nháp** để sửa bằng `PUT` (hiện `PUT` chỉ cho `DRAFT`). *(Khuyến nghị: cho phép khi chuyến chưa có ghế `BOOKED` / `CHECKED_IN` — hiện chưa có booking nên luôn được; BTP-001/002 bổ sung điều kiện "không còn giữ ghế".)* Nếu **không** cho: nhập sai sau khi mở bán thì phải hủy + tạo lại. |
 
 - `SOLD_OUT`: **TRN-006 không tự đặt**. Khóa hết ghế trống bằng `BLOCKED` không làm chuyến thành `SOLD_OUT`; "hết ghế" do BTP-002 (bán hết) / TRN-004 (search lọc còn ghế) quyết.
-- Chuyển trạng thái sai bảng → 409 `TRIP_STATUS_TRANSITION_INVALID`. Hai request đồng thời (vd mở bán ↔ hủy) → một thành công, bên kia 409 (khóa dòng + `updateMany` có điều kiện `status` như TRN-003).
+- Chuyển trạng thái sai bảng → 409 `TRIP_STATUS_TRANSITION_INVALID`. Request đồng thời **xếp hàng** (khóa dòng + `updateMany` có điều kiện `status` như TRN-003): bên sau chạy trên trạng thái mới — hai lần mở bán → một 409; mở bán rồi hủy → cả hai chạy (sửa theo review 30/09/2026).
 
 ### Q3 — Điều kiện mở bán (BR-39)
 
@@ -144,12 +144,39 @@ Bảng giá bị tắt / thiếu rule, xe chuyển `INACTIVE`, điểm hoặc tu
 | 1 | Đồng bộ tài liệu theo Q (SRS, API §6.2/§7.3, DB §7, LLD §8/§9, Security §7, Test plan TC-TRN-004..007, GLOSSARY, file 11) | ✅ `951a761` |
 | 2 | Migration (cột theo Q4/Q6) + Prisma | ✅ `20260930130000_trip_sale_lifecycle` (cutoff 0–1440 mặc định 60, `status_reason`, CHECK hủy có lý do); `migrate diff` rỗng |
 | 3 | `TripService`: chuyển trạng thái + kiểm điều kiện + khóa ghế; DTO/controller/errors | ✅ `trip-sale.ts` (bảng chuyển + điều kiện, hàm thuần), `changeStatus`, `setSeatStatus`, `update` giữ ghế khóa; `reasons[]` RFC 7807 |
-| 4 | Test: unit (bảng chuyển trạng thái, điều kiện), HTTP (RBAC, 400), int (RLS, đồng thời, audit lỗi, đổi xe giữ ghế khóa) | ✅ 74/74 file, **942/942** test, 0 skip (PG + Redis + Mongo thật); mutation 3/3 đỏ đúng chỗ. Sửa 3 test TRN-003 do đổi hành vi có chủ đích (giữ ghế khóa khi đổi xe; CHECK hủy có lý do; mock thiếu trường mới) |
+| 4 | Test: unit (bảng chuyển trạng thái, điều kiện), HTTP (RBAC, 400), int (RLS, đồng thời, audit lỗi, đổi xe giữ ghế khóa) | ✅ 74/74 file, **947/947** test sau sửa review (942 trước review), 0 skip (PG + Redis + Mongo thật); mutation 3/3 đỏ đúng chỗ. Sửa 3 test TRN-003 do đổi hành vi có chủ đích (giữ ghế khóa khi đổi xe; CHECK hủy có lý do; mock thiếu trường mới) |
 | 5 | OpenAPI + client TS/Dart | ✅ TS: 2 route, 2 DTO, 2 trường chuyến, `reasons`; Dart 7.25.0 + `build_runner`: analyze 0 error, test 533/533 |
-| 6 | Review (`code-reviewer` + `security-auditor`) + guide/checklist + commit/push | 🔨 code `90deb62`, client `bb0af69` đã push; guide/checklist xong; review đang chạy |
+| 6 | Review (`code-reviewer` + `security-auditor`) + guide/checklist + commit/push | ✅ không blocking / high; Medium tiềm ẩn → bàn giao BTP / Admin; Low sửa + test (bảng dưới) |
 | 7 | Màn Operator OS (mở/khóa bán, sơ đồ ghế khóa) — sau M1 | ⏸ |
 
 ---
+
+## Kết quả review (30/09/2026)
+
+| Nguồn | Mức | Finding | Xử lý |
+| --- | --- | --- | --- |
+| security M-1 + code-reviewer M1 | Medium (tiềm ẩn) | Khóa ghế / thu hồi nháp / hủy không thấy **giữ ghế Redis** (ADR-015) và booking đang ghi dở; khoá `FOR NO KEY UPDATE` dòng chuyến không chặn khoá FK ngầm `FOR KEY SHARE` của booking → có thể hủy chuyến có vé / khóa ghế đang thanh toán khi BTP có | ✅ Phần làm được ngay: thu hồi nháp / hủy **khoá toàn bộ ghế `FOR SHARE`** trước khi đếm vé (ghế đang được bán dở → chờ commit → thấy `BOOKED` → 409; test + mutation). ⏭ **Bàn giao BTP-001 (file 11 v0.30, LLD v0.13):** giữ / bán ghế phải khoá chuyến `FOR SHARE` + kiểm `OPEN_FOR_SALE` + còn giờ bán; **cần Khanh chốt** hold ghi thêm `HOLDING` vào Postgres (hybrid) hay thuần Redis + kiểm key ở các luồng trên. Tài liệu API/LLD sửa: "ghế đang giữ → 409" chỉ đúng với trạng thái trong Postgres |
+| security M-2 | Medium (tiềm ẩn) | Khi có Admin khóa chuyến, Owner mở lại được chuyến Admin khóa (`LOCKED → OPEN_FOR_SALE`) | ⏭ Bàn giao task Admin (Security §7 "khóa khi vi phạm — task Admin sau"): thêm nguồn khóa (vd `locked_by_scope`) và `canTransition` từ chối Operator mở khóa của Platform. Chưa có đường Admin nên chưa khai thác được |
+| code-reviewer M2 | Medium | Thiếu test nhánh tranh chấp "được cả lô hoặc không" | ✅ Test: ghế đang được transaction khác đổi `HOLDING` (chưa commit) → cả lô 409, ghế còn lại không đổi |
+| security L-1 + code-reviewer L7 | Low | Audit ghi trước `findDetail`; request xếp hàng chờ khoá tiêu hạn transaction → audit xong ở Mongo sau khi Postgres hết hạn → dòng "ma" | ✅ Audit là lệnh cuối; `transactionDeadline` + option `deadline` (sửa chung ở TRN-005 `1f7ece3`, áp cho fare + trip) — không đủ thời gian thì từ chối trước khi ghi |
+| security L-2 | Low | Kiểm điều kiện mở bán không khoá bảng giá / xe / tuyến → sửa đồng thời lọt giữa lúc kiểm và commit | ✅ `FOR SHARE` tuyến, bảng giá, xe trước khi kiểm (các luồng sửa đó không khoá `trips` → không vòng chờ) |
+| security L-3 | Low | Giữ kết nối pool khi chờ khoá / Mongo; không giới hạn tần suất theo nhà xe | Giữ nguyên trong task: giới hạn tần suất `/operator/*` + cấu hình pool là việc chung (FND/OPS) — ghi đề xuất cho Khanh. Đã giảm tác động: audit trong transaction ≤ hạn còn lại, P2028 → 503 |
+| code-reviewer L1 | Low | Mô tả "mở bán ↔ hủy đồng thời → một thắng" sai | ✅ Sửa comment + Q2 + Test plan v0.10 + API v0.17: request xếp hàng, bên sau chạy trên trạng thái mới |
+| code-reviewer L2 | Low | `PUT` sinh lại ghế âm thầm xoá ghế `HOLDING` / `BOOKED` | ✅ Còn ghế khác `AVAILABLE` / `BLOCKED` → 409 `TRIP_SEAT_NOT_AVAILABLE` (test) |
+| code-reviewer L3 | Low | `TRIP_BLOCKED_SEATS_MISSING` nói "xe mới" kể cả khi bỏ xe; không nêu mã ghế | ✅ Câu trung tính, `detail` nêu mã ghế (test) |
+| code-reviewer L4 | Low | Thiếu test: xe có sơ đồ thiếu ghế khóa, điểm riêng ngừng dùng, lý do vào audit, P2028 → 503 | ✅ Thêm cả 4 (lý do kiểm qua spy `recordAuditEvent`). Nháp quá hạn sinh lại ghế dùng cùng nhánh code với đổi xe |
+| code-reviewer L5 + security I-4 | Low | `setSeatStatus` P2028 → 500 | ✅ Bọc chung `withRetryable`: `AuditWriteError` → 503 lịch sử, P2028 → 503 `tripBusy` |
+| code-reviewer L6 + security I-2 | Low | CHECK hủy chưa backfill; chấp nhận lý do rỗng / khoảng trắng | ✅ Migration (chưa merge, sửa tại chỗ): backfill chuyến hủy thiếu lý do trước khi thêm CHECK; CHECK `btrim(status_reason) <> ''` (test) |
+| security I-3 + code-reviewer nit | Nit | `reasons` kiểu `string[]`; so `"ACTIVE"` bằng chuỗi; log lỗi audit mất stack | ✅ `SaleReadinessReason[]`; dùng enum `CatalogStatus` / `StopPointStatus`; log có cấu trúc `{ event: "audit.write_failed", … }` như IAM |
+| code-reviewer nit | Nit | `isTransactionExpired` / `TripActor` lặp với fare; `findDetail` đọc hai lần khi mở bán | Giữ nguyên: gom về `common` là refactor ngoài phạm vi; đọc lại sau khi đổi trạng thái là cần (trạng thái mới) |
+| security I-1, I-5, I-6, I-7 | Info | Path param không kiểm UUID; gửi Sentry khi audit ghế lỗi; ghim `writeConcern`; trigger chặn rời `CANCELLED` | Giữ nguyên: giống module khác (id sai → 404); log có cấu trúc đã vào Pino; `writeConcern` là cấu hình chung (Atlas mặc định `majority`); trigger `CANCELLED` để TRN-008 / Admin (các đường có thể đổi) |
+
+## Bàn giao
+
+- **BTP-001 / BTP-002:** như dòng M-1 — khoá chuyến `FOR SHARE`, kiểm `OPEN_FOR_SALE` + `isOnlineSaleOpen` (hàm có sẵn ở `trip-sale.ts`) + giá ghế khác `null` / > 0 trong cùng transaction; hold phải kiểm ghế `BLOCKED`; **câu hỏi hold Redis vs Postgres cần Khanh chốt**.
+- **Task Admin khóa chuyến:** nguồn khóa để Owner không mở lại khóa của Platform (M-2).
+- **TRN-008:** hủy / đổi chuyến đã có vé; cân nhắc trigger DB chặn rời `CANCELLED`.
+- **EMP-002:** cửa sổ đón khách (Q4).
 
 ## Rủi ro phải test chủ động
 

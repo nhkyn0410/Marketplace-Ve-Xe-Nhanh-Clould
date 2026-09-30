@@ -48,6 +48,7 @@
 | v0.27     | 30/09/2026 | AI Agent       | `TASK-TRN-005`: Khanh chốt **Q1 = PA1** (bảng giá theo tuyến × loại xe catalog) và **Q4 = Mongo `audit_event`**; đồng bộ SRS v1.30, GLOSSARY, HLD v0.9, LLD v0.10, DB v0.16, API v0.14, Security v0.12, Test plan v0.8 trước khi code. Giữ trạng thái Review. |
 | v0.28     | 30/09/2026 | AI Agent       | Bắt đầu **`TASK-TRN-006`** theo yêu cầu của Khanh: nhánh `TASK-TRN-006`, tạo `TRN-006-todo.md`, Draft → **In Progress**. Chưa code trước khi chốt Q1–Q8 (SDLC có danh sách trạng thái §17.3/§17.4 và BR-39, chưa có bảng chuyển trạng thái, "tạm dừng" vs "khóa", nơi cấu hình thời điểm ngừng bán online, endpoint, audit). Giữ trạng thái Review. |
 | v0.29     | 30/09/2026 | AI Agent       | `TASK-TRN-006`: Khanh chốt Q1–Q8 theo khuyến nghị (tạm dừng = khóa, bảng chuyển trạng thái + thu hồi nháp, điều kiện mở bán trả đủ lý do, ngừng bán online theo chuyến, khóa ghế theo lô, audit, API, chỉ kiểm lúc mở bán); **cửa sổ đón khách chuyển sang `TASK-EMP-002`**. Đồng bộ SRS v1.31, GLOSSARY, LLD v0.12, DB v0.18, API v0.16, Security v0.13, Test plan v0.9 trước khi code. Giữ trạng thái Review. |
+| v0.30     | 30/09/2026 | AI Agent       | `TASK-BTP-001`: ghi bàn giao từ review TRN-006 (khoá chuyến `FOR SHARE` + kiểm trạng thái / giờ bán khi giữ / bán ghế; câu hỏi hold Redis vs Postgres cần Khanh chốt trước khi code BTP-001). Giữ trạng thái Review. |
 
 ---
 
@@ -197,7 +198,7 @@ Bảng xếp theo thứ tự làm. ID cũ giữ nguyên để không vỡ tham c
 
 | Task ID      | Task                                                                                            | Nguồn                  | Owner        | Dependency                 | Status |
 | ------------ | ----------------------------------------------------------------------------------------------- | ---------------------- | ------------ | -------------------------- | ------ |
-| TASK-BTP-001 | SeatHold Redis `SET NX EX 600` + Lua EVAL ownership                                             | FR-BTP-01..03, ADR-015 | BE           | TASK-TRN-006, TASK-FND-004 | Draft  |
+| TASK-BTP-001 | SeatHold Redis `SET NX EX 600` + Lua EVAL ownership. **Bàn giao TRN-006 (review):** giữ / bán ghế phải khoá chuyến `FOR SHARE` + kiểm `OPEN_FOR_SALE` và còn giờ bán online trong cùng transaction; hold Redis phải kiểm ghế `BLOCKED`, còn khóa ghế / thu hồi nháp / hủy / đổi xe hiện **không thấy** hold Redis → cần Khanh chốt trước khi code: hold ghi thêm `HOLDING` vào Postgres (hybrid, ADR-015 để ngỏ) hay giữ thuần Redis + kiểm key ở các luồng đó | FR-BTP-01..03, ADR-015 | BE           | TASK-TRN-006, TASK-FND-004 | Draft  |
 | TASK-BTP-002 | Booking snapshot + total calculation (BIGINT/Decimal)                                           | FR-BTP-05..06, ADR-009 | BE/FE        | TASK-BTP-001               | Draft  |
 | TASK-BTP-003 | PaymentGateway adapter VNPay (SHA512) + MoMo (SHA256) + webhook BullMQ + dedup `(provider,txn)` | FR-BTP-07..09, ADR-019 | BE           | TASK-BTP-002               | Draft  |
 | TASK-BTP-004 | Ticket issuance + QR token hash                                                                 | FR-BTP-10..11          | BE/FE/Mobile | TASK-BTP-003               | Draft  |

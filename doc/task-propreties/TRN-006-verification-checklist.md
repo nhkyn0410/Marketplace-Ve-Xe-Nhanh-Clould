@@ -17,13 +17,13 @@
 ## PHẦN B — Schema & migration
 
 - [x] Migration `20260930130000_trip_sale_lifecycle`: `online_sale_cutoff_minutes` (mặc định 60, CHECK 0–1440), `status_reason`, CHECK hủy phải có lý do.
-- [x] Ghi thẳng DB (kể cả đường system): hủy không lý do, cutoff −1 / 1441 bị chặn.
+- [x] Ghi thẳng DB (kể cả đường system): hủy không lý do / lý do toàn khoảng trắng, cutoff −1 / 1441 bị chặn; migration backfill chuyến hủy thiếu lý do.
 - [x] 15 migration áp tuần tự; `db:app-role` pass; `prisma migrate diff` rỗng.
 
 ## PHẦN C — Điều kiện mở bán (BR-39, Q3)
 
 - [x] Thiếu nhiều điều kiện → 422 `TRIP_NOT_READY_FOR_SALE` kèm **mọi** lý do; trạng thái và audit không đổi.
-- [x] Từng lý do riêng: thiếu giá một loại chỗ, giá 0, xe bảo dưỡng, điểm dừng ngừng dùng, tuyến ngừng dùng, nhà xe bị đình chỉ.
+- [x] Từng lý do riêng: thiếu giá một loại chỗ, giá 0, xe bảo dưỡng, điểm dừng ngừng dùng (catalog + điểm riêng), tuyến ngừng dùng, nhà xe bị đình chỉ. Kiểm dưới khoá `FOR SHARE` tuyến / bảng giá / xe.
 - [x] Biên thời điểm ngừng bán online: đúng mốc là đóng; 0 phút = bán tới giờ khởi hành (unit).
 - [x] Khóa → bảng giá tắt → mở lại bị chặn `FARE_MISSING`; bật lại → mở lại được (Q8: chỉ kiểm lúc mở bán / mở lại).
 - [x] `reasons` đi qua filter RFC 7807 (chỉ mảng chuỗi) và có trong OpenAPI `ProblemDetailsDto`.
@@ -33,15 +33,15 @@
 - [x] Bảng chuyển 10 × 4 cặp đúng LLD §8 (unit); sang chính nó → 409.
 - [x] Thu hồi nháp → sửa được bằng `PUT`; hủy có lý do → xe rảnh ngay (gắn lại cùng xe, cùng giờ được); hủy xong không mở lại.
 - [x] Chuyến đã có ghế `BOOKED`: thu hồi nháp / hủy → 409; khóa bán vẫn được.
-- [x] Hai request mở bán đồng thời → đúng một thành công, một 409, đúng một audit.
-- [x] Audit lỗi → 503, trạng thái không đổi. Mutation bỏ kiểm điều kiện mở bán → 3 test đỏ; bỏ chặn chuyến đã có vé → 1 test đỏ.
+- [x] Hai request mở bán đồng thời → đúng một thành công, một 409, đúng một audit. Hủy lúc ghế đang được bán (chưa commit) → chờ rồi 409 (mutation bỏ khoá ghế → đỏ).
+- [x] Audit lỗi → 503; transaction hết hạn → 503; trạng thái không đổi. Audit là lệnh cuối, giới hạn theo hạn còn lại của transaction. Mutation bỏ kiểm điều kiện mở bán → 3 test đỏ; bỏ chặn chuyến đã có vé → 1 test đỏ.
 
 ## PHẦN E — Khóa ghế thủ công (Q5, BR-42)
 
 - [x] Khóa / mở theo lô, ghế đã ở trạng thái đích bỏ qua; audit sau commit chỉ ghi ghế thực sự đổi.
-- [x] Được cả lô hoặc không: mã lạ → 422, ghế đã bán → 409, không ghế nào đổi.
+- [x] Được cả lô hoặc không: mã lạ → 422, ghế đã bán → 409, ghế đang được transaction khác giữ → 409; không ghế nào đổi.
 - [x] Chuyến hủy → 409 `TRIP_NOT_EDITABLE`; Mongo lỗi vẫn khóa được ghế.
-- [x] Đổi xe giữ ghế khóa theo mã; xe mới thiếu ghế đã khóa → 409 `TRIP_BLOCKED_SEATS_MISSING`. Mutation bỏ giữ ghế khóa → test đỏ.
+- [x] Đổi xe giữ ghế khóa theo mã; xe mới thiếu ghế đã khóa → 409 `TRIP_BLOCKED_SEATS_MISSING` nêu mã ghế; còn ghế đang giữ / đã bán → 409 không sinh lại ghế. Mutation bỏ giữ ghế khóa → test đỏ.
 
 ## PHẦN F — Tenant & quyền
 
@@ -55,9 +55,9 @@
 
 ## PHẦN H — Test, review, CI & đóng task
 
-- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 74/74 file, 942/942 test, 0 skip.
+- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 74/74 file, 947/947 test, 0 skip (sau sửa review).
 - [x] API lint + typecheck + build sạch; typecheck monorepo 10/10.
-- [ ] `code-reviewer` + `security-auditor` không còn finding blocking/high.
+- [x] `code-reviewer` + `security-auditor` không còn finding blocking/high (Medium tiềm ẩn → bàn giao BTP-001 / Admin; Low đã sửa + test — bảng trong todo).
 - [ ] Smoke guide §3 trên API chạy thật — chưa chạy. Tương đương: `trip.http.spec.ts` (route + guard thật) + `trip-sale.int.spec.ts` (Postgres + Mongo thật).
 - [x] AI journal đã ghi; không commit journal.
 - [ ] CI branch xanh — Khanh xác nhận.
