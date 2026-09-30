@@ -32,6 +32,9 @@ match:
 ## Lỗi hay gặp
 
 - CI "Contract" đỏ: quên chạy bước 2 hoặc 3. Sinh lại rồi commit.
+- Không có Docker (vd. môi trường cloud): chạy thẳng file jar cùng bản, cần Java 11+:
+  `java -jar openapi-generator-cli-7.25.0.jar generate -i packages/api-client/src/generated/openapi.json -g dart-dio -o <thư-mục-tạm> --additional-properties=pubName=api_client_dart,pubLibrary=api_client_dart`
+  (jar tải từ Maven Central `org/openapitools/openapi-generator-cli/7.25.0/`, đối chiếu file `.sha1` cạnh jar). Sinh vào thư mục tạm rồi chỉ chép **file mới** + file `lib/` / `README.md` đổi; giữ test cũ và bỏ dòng `test/`, `.openapi-generator-ignore` khỏi `.openapi-generator/FILES` — giống kết quả khi sinh đè bằng Docker.
 - Cảnh báo "OpenAPI 3.1 support is still in beta" là bình thường. Nếu nâng bản generator thì phải chạy lại cả `dart analyze`.
 
 **Liên quan:** ADR-012 (OpenAPI 3.1 là nguồn duy nhất) · ADR-028 · `.github/workflows/contract.yml` · `doc/task-propreties/FND-009-guide.md` §3
