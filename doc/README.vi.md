@@ -18,19 +18,19 @@ Nguồn thiết kế chính nằm trong `doc/SDLC/`. Khi bắt đầu code, đ�
 
 ## Stack
 
-| Khu vực          | Lựa chọn                               |
-| ---------------- | -------------------------------------- |
-| Runtime          | Node.js 24 LTS, TypeScript strict      |
-| Package manager  | pnpm 10                                |
-| Monorepo         | Turborepo                              |
-| Backend          | NestJS 11, nestjs-zod                  |
-| Web              | Next.js 16 App Router                  |
-| Mobile           | Flutter 3.x + Dart 3.x                 |
-| Operational DB   | PostgreSQL 16, Prisma 5                |
-| Audit/log DB     | MongoDB 7, Mongoose 8                  |
-| Cache/lock/queue | Redis 7, ioredis, BullMQ               |
-| Tests            | Vitest, Supertest, Playwright, Maestro |
-| Observability    | Pino, Sentry, OpenTelemetry            |
+| Khu vực | Lựa chọn |
+| --- | --- |
+| Runtime | Node.js 24 LTS, TypeScript strict |
+| Package manager | pnpm 10 |
+| Monorepo | Turborepo |
+| Backend | NestJS 11, nestjs-zod |
+| Web | Next.js 16 App Router |
+| Mobile | Expo SDK 55+ |
+| Operational DB | PostgreSQL 16, Prisma 5 |
+| Audit/log DB | MongoDB 7, Mongoose 8 |
+| Cache/lock/queue | Redis 7, ioredis, BullMQ |
+| Tests | Vitest, Supertest, Playwright, Maestro |
+| Observability | Pino, Sentry, OpenTelemetry |
 
 ## Cấu Trúc Repository
 
@@ -40,13 +40,14 @@ apps/
   marketplace/          Next.js app cho hành khách
   operator-os/          Next.js dashboard cho nhà xe và nhân viên
   admin/                Next.js dashboard cho platform admin
-  passenger_mobile/     Flutter app cho hành khách
-  employee_mobile/      Flutter app cho nhân viên
+  passenger-mobile/     Expo app cho hành khách
+  employee-mobile/      Expo app cho nhân viên
 
 packages/
   types/                Zod schemas và shared TypeScript types
   api-client/           Placeholder cho generated API client
   ui/                   Shared web UI package
+  ui-mobile-shared/     Shared mobile UI helpers
   utils/                Shared utilities, gồm money helpers
   config/               Shared TypeScript configuration
 ```
@@ -83,13 +84,13 @@ pnpm turbo run dev --filter=@vexenhanh/marketplace
 
 ## Lệnh Gốc
 
-| Lệnh                  | Mục đích                                             |
-| --------------------- | ---------------------------------------------------- |
-| `pnpm dev`            | Chạy các dev task của workspace song song            |
-| `pnpm build`          | Build tất cả workspace                               |
-| `pnpm lint`           | Lint tất cả workspace                                |
-| `pnpm typecheck`      | Typecheck tất cả workspace                           |
-| `pnpm test`           | Chạy Vitest trên các workspace                       |
+| Lệnh | Mục đích |
+| --- | --- |
+| `pnpm dev` | Chạy các dev task của workspace song song |
+| `pnpm build` | Build tất cả workspace |
+| `pnpm lint` | Lint tất cả workspace |
+| `pnpm typecheck` | Typecheck tất cả workspace |
+| `pnpm test` | Chạy Vitest trên các workspace |
 | `pnpm gen:api-client` | Generate API client package sau khi OpenAPI thay đổi |
 
 ## Quy Tắc Phát Triển
@@ -125,15 +126,15 @@ Với thay đổi nhỏ, viết test tập trung. Khi chạm shared contracts, a
 
 ## Tài Liệu Quan Trọng
 
-| File                                          | Vai trò                                                               |
-| --------------------------------------------- | --------------------------------------------------------------------- |
-| `AGENTS.md`                                   | Coding brief cross-tool: stack, structure, style, testing, boundaries |
-| `CLAUDE.md`                                   | Claude Code operational workflow và project state pointers            |
-| `doc/context/PROJECT-STATE.md`                | Trạng thái sống của dự án                                             |
-| `doc/context/DOMAIN-MAP.md`                   | Map domain và tên module                                              |
-| `doc/context/GLOSSARY.md`                     | Thuật ngữ entity, state, error-code                                   |
-| `doc/SDLC/10-architecture-decision-record.md` | Architecture decisions                                                |
-| `doc/SDLC/11-project-task-breakdown.md`       | Build task backlog                                                    |
+| File | Vai trò |
+| --- | --- |
+| `AGENTS.md` | Coding brief cross-tool: stack, structure, style, testing, boundaries |
+| `CLAUDE.md` | Claude Code operational workflow và project state pointers |
+| `doc/context/PROJECT-STATE.md` | Trạng thái sống của dự án |
+| `doc/context/DOMAIN-MAP.md` | Map domain và tên module |
+| `doc/context/GLOSSARY.md` | Thuật ngữ entity, state, error-code |
+| `doc/SDLC/10-architecture-decision-record.md` | Architecture decisions |
+| `doc/SDLC/11-project-task-breakdown.md` | Build task backlog |
 
 ## Production Blockers
 

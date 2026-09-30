@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent   |
 | Người duyệt   | Nguyễn Hồng Khanh             |
 | Ngày tạo      | 11/05/2026                    |
-| Ngày cập nhật | 26/09/2026                    |
+| Ngày cập nhật | 03/06/2026                    |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -23,9 +23,6 @@
 | v0.2      | 25/05/2026 | AI Agent       | Bổ sung tham chiếu DOMAIN-MAP / GLOSSARY / PROJECT-STATE; chốt email OTP v1; chốt phone mask `0*** *** 789`; đóng SEC-OQ-03 và SEC-OQ-05 (storage)                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | v0.3      | 25/05/2026 | AI Agent       | Cập nhật tham chiếu SRS v1.15 → v1.20; cập nhật số mục DOMAIN-MAP. Không thay đổi nội dung normative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 5 Rework** — bake **ADR-017/019/020 (Khanh re-confirm CRITICAL 01/06/2026)** + ADR-011/018. §5 auth: Better Auth 3-namespace + Hybrid token (JWT 15min + opaque refresh 30d rotation/family) + §5.2 MFA TOTP + §5.3 OAuth Google/FB/Apple PKCE. §6 TenantGuard + Postgres RLS. §8 payout manual confirm + maker-checker (ADR-022). §9 KYC R2 private presigned (ADR-018) + payment PCI SAQ-A (ADR-019) + cross-border PII. §11 webhook HMAC + OAuth/refresh-reuse threat + SQL injection (Prisma). **Đóng SEC-OQ-01/02/04/06** (per ADR-017/018); refine SEC-OQ-05/07; thêm SEC-OQ-08 (OAuth linking). |
-| v0.5      | 25/09/2026 | AI Agent       | **Hiện thực hóa phần Web của ADR-017 qua TASK-OQ-05/TASK-IAM-006:** bỏ defer cookie; chốt cookie host-only, signed double-submit CSRF, strict Origin/CORS allowlist, dual transport tường minh và chống credential ambiguity. Giữ JSON/Bearer cho Mobile; không thay đổi trạng thái Approved. |
-| v0.6      | 26/09/2026 | AI Agent       | §7 thêm dòng Route/StopPoint theo SRS permission matrix (TASK-TRN-002, Khanh duyệt Q6): quyền `route:manage` chỉ Operator Owner trong tenant. Giữ trạng thái Approved, không tự promote. |
-| v0.7      | 27/09/2026 | AI Agent       | **TASK-IAM-006 (Khanh chốt):** §5 tách Owner / nhân viên (nhân viên `{slug}/nv.{tên}` qua cổng riêng, chỉ Bearer); §5.1 ràng origin ↔ scope phiên (M1 security-auditor) với env `OPERATOR_WEB_ORIGINS`/`ADMIN_WEB_ORIGINS`, làm rõ vai trò HMAC của CSRF token. Không đổi trạng thái Approved. |
 
 ---
 
@@ -68,11 +65,11 @@ Tài liệu này mô tả thiết kế bảo mật và phân quyền cho hệ th
 
 ## 4. Actor và trust boundary
 
-Identity 3 namespace tách biệt (ADR-017): Passenger=Email; Operator-side=Owner `{slug}/{username}` (cổng `/auth/operator/login`) và nhân viên `{slug}/nv.{tên}` (cổng riêng `/auth/employee/login`, chỉ Bearer — amend 27/09/2026, TASK-IAM-006); Platform-side=`platform/{username}`. Sai cổng trả cùng lỗi như sai mật khẩu.
+Identity 3 namespace tách biệt (ADR-017): Passenger=Email; Operator-side=`{slug}/{username}`; Platform-side=`platform/{username}`.
 
 | Actor             | Trust level          | Boundary                                        |
 | ----------------- | -------------------- | ----------------------------------------------- |
-| Guest             | Public/untrusted     | Dữ liệu public; giữ ghế / đặt vé / thanh toán qua guest session; tra cứu / hủy / hoàn sau xác minh mã và thông tin liên hệ, bổ sung nếu policy yêu cầu |
+| Guest             | Public/untrusted     | Chỉ public data và ticket lookup có xác minh    |
 | Passenger (User)  | Authenticated user   | Chỉ dữ liệu của chính mình                      |
 | Operator          | Tenant admin         | Chỉ dữ liệu thuộc Operator (`operatorId` + RLS) |
 | Employee          | Tenant scoped worker | Chỉ dữ liệu theo Operator, role và assignment   |
@@ -88,8 +85,7 @@ Auth library = **Better Auth** + custom NestJS adapter (ADR-017).
 | Actor               | Cơ chế                                                                | Rule                                                                         |
 | ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Passenger (User)    | Email + OTP (Resend) primary; hoặc OAuth Google/Facebook/Apple (PKCE) | Self-register; reset qua email; account linking email-match                  |
-| Operator (Owner)    | `{operatorSlug}/{username}` + password; closed enrollment; cấm tiền tố `nv.` | Không public/OAuth; TOTP bắt buộc; web cookie hoặc Bearer                    |
-| Employee            | `{operatorSlug}/nv.{tên}` + password (Owner cấp); cổng `/auth/employee/login` | Không public/OAuth; chỉ Bearer (app Nhân viên); Operator quản lý trạng thái + assignment scope |
+| Operator / Employee | `{operatorSlug}/{username}` + password; closed enrollment             | Không public/OAuth; Operator quản lý trạng thái + assignment scope           |
 | Admin / Platform    | `platform/{username}` + password; closed enrollment                   | TOTP mandatory; không public/OAuth                                           |
 | Guest               | Guest session, không login                                            | Search/hold/book/pay/lookup; email/OTP verify cho thao tác nhạy cảm + lookup |
 
@@ -99,15 +95,11 @@ Auth library = **Better Auth** + custom NestJS adapter (ADR-017).
 | ------------- | --------------------------------------------------------------------------------------------------- |
 | Access token  | JWT RS256, TTL **15 phút** (claims `sub`, `scope`, `role`, `operatorSlug`)                          |
 | Refresh token | Opaque 32-byte, TTL **30 ngày**, rotation mỗi lần refresh + family invalidation khi phát hiện reuse |
-| Token storage | Web Operator OS/Admin = `vxn_access` + `vxn_refresh` httpOnly cookie; Mobile = JSON/Bearer trong `flutter_secure_storage`. Web opt-in bằng `X-Auth-Transport: cookie`; thiếu header giữ hành vi Mobile. Phần Web trước đây defer ở TASK-IAM-002 được mở lại trong TASK-IAM-006. |
+| Token storage | Web = JWT trong httpOnly cookie (+ CSRF token); Mobile = `expo-secure-store`                        |
 | Session store | `auth_sessions` (Postgres) + Redis cache metadata                                                   |
 | Multi-device  | Mỗi login = 1 session family; revoke theo family hoặc revoke all                                    |
 | Force logout  | Khi khóa account, reset password, thu hồi quyền hoặc phát hiện rủi ro → revoke family               |
 | Login history | actor, thời điểm, device/IP nếu có, kết quả                                                         |
-
-Cookie Web là host-only, không khai `Domain`: access `SameSite=Lax`, path `/v1`, 15 phút; refresh `SameSite=Strict`, path `/v1/auth/refresh`, 30 ngày; `Secure` bắt buộc staging/production và chỉ được false trên local HTTP. Mọi lần xóa cookie phải dùng đúng tên/path/flags đã cấp.
-
-CSRF dùng signed double-submit `vxn_csrf` + header `X-CSRF-Token`. Token được cấp/khôi phục qua `GET /v1/auth/csrf`, rotate khi session được cấp/refresh/đổi mật khẩu và clear khi logout/current family bị revoke. Mọi unsafe method dùng cookie bắt buộc token hợp lệ **và** `Origin` thuộc exact allowlist; Bearer mode không dùng CSRF. Request đồng thời mang Bearer và access cookie bị từ chối `AUTH_TRANSPORT_AMBIGUOUS` thay vì chọn ngầm. **Ràng origin ↔ scope** (TASK-IAM-006, M1): origin khai theo app (`OPERATOR_WEB_ORIGINS` → scope `operator`, `ADMIN_WEB_ORIGINS` → `platform`); phiên cookie gọi từ origin của app khác scope bị `403 AUTH_ORIGIN_FORBIDDEN` (kể cả GET, login và refresh — refresh kiểm trước khi xoay, không xoá cookie), nên XSS ở một app không mượn được phiên app kia trong cùng trình duyệt. HMAC của CSRF token chỉ chặn token tự bịa (ai cũng xin được token qua `/auth/csrf`); lớp chặn chính là Origin allowlist + header tuỳ biến cần preflight.
 
 ### 5.2. MFA (ADR-017)
 
@@ -147,9 +139,8 @@ RBAC 8-role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / 
 | Search trip              | Có                 | Có          | Có trong phạm vi              | Không                  | Có                     |
 | Create booking           | Có (guest session) | Có          | Có thể hỗ trợ nếu được phép   | Không                  | Có thể hỗ trợ          |
 | Payment                  | Có (guest session) | Có          | Không trực tiếp               | Không                  | Giám sát/đối soát      |
-| Cancel/refund request    | Vé / booking đã xác minh, theo policy | Vé của mình | Vé thuộc Operator theo policy | Không                  | Có                     |
+| Cancel/refund request    | Không              | Vé của mình | Vé thuộc Operator theo policy | Không                  | Có                     |
 | Vehicle/SeatMap          | Không              | Không       | Có trong tenant               | Xem nếu được phân công | Giám sát/toàn hệ thống |
-| Route/StopPoint riêng/đề xuất | Không         | Không       | Có trong tenant (`route:manage`, Owner) | Xem theo chuyến được phân công (task sau) | Duyệt đề xuất, quản lý catalog (ADM-001) |
 | Check-in                 | Không              | Không       | Xem kết quả                   | Có theo assignment     | Giám sát               |
 | KYC Operator             | Không              | Không       | Hồ sơ của mình                | Không                  | Duyệt/quản lý          |
 | Policy/commission/payout | Không              | Không       | Xem phần liên quan            | Không                  | Cấu hình               |
@@ -161,7 +152,6 @@ RBAC 8-role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / 
 
 | Thao tác                          | Kiểm soát bắt buộc                                                                                       |
 | --------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Guest yêu cầu hủy vé / hoàn tiền  | Đối chiếu mã booking / mã vé với contact đã lưu; xác minh bổ sung theo policy; chỉ thao tác trên booking / ticket đã xác minh (`UC-08`, `UC-35`, `BR-21`) |
 | Refund thủ công                   | Admin permission, re-auth/TOTP, reason, audit, notification Operator                                     |
 | Payout confirm + nhập bank ref    | Admin permission, re-auth/TOTP, reason, audit; maker-checker dual-control khi team Platform >1 (ADR-022) |
 | Đổi bank account Operator         | Operator/Admin permission, re-auth, re-verify, audit                                                     |
@@ -176,7 +166,7 @@ RBAC 8-role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / 
 
 | Dữ liệu                            | Kiểm soát                                                                                                               |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Password                           | **scrypt** (Node built-in, `N=2^16, r=8, p=2`, salt 16B ngẫu nhiên/lần, so sánh timing-safe, cost params nhúng trong hash để nâng cost không vỡ format); không log plaintext. Chỉ áp cho Operator/Employee/Platform — Passenger dùng Email-OTP/OAuth, không có password. *(Chốt 09/09/2026: bản trước ghi "Better Auth hashing (Argon2/bcrypt)"; đổi sang scrypt vì không cần native dependency → an toàn với Docker distroless ADR-023, tránh đúng loại bẫy đã gặp với Prisma/libssl.)* |
+| Password                           | Better Auth hashing (Argon2/bcrypt), không log plaintext                                                                |
 | OTP/token                          | Không log plaintext, TTL ngắn; refresh token opaque (không readable)                                                    |
 | Số điện thoại/email                | Mask khi không cần đầy đủ; SĐT theo `0*** *** 789` (OQ-11)                                                              |
 | Payment data                       | **PCI SAQ-A**: cổng hosted/redirect (VNPay/MoMo), KHÔNG lưu card data; chỉ lưu mã giao dịch/provider metadata (ADR-019) |
@@ -208,9 +198,7 @@ AuditLog ghi vào Mongo `audit_event` (cluster RIÊNG, append-only via REVOKE, A
 | IDOR                  | Backend ownership check + tenant filter + Postgres RLS, test case bắt buộc                                                     |
 | SQL/NoSQL Injection   | Prisma parameterized query (Postgres); Mongoose schema validation (Mongo audit); Zod input validation; không truyền filter raw |
 | XSS                   | Escape/sanitize nội dung user-generated, CSP TBD                                                                               |
-| CSRF                  | Web cookie dùng signed double-submit `vxn_csrf` + `X-CSRF-Token` và exact `Origin`; rotate theo session/refresh; Mobile Bearer không áp dụng |
-| CORS                  | Credentialed exact-origin allowlist theo môi trường; không wildcard; reject unsafe cookie request thiếu/sai Origin             |
-| Credential confusion  | Bearer và access cookie cùng xuất hiện → `400 AUTH_TRANSPORT_AMBIGUOUS`; không ưu tiên ngầm                                     |
+| CSRF                  | Web dùng httpOnly cookie → CSRF token bắt buộc; Mobile Bearer không cần                                                        |
 | OAuth abuse           | PKCE + `state` param; verify email ownership chống account-linking takeover (ADR-020)                                          |
 | Refresh token reuse   | Rotation + family invalidation (ADR-017)                                                                                       |
 | Brute force login/OTP | Rate limit, lock tạm, monitoring (SEC-OQ-07)                                                                                   |
@@ -224,14 +212,14 @@ AuditLog ghi vào Mongo `audit_event` (cluster RIÊNG, append-only via REVOKE, A
 
 | ID        | Câu hỏi                                                                                 | Tác động                | Trạng thái                                                                                                                           |
 | --------- | --------------------------------------------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| SEC-OQ-01 | Web dùng Bearer token hay cookie session?                                               | CSRF/token storage      | **Đóng theo ADR-017 + TASK-OQ-05 (25/09/2026)**: Web Operator/Admin dùng host-only httpOnly cookie + signed double-submit CSRF/Origin allowlist; Mobile giữ JSON/Bearer (`flutter_secure_storage`) |
+| SEC-OQ-01 | Web dùng Bearer token hay cookie session?                                               | CSRF/token storage      | **Đóng theo ADR-017**: Web = httpOnly cookie (+ CSRF); Mobile = Bearer (expo-secure-store)                                           |
 | SEC-OQ-02 | Có bật MFA cho Admin/Operator ở v1 không?                                               | Auth flow               | **Đóng theo ADR-017**: TOTP **bắt buộc** Owner/PlatformAdmin/PlatformSupport + backup code; optional Driver/TicketStaff/SupportStaff |
 | SEC-OQ-03 | Mask số điện thoại cụ thể theo rule nào?                                                | UI/API/report           | Đóng 11/05/2026 theo OQ-11: `0*** *** 789`                                                                                           |
 | SEC-OQ-04 | KYC document lưu provider nào?                                                          | Object storage security | **Đóng theo ADR-018**: Cloudflare R2 private bucket, presigned TTL 5min + audit. Production location → **OQ-21** (mở)                |
 | SEC-OQ-05 | AuditLog lưu bao lâu và ai được export?                                                 | Compliance/operation    | Storage đóng theo ADR-011 (Mongo cluster RIÊNG); **retention + export ACL còn mở** (DB-OQ-06)                                        |
 | SEC-OQ-06 | Token TTL access/refresh và multi-device limit cụ thể?                                  | Session policy §5.1     | **Đóng theo ADR-017**: access 15min + refresh 30d rotation/family; multi-device = session family                                     |
-| SEC-OQ-07 | OTP rate limit và reuse policy (cooldown, attempt limit)?                               | Brute force control     | **Đóng (08/06/2026) — IAM-001.1**: verify-attempt 3 lần/OTP (Better Auth `allowedAttempts`); OTP TTL 5 phút; gửi lại cooldown 60s + ≤5 lần/giờ/email                                                                  |
-| SEC-OQ-08 | Policy account-linking OAuth (email khớp nhưng chưa verify, multi-provider cùng email)? | Auth edge case          | **Đóng (08/06/2026) — IAM-001.1**: `accountLinking.enabled`, chỉ link khi email khớp + verified; `trustedProviders=[google,apple]`, Facebook đi đường verified-match; `allowDifferentEmails=false`; Operator/Platform không linking                                                                        |
+| SEC-OQ-07 | OTP rate limit và reuse policy (cooldown, attempt limit)?                               | Brute force control     | Mở; chốt implementation LLD (default: cooldown 60s, ≤5 attempt/giờ)                                                                  |
+| SEC-OQ-08 | Policy account-linking OAuth (email khớp nhưng chưa verify, multi-provider cùng email)? | Auth edge case          | Mở; chốt LLD (Better Auth UI manual link, ADR-020 mitigation)                                                                        |
 
 ---
 

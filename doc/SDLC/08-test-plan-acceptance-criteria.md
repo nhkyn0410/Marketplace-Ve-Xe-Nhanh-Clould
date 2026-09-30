@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent        |
 | Người duyệt   | Nguyễn Hồng Khanh                |
 | Ngày tạo      | 11/05/2026                       |
-| Ngày cập nhật | 25/09/2026                       |
+| Ngày cập nhật | 01/06/2026                       |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -21,9 +21,6 @@
 | --------- | ---------- | -------------- | ----------------------------------------- |
 | v0.1      | 11/05/2026 | AI Agent       | Tạo bản nháp Test Plan & Acceptance Criteria |
 | v0.2      | 01/06/2026 | AI Agent       | **Sprint 4 Rework** — bake **ADR-025** test framework (Vitest + Supertest + Playwright + Maestro) + stack ADR. §4 strategy map tool cụ thể; §6 môi trường Postgres/Mongo Testcontainers + VNPay/MoMo sandbox; §8/§9 thêm mandatory test money BIGINT/idempotency dedup/tenant RLS/webhook HMAC/OAuth (ADR-009/011/015/017/019). Đóng TEST-OQ-02 (sandbox VNPay+MoMo+Resend+Expo per ADR-019/020); refine TEST-OQ-01. |
-| v0.3      | 25/09/2026 | AI Agent       | **TASK-OQ-05 / TASK-IAM-006:** thêm acceptance + Supertest/Playwright cho dual transport, cookie flags, CSRF/CORS, `/auth/me`, first-login/TOTP, refresh single-flight và hồi quy Mobile JSON/Bearer. Giữ trạng thái Draft. |
-| v0.4      | 27/09/2026 | AI Agent       | **TASK-IAM-006 Q4:** TC-SEC-008 thêm kịch bản Employee đăng nhập Operator OS web → báo không có dữ liệu + thu hồi phiên. Giữ trạng thái Draft. |
-| v0.5      | 27/09/2026 | AI Agent       | **TASK-IAM-006:** TC-SEC-008 cập nhật (nhân viên nhận lỗi chung ở Operator OS); thêm TC-SEC-009 (cổng nhân viên tách, quy tắc `nv.`) và TC-SEC-010 (ràng origin ↔ scope phiên). Giữ trạng thái Draft. |
 
 ---
 
@@ -45,7 +42,7 @@
 
 ## 3. Giới thiệu
 
-Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu và test case nháp. Test framework đã chốt (ADR-025): **Vitest** (unit+integration BE+FE monorepo), **Supertest** (e2e API), **Playwright** (e2e web), **Maestro** (e2e mobile Flutter) + `flutter_test` / `integration_test` (widget + E2E in-app). Tham chiếu: `01-srs`, `03-lld`, `04-db`, `05-api`, `07-security`, `10-adr` (v0.21 — ADR-025 + 009/011/015/017/019).
+Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu và test case nháp. Test framework đã chốt (ADR-025): **Vitest** (unit+integration BE+FE monorepo), **Supertest** (e2e API), **Playwright** (e2e web), **Maestro** (e2e mobile Expo). Tham chiếu: `01-srs`, `03-lld`, `04-db`, `05-api`, `07-security`, `10-adr` (v0.21 — ADR-025 + 009/011/015/017/019).
 
 ---
 
@@ -57,7 +54,7 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 | Integration | **Vitest** + Testcontainers | Module với Postgres/Mongo/Redis thật, queue, provider mock | Developer/QA |
 | API contract / e2e | **Supertest** | Endpoint, Zod DTO, RFC 7807 error code, permission, RLS | QA/Developer |
 | E2E Web | **Playwright** | Luồng marketplace/operator/admin chính | QA |
-| E2E Mobile | **Maestro** + `integration_test` | Luồng passenger + employee (booking, check-in) | QA |
+| E2E Mobile | **Maestro** | Luồng passenger + employee (booking, check-in) | QA |
 | Security | Vitest + Supertest | Auth, RBAC, tenant RLS, IDOR, rate limit, webhook HMAC | QA/Security |
 | Performance | k6/Artillery (chốt LLD) | Search, seat hold, payment callback, report export | QA/DevOps |
 | UAT | Manual | Người duyệt xác nhận nghiệp vụ | Người duyệt/PO |
@@ -68,7 +65,7 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 
 | Nhóm | Trong scope | Mức ưu tiên |
 | ---- | ----------- | ----------- |
-| IAM | Đăng ký, login 3-namespace, OTP/OAuth, refresh rotation, TOTP, session revoke; Web cookie/CSRF/CORS/bootstrap và hồi quy Mobile Bearer | Cao |
+| IAM | Đăng ký, login 3-namespace, OTP/OAuth, refresh rotation, TOTP, session revoke | Cao |
 | Marketplace | Search, filter, trip detail, seat map, booking, ticket | Cao |
 | Booking/Payment | SeatHold (Redis), create booking, VNPay/MoMo callback, refund, escrow | Rất cao |
 | Operator OS | KYC, vehicle, route, trip, booking list, finance, payout | Cao |
@@ -85,7 +82,7 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 | ---------- | ---- | ------- |
 | Local | Vitest + Testcontainers | Postgres 16 + Mongo 7 ephemeral; Redis local/Upstash dev |
 | CI | GitHub Actions + Vitest + Turborepo affected | Seed data ổn định; tách unit (mọi commit) vs integration/e2e (scheduled) (ADR-026) |
-| Staging | Playwright + Maestro + Supertest | Sandbox **VNPay + MoMo** + **Resend** + **FCM/APNs**; KYC local adapter |
+| Staging | Playwright + Maestro + Supertest | Sandbox **VNPay + MoMo** + **Resend** + **Expo Push**; KYC local adapter |
 | Production | Smoke test sau deploy | Không dùng dữ liệu giả nhạy cảm |
 
 ---
@@ -117,7 +114,6 @@ Tài liệu này mô tả chiến lược kiểm thử, tiêu chí nghiệm thu 
 | Money correctness | Mọi tính tiền dùng BIGINT/Decimal; commission/refund/payout không sai số làm tròn (ADR-009/011). |
 | Refund | User/Admin hủy vé đúng policy snapshot, refund state rõ, audit ghi. |
 | Tenant isolation | Operator chỉ xem/quản lý dữ liệu tenant mình; RLS chặn cả khi app guard miss (ADR-011/017). |
-| Web auth | Operator OS/Admin hoàn tất first-login/TOTP, nhận cookie đúng flags, reload bootstrap được; CSRF/origin sai bị chặn; Mobile JSON/Bearer không đổi. |
 | Employee | Employee chỉ check-in chuyến được phân công, không xem dữ liệu ngoài scope. |
 | Admin | Admin xử lý KYC/refund/dispute/payout có re-auth/TOTP/audit với quyền phù hợp. |
 | Notification | Ticket vẫn xem được dù email/push thất bại; delivery retry ghi nhận (BullMQ DLQ). |
@@ -141,14 +137,6 @@ Mandatory (rủi ro cao, ADR-025): money math, idempotency, tenant RLS, seat-hol
 | TC-REF-001 | Hủy vé trước hạn tạo refund đúng policy snapshot | E2E | Cao |
 | TC-SEC-001 | Operator A không xem booking Operator B (RLS) | Security | Rất cao |
 | TC-SEC-002 | Refresh token reuse bị family invalidation | Security | Cao |
-| TC-SEC-003 | Bearer/default Mobile giữ nguyên JSON schema, không có `Set-Cookie`; cookie mode không lộ token thô | Contract/Security | Rất cao |
-| TC-SEC-004 | Cookie access/refresh/CSRF đúng HttpOnly/Secure/SameSite/Path/TTL; logout/revoke current family xóa đúng attributes | Security | Rất cao |
-| TC-SEC-005 | CSRF thiếu/sai/cũ và unsafe request có Origin ngoài allowlist/`null` bị từ chối; preflight hợp lệ không qua auth | Security | Rất cao |
-| TC-SEC-006 | Bearer và access cookie đồng thời bị `AUTH_TRANSPORT_AMBIGUOUS`; transport lạ bị `AUTH_TRANSPORT_INVALID` | Security | Cao |
-| TC-SEC-007 | `/auth/me` không trả secret/không tự refresh; access hết hạn → web refresh single-flight rồi retry | API/E2E Web | Cao |
-| TC-SEC-008 | Playwright Operator: temp password → đổi → login lại → TOTP enrollment → backup code một lần → reload/protected route; Admin password → TOTP → protected route; nhân viên nhập vào Operator OS → lỗi đăng nhập chung, không có phiên | E2E Web | Rất cao |
-| TC-SEC-009 | Cổng nhân viên `/auth/employee/login` (`{slug}/nv.{tên}`) trả token Bearer, cookie mode → 400; nhân viên ở cổng Owner và Owner ở cổng nhân viên → 401 chung, không tạo phiên; DB từ chối nhân viên thiếu `nv.` và Owner dùng `nv.` | API/DB | Rất cao |
-| TC-SEC-010 | Phiên cookie gọi từ origin của app khác scope (Operator ↔ Admin) → 403 `AUTH_ORIGIN_FORBIDDEN` cho GET/mutation/login; refresh sai origin bị chặn trước khi xoay token và không xoá cookie | API | Cao |
 | TC-EMP-001 | Employee check-in ticket hợp lệ được phân công (Maestro) | E2E | Cao |
 | TC-EMP-002 | Employee không check-in chuyến ngoài assignment | Security | Cao |
 | TC-ADM-001 | Admin refund/payout thủ công yêu cầu re-auth/TOTP + audit | E2E/Security | Cao |
@@ -164,7 +152,7 @@ Mandatory (rủi ro cao, ADR-025): money math, idempotency, tenant RLS, seat-hol
 | SRS liên quan đã Review/Approved | TBD |
 | HLD/LLD/API/DB/Security liên quan đã Review/Approved | TBD (rework v0.x chờ Khanh promote) |
 | Test environment có seed data + Testcontainers | TBD |
-| Provider sandbox (VNPay/MoMo/Resend/FCM) sẵn sàng | TBD |
+| Provider sandbox (VNPay/MoMo/Resend/Expo) sẵn sàng | TBD |
 
 ### 10.2. Exit criteria
 
@@ -182,7 +170,7 @@ Mandatory (rủi ro cao, ADR-025): money math, idempotency, tenant RLS, seat-hol
 | ID | Câu hỏi | Tác động | Trạng thái |
 | -- | ------- | -------- | ---------- |
 | TEST-OQ-01 | Ưu tiên automation backend hay E2E trước? | Kế hoạch QA | Refined per ADR-025: **BE unit/integration (Vitest) trước** (ROI cao, nhanh); E2E critical path sau |
-| TEST-OQ-02 | Provider sandbox nào cho payment/notification? | Integration test | **Đóng theo ADR-019/020**: VNPay + MoMo sandbox; Resend; FCM + APNs |
+| TEST-OQ-02 | Provider sandbox nào cho payment/notification? | Integration test | **Đóng theo ADR-019/020**: VNPay + MoMo sandbox; Resend; Expo Push |
 | TEST-OQ-03 | Performance baseline cụ thể cho seat hold/payment? | Load test | Mở; cần target số liệu (k6/Artillery chốt LLD) |
 | TEST-OQ-04 | UAT data set do ai chuẩn bị? | UAT | Mở (solo: Khanh + AI seed) |
 
