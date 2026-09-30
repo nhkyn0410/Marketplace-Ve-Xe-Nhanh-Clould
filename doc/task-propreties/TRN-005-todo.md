@@ -4,7 +4,9 @@
 > **Dependency:** TASK-TRN-003 (chuyến) — nhánh `TASK-TRN-005` tách từ nhánh TRN-003 (`claude/admiring-thompson-38d7s8`), chưa merge `develop`. Merge TRN-003 trước rồi đưa `develop` vào nhánh này.
 > **Mở khóa:** TASK-TRN-006 (mở bán cần fare hợp lệ — BR-39), TASK-TRN-004 (search hiển thị giá), TASK-BTP-002 (booking snapshot giá).
 
-## Trạng thái (30/09/2026) — 🔨 **ĐANG TRIỂN KHAI**
+## Trạng thái (30/09/2026) — 🔨 **CODE + REVIEW XONG, CHỜ CI + MÀN OPERATOR OS**
+
+- ✅ Review `code-reviewer` + `security-auditor` đã xử lý (bảng "Kết quả review"); tài liệu đồng bộ: API v0.15, DB v0.17, LLD v0.11.
 
 - ✅ Tạo nhánh `TASK-TRN-005`; đối chiếu SDLC (mới có nguyên tắc, chưa có cột bảng / endpoint / cách tính giá / nơi lưu lịch sử).
 - ✅ Khanh chốt **Q2, Q3, Q5, Q6, Q7** theo khuyến nghị (30/09/2026). Tài liệu đã đồng bộ ngay: SRS `BR-41` v1.29 + GLOSSARY (Q3 — thời điểm = giờ khởi hành); file 11 TRN-005 + **ADM-001** (Q6 — cảnh báo trần/sàn chuyển sang ADM-001).
@@ -102,7 +104,25 @@ Chọn **P** nếu Khanh muốn lịch sử giá vẫn xem/sửa giá được k
 - [x] #3 [TRN-005.3] Module `fare/` + API + giá ghế trong chi tiết chuyến; `AuditService.listAuditEvents`; `audit/audit.testing.ts` (luật ESLint cấm Mongoose ngoài `audit/`, kể cả file test).
 - [x] #4 [TRN-005.4] OpenAPI (+5 operation, +5 schema, `TripResponse` thêm `price`) + client TS/Dart; phép so CI Contract khớp.
 - [x] #5 [TRN-005.5] Test: 71/71 file, **835/835** test, 0 skip (Postgres/Redis/Mongo thật, role app); mutation 3/3 (EXCLUDE, RLS, nuốt lỗi audit) đỏ đúng chỗ.
-- [ ] #6 [TRN-005.6] Review + CI + màn Operator OS.
+- [x] #6 [TRN-005.6] Review (`code-reviewer` + `security-auditor`): không blocking; 1 High = 1 Medium trùng nhau (audit Mongo chậm trong transaction) đã sửa + test — bảng dưới. Sau sửa: 72/72 file, **849/849** test, 0 skip; lint + typecheck + build sạch.
+- [ ] #7 [TRN-005.7] CI (PR vào `develop`, sau TRN-003) + màn Operator OS (sau M1).
+
+### Kết quả review (30/09/2026)
+
+| Nguồn | Mức | Finding | Xử lý |
+| --- | --- | --- | --- |
+| code-reviewer + security-auditor | **High / Medium** | Ghi audit Mongo trong transaction Postgres **không giới hạn thời gian**: Mongo chậm / failover (5–30s) → giữ kết nối pool + khoá dòng tới khi transaction hết hạn (5s) → trả 500, và lệnh Mongo vẫn ghi sau đó → **dòng lịch sử "ma"** (reviewer tái hiện: 500 sau 6s, lịch sử có giá 999 không tồn tại) | ✅ `AuditService.recordAuditEvent(…, { timeoutMs })`: kiểm schema như cũ → Mongo chưa kết nối thì **từ chối ngay** (Mongoose sẽ xếp hàng 10s rồi ghi "về sau") → ghi thẳng driver `insertOne` + CSOT `timeoutMS` (server nhận `maxTimeMS`, tự huỷ lệnh quá hạn). Fare dùng 2s; lỗi → `AuditWriteError` / P2028 → **503 `SERVICE_UNAVAILABLE`**. Evidence thủ công (failpoint `failCommand` chặn insert 6s, `AuditService` thật): **503 sau 2.018 ms, giá giữ nguyên, chờ 7s không có dòng "ma"**. Probe driver: `Model.create` bỏ qua `timeoutMS` (ghi xong sau 3s); `insertOne`/`timeoutMS` báo lỗi sau 0,8s và không có bản ghi về sau, cả khi Mongo sập hẳn. Test: audit lỗi → 503; audit chậm 6s → P2028 → 503, khoá dòng được nhả; Mongo chưa kết nối → lỗi < 1s; FareService luôn truyền `timeoutMs` (mutation bỏ → đỏ; bỏ kiểm `readyState` → đỏ). Rủi ro còn lại: commit Postgres lỗi **sau** khi Mongo đã ghi (rất hiếm) — như Q4 đã chấp nhận |
+| security-auditor L1 + code-reviewer nit | Low | `PUT` không đổi gì vẫn ghi một dòng lịch sử; trang lịch sử 100 dòng × 2 bản chụp × 200 rule = vài MB; thiếu index Mongo cho đọc lịch sử | ✅ `PUT` trùng nội dung (kể cả đảo thứ tự rule) → không ghi DB, không thêm lịch sử (test). Trang lịch sử tối đa **20** (OpenAPI + Zod). Index `{targetType, targetId, createdAt: -1}` (schema + `mongo:audit:hardening`). Không thêm rate limit: chỉ Owner đã MFA sửa được bảng giá của chính mình |
+| security-auditor L2 | Low | `InstantSchema` không chặn năm nhỏ: `0000-01-01T00:00+01:00` → UTC năm −1 → lưu được nhưng đọc lại 500 | ✅ Năm UTC 1970–9999 (test fare DTO: năm âm, 1969, > 9999; cursor lịch sử) |
+| security-auditor L3 + code-reviewer #3 | Low | `listAuditEvents` đọc chung, trả cả tài liệu (`requestId`, `reason`…); action lạ trong `targetType: "fare"` làm hỏng cả trang lịch sử | ✅ Bắt buộc liệt kê `actions` (lọc `$in`), projection chỉ 5 trường của màn lịch sử, từ chối `operatorId` / `targetId` rỗng (test unit + int) |
+| code-reviewer #2 | Low | `nextCursor` khác null khi trang vừa đủ → thêm một trang rỗng | ✅ Đọc `limit + 1`. Không thêm `_id` vào cursor: các lần ghi của một bảng giá tuần tự qua khoá dòng nên không trùng mili-giây; lệch đồng hồ giữa nhiều instance — v1 một instance |
+| code-reviewer #4 | Low | DB chỉ chặn `price >= 0`; dòng ghi thẳng DB > 2^53 làm xem bảng giá / chi tiết chuyến trả 500 | ✅ Migration `20260930120000_fare_price_cap`: CHECK `price <= 100000000` (test: vượt trần bị chặn, đúng trần được) |
+| code-reviewer #5 | Low | P2002 ở `update` cũng thành `FARE_ROUTE_CONFLICT` | ✅ Chỉ `create` đổi P2002 → 409. Giữ ánh xạ 23P01 làm chốt chặn cuối (service kiểm trước) |
+| code-reviewer nit | Nit | `CASE … ELSE 2` coi loại chỗ mới là `BED` | ✅ Test khoá `SeatType = [SEAT, BED]` — thêm loại chỗ phải sửa EXCLUDE |
+| code-reviewer + security-auditor I1 | Nit | `audit.testing.ts` vào `dist` | ✅ `tsconfig.build.json` loại `**/*.testing.ts` |
+| code-reviewer nit | Nit | fare ↔ trip dùng chéo `InstantSchema`, `routeUnavailable` | Giữ nguyên: không có vòng import file, chuyển sang `common/` là refactor ngoài phạm vi |
+| code-reviewer nit | Nit | Ghim `w: "majority"` cho kết nối audit | Giữ nguyên: đổi cấu hình kết nối chung của IAM; Atlas mặc định `majority` |
+| security-auditor I2–I4 | Info | Path param không kiểm UUID; cursor theo đồng hồ app; audit fare không có IP/thiết bị | Giữ nguyên: giống module khác (id sai → 404); v1 một instance; event đã có `requestId`/`traceId` để đối chiếu log truy cập |
 
 ## Rủi ro phải test chủ động
 

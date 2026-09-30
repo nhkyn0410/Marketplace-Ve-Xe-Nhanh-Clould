@@ -20,8 +20,8 @@
 - [x] 2 bảng `ENABLE + FORCE RLS`, policy `tenant_isolation`; có trong `RLS_TABLES`; `rlsProblems()` rỗng.
 - [x] Tenant B không đọc/sửa/xoá bảng giá, rule của A dù query quên lọc.
 - [x] FK ghép chặn bảng giá của A gắn tuyến của B, kể cả đi đường system.
-- [x] Ghi thẳng DB: giá âm, khung giờ thiếu một đầu / ngược chiều, trùng giá thường, chồng khung giờ đều bị chặn; khung giờ nối tiếp và phạm vi khác thì được.
-- [x] 13 migration áp tuần tự; `db:app-role` pass; `prisma migrate diff` rỗng.
+- [x] Ghi thẳng DB: giá âm / vượt 100.000.000, khung giờ thiếu một đầu / ngược chiều, trùng giá thường, chồng khung giờ đều bị chặn; đúng trần, khung giờ nối tiếp và phạm vi khác thì được.
+- [x] 14 migration áp tuần tự (thêm `20260930120000_fare_price_cap` sau review); `db:app-role` pass; `prisma migrate diff` rỗng.
 - [x] Mutation: bỏ `fare_rules_base_unique` → 2 test đỏ; tắt RLS `fare_rules` → 2 test đỏ.
 
 ## PHẦN C — Tiền (test money bắt buộc)
@@ -44,7 +44,9 @@
 
 - [x] Mỗi lần tạo/sửa đúng một bản ghi; mới nhất trước; `before` = `after` của lần trước; người sửa đúng; phân trang theo `createdAt`.
 - [x] Nhà xe khác → 404 `FARE_NOT_FOUND`.
-- [x] Ghi audit lỗi → không đổi giá, không tạo bảng giá. Mutation "nuốt lỗi audit" → test đỏ.
+- [x] Ghi audit lỗi → 503, không đổi giá, không tạo bảng giá. Mutation "nuốt lỗi audit" → test đỏ.
+- [x] Audit chậm (review High): ghi giới hạn 2s ở driver, Mongo chưa kết nối từ chối ngay, transaction hết hạn → 503; failpoint Mongo treo 6s → 503 sau ~2s, không có dòng lịch sử "ma" (evidence todo). Mutation bỏ giới hạn / bỏ kiểm kết nối → đỏ.
+- [x] `PUT` không đổi gì (kể cả đảo thứ tự rule) → không thêm lịch sử; trang lịch sử tối đa 20, không trả trang rỗng thừa.
 
 ## PHẦN F — Giá ghế của chuyến (Q1 = PA1)
 
@@ -53,15 +55,15 @@
 
 ## PHẦN G — Contract & quyền
 
-- [x] OpenAPI có 5 route fare (Bearer, requestBody, path param, 409), route lịch sử, `price` trong ghế chuyến (`openapi.spec.ts`).
+- [x] OpenAPI có 5 route fare (Bearer, requestBody, path param, 409, 503), route lịch sử (`limit` ≤ 20), `price` trong ghế chuyến (`openapi.spec.ts`).
 - [x] HTTP: Owner được; không token 401; Employee/Platform 403; người sửa lấy từ token; body không mang `operatorId`; dữ liệu sai 400 không gọi service.
 - [x] Client TS sinh lại (chỉ thêm phần fare + `price`); Dart client v7.25.0 + `build_runner`; `dart analyze` 0 error; `dart test` 528/528; phép so CI Contract khớp.
 
 ## PHẦN H — Test, review, CI & đóng task
 
-- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 71/71 file, 835/835 test, 0 skip.
+- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 72/72 file, 849/849 test, 0 skip (sau sửa review).
 - [x] Monorepo: lint + test + build 26/26, typecheck 10/10.
-- [ ] `code-reviewer` + `security-auditor` không còn finding blocking/high.
+- [x] `code-reviewer` + `security-auditor` không còn finding blocking/high (High audit chậm đã sửa + test; bảng trong todo).
 - [ ] Smoke guide §3 trên API chạy thật — chưa chạy. Tương đương: `fare.http.spec.ts` (route + guard thật) + `fare.int.spec.ts` (Postgres + Mongo thật).
 - [x] AI journal đã ghi; không commit journal.
 - [ ] CI branch xanh — Khanh xác nhận.

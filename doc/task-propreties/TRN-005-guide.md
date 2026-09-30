@@ -28,7 +28,7 @@ SELECT relname, relrowsecurity, relforcerowsecurity FROM pg_class WHERE relname 
 SELECT conname FROM pg_constraint WHERE conrelid = 'fare_rules'::regclass AND contype IN ('x', 'c') ORDER BY conname;
 ```
 
-Kỳ vọng: 2 bảng `true/true`; có `fare_rules_base_unique`, `fare_rules_window_no_overlap` (EXCLUDE), `fare_rules_price_non_negative`, `fare_rules_window_consistent` (CHECK).
+Kỳ vọng: 2 bảng `true/true`; có `fare_rules_base_unique`, `fare_rules_window_no_overlap` (EXCLUDE), `fare_rules_price_non_negative`, `fare_rules_price_max`, `fare_rules_window_consistent` (CHECK).
 
 ## 2. Test tự động
 
@@ -64,7 +64,7 @@ Kỳ vọng:
 
 - **3A — Tạo / sửa:** 201; `GET /fares/{id}` trả rule sắp giá thường trước; tạo lần hai cho cùng tuyến → 409 `FARE_ROUTE_CONFLICT`; hai rule cùng loại xe × loại chỗ trùng → 400 `FARE_RULES_OVERLAP`.
 - **3B — Giá ghế:** `GET /trips/{tripId}` của chuyến trên tuyến đó: xe giường nằm → 300.000; đổi sang xe Limousine (`PUT /trips/{id}`) → 450.000; chuyến khởi hành trong khung Tết → 600.000; `PUT /fares/{id}` với `status = INACTIVE` → `price = null`.
-- **3C — Lịch sử:** `GET /fares/{id}/revisions` trả mỗi lần tạo/sửa một dòng, mới nhất trước, `before` của lần sửa = `after` của lần trước.
+- **3C — Lịch sử:** `GET /fares/{id}/revisions` trả mỗi lần tạo/sửa một dòng, mới nhất trước, `before` của lần sửa = `after` của lần trước; `PUT` gửi lại y hệt → không thêm dòng; `limit=21` → 400.
 - **3D — Tenant / quyền:** token nhà xe khác → 404 ở `GET/PUT/revisions`, `routeId` của nhà xe khác → 422; không token → 401; token Employee / Platform → 403.
 
 ## 4. OpenAPI và client
@@ -77,7 +77,7 @@ Sinh client Dart theo [RB-04](../runbook/RB-04-api-client.md). Kiểm `git diff`
 
 ## 5. Production rollout
 
-Chỉ sau CI và review: backup → migrate bằng owner → `db:app-role` → deploy API. Sửa giá cần Mongo audit sống (Mongo sập → sửa giá bị từ chối, giống thao tác tài khoản IAM) — kiểm `/v1/health/mongo` trước khi mở tính năng.
+Chỉ sau CI và review: backup → migrate bằng owner (2 migration: `add_fare`, `fare_price_cap`) → `db:app-role` → `pnpm --filter @vexenhanh/api run mongo:audit:hardening` (thêm index `targetType_1_targetId_1_createdAt_-1` cho lịch sử giá; index cũ `targetType_1_targetId_1` để lại vô hại) → deploy API. Sửa giá cần Mongo audit sống: Mongo sập / chậm quá 2 giây → sửa giá trả 503, bảng giá không đổi (giống thao tác tài khoản IAM) — kiểm `/v1/health/mongo` trước khi mở tính năng.
 
 ## Lưu ý phạm vi
 
