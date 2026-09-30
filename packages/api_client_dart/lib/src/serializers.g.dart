@@ -38,6 +38,28 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(EmployeeUpdateDto.serializer)
       ..add(EmployeeUpdateDtoRoleEnum.serializer)
       ..add(EmployeeUpdateDtoStatusEnum.serializer)
+      ..add(FareCreateInputDto.serializer)
+      ..add(FareCreateInputDtoRulesInner.serializer)
+      ..add(FareCreateInputDtoRulesInnerSeatTypeEnum.serializer)
+      ..add(FareCreateInputDtoStatusEnum.serializer)
+      ..add(FareListResponseDtoOutput.serializer)
+      ..add(FareListResponseDtoOutputItemsInner.serializer)
+      ..add(FareListResponseDtoOutputItemsInnerStatusEnum.serializer)
+      ..add(FareResponseDtoOutput.serializer)
+      ..add(FareResponseDtoOutputRulesInner.serializer)
+      ..add(FareResponseDtoOutputRulesInnerSeatTypeEnum.serializer)
+      ..add(FareResponseDtoOutputStatusEnum.serializer)
+      ..add(FareRevisionListResponseDtoOutput.serializer)
+      ..add(FareRevisionListResponseDtoOutputItemsInner.serializer)
+      ..add(FareRevisionListResponseDtoOutputItemsInnerActionEnum.serializer)
+      ..add(FareRevisionListResponseDtoOutputItemsInnerAfter.serializer)
+      ..add(
+          FareRevisionListResponseDtoOutputItemsInnerAfterStatusEnum.serializer)
+      ..add(FareRevisionListResponseDtoOutputItemsInnerBefore.serializer)
+      ..add(FareRevisionListResponseDtoOutputItemsInnerBeforeStatusEnum
+          .serializer)
+      ..add(FareUpdateInputDto.serializer)
+      ..add(FareUpdateInputDtoStatusEnum.serializer)
       ..add(HealthResponseDtoOutput.serializer)
       ..add(HealthResponseDtoOutputStatusEnum.serializer)
       ..add(MessageResponseDtoOutput.serializer)
@@ -165,6 +187,35 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(EmployeeListResponseDtoOutputItemsInner)]),
           () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(FareCreateInputDtoRulesInner)]),
+          () => ListBuilder<FareCreateInputDtoRulesInner>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(FareCreateInputDtoRulesInner)]),
+          () => ListBuilder<FareCreateInputDtoRulesInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(FareListResponseDtoOutputItemsInner)]),
+          () => ListBuilder<FareListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(FareResponseDtoOutputRulesInner)]),
+          () => ListBuilder<FareResponseDtoOutputRulesInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(FareResponseDtoOutputRulesInner)]),
+          () => ListBuilder<FareResponseDtoOutputRulesInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(FareResponseDtoOutputRulesInner)]),
+          () => ListBuilder<FareResponseDtoOutputRulesInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(FareRevisionListResponseDtoOutputItemsInner)
+          ]),
+          () => ListBuilder<FareRevisionListResponseDtoOutputItemsInner>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
             const FullType(OperatorStopPointListResponseDtoOutputItemsInner)

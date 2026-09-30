@@ -167,6 +167,8 @@ class _$TripResponseDtoOutputSeatsInner
   final TripResponseDtoOutputSeatsInnerTypeEnum type;
   @override
   final TripResponseDtoOutputSeatsInnerStatusEnum status;
+  @override
+  final int? price;
 
   factory _$TripResponseDtoOutputSeatsInner(
           [void Function(TripResponseDtoOutputSeatsInnerBuilder)? updates]) =>
@@ -178,7 +180,8 @@ class _$TripResponseDtoOutputSeatsInner
       required this.row,
       required this.column,
       required this.type,
-      required this.status})
+      required this.status,
+      this.price})
       : super._();
   @override
   TripResponseDtoOutputSeatsInner rebuild(
@@ -198,7 +201,8 @@ class _$TripResponseDtoOutputSeatsInner
         row == other.row &&
         column == other.column &&
         type == other.type &&
-        status == other.status;
+        status == other.status &&
+        price == other.price;
   }
 
   @override
@@ -210,6 +214,7 @@ class _$TripResponseDtoOutputSeatsInner
     _$hash = $jc(_$hash, column.hashCode);
     _$hash = $jc(_$hash, type.hashCode);
     _$hash = $jc(_$hash, status.hashCode);
+    _$hash = $jc(_$hash, price.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -222,7 +227,8 @@ class _$TripResponseDtoOutputSeatsInner
           ..add('row', row)
           ..add('column', column)
           ..add('type', type)
-          ..add('status', status))
+          ..add('status', status)
+          ..add('price', price))
         .toString();
   }
 }
@@ -259,6 +265,10 @@ class TripResponseDtoOutputSeatsInnerBuilder
   set status(TripResponseDtoOutputSeatsInnerStatusEnum? status) =>
       _$this._status = status;
 
+  int? _price;
+  int? get price => _$this._price;
+  set price(int? price) => _$this._price = price;
+
   TripResponseDtoOutputSeatsInnerBuilder() {
     TripResponseDtoOutputSeatsInner._defaults(this);
   }
@@ -272,6 +282,7 @@ class TripResponseDtoOutputSeatsInnerBuilder
       _column = $v.column;
       _type = $v.type;
       _status = $v.status;
+      _price = $v.price;
       _$v = null;
     }
     return this;
@@ -305,6 +316,7 @@ class TripResponseDtoOutputSeatsInnerBuilder
               type, r'TripResponseDtoOutputSeatsInner', 'type'),
           status: BuiltValueNullFieldError.checkNotNull(
               status, r'TripResponseDtoOutputSeatsInner', 'status'),
+          price: price,
         );
     replace(_$result);
     return _$result;

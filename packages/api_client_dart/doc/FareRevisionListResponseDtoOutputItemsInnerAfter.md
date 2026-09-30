@@ -1,4 +1,4 @@
-# api_client_dart.model.TripResponseDtoOutputSeatsInner
+# api_client_dart.model.FareRevisionListResponseDtoOutputItemsInnerAfter
 
 ## Load the model package
 ```dart
@@ -8,13 +8,10 @@ import 'package:api_client_dart/api.dart';
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**code** | **String** |  | 
-**deck** | **int** |  | 
-**row** | **int** |  | 
-**column** | **int** |  | 
-**type** | **String** |  | 
+**routeId** | **String** |  | 
 **status** | **String** |  | 
-**price** | **int** |  | 
+**note** | **String** |  | 
+**rules** | [**BuiltList&lt;FareResponseDtoOutputRulesInner&gt;**](FareResponseDtoOutputRulesInner.md) |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

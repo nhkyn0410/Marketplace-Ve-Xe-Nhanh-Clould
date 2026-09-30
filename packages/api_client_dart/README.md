@@ -98,6 +98,11 @@ Class | Method | HTTP request | Description
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerList**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerlist) | **GET** /v1/operator/employees | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerResetPassword**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerresetpassword) | **POST** /v1/operator/employees/{employeeId}/password-reset | 
 [*OperatorEmployeesApi*](doc/OperatorEmployeesApi.md) | [**employeeAccountControllerUpdate**](doc/OperatorEmployeesApi.md#employeeaccountcontrollerupdate) | **PATCH** /v1/operator/employees/{employeeId} | 
+[*OperatorFaresApi*](doc/OperatorFaresApi.md) | [**fareControllerCreate**](doc/OperatorFaresApi.md#farecontrollercreate) | **POST** /v1/operator/fares | 
+[*OperatorFaresApi*](doc/OperatorFaresApi.md) | [**fareControllerGet**](doc/OperatorFaresApi.md#farecontrollerget) | **GET** /v1/operator/fares/{fareId} | 
+[*OperatorFaresApi*](doc/OperatorFaresApi.md) | [**fareControllerList**](doc/OperatorFaresApi.md#farecontrollerlist) | **GET** /v1/operator/fares | 
+[*OperatorFaresApi*](doc/OperatorFaresApi.md) | [**fareControllerRevisions**](doc/OperatorFaresApi.md#farecontrollerrevisions) | **GET** /v1/operator/fares/{fareId}/revisions | 
+[*OperatorFaresApi*](doc/OperatorFaresApi.md) | [**fareControllerUpdate**](doc/OperatorFaresApi.md#farecontrollerupdate) | **PUT** /v1/operator/fares/{fareId} | 
 [*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerCreate**](doc/OperatorRoutesApi.md#routecontrollercreate) | **POST** /v1/operator/routes | 
 [*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerGet**](doc/OperatorRoutesApi.md#routecontrollerget) | **GET** /v1/operator/routes/{routeId} | 
 [*OperatorRoutesApi*](doc/OperatorRoutesApi.md) | [**routeControllerList**](doc/OperatorRoutesApi.md#routecontrollerlist) | **GET** /v1/operator/routes | 
@@ -140,6 +145,17 @@ Class | Method | HTTP request | Description
  - [EmployeeListResponseDtoOutputItemsInner](doc/EmployeeListResponseDtoOutputItemsInner.md)
  - [EmployeePasswordResetDto](doc/EmployeePasswordResetDto.md)
  - [EmployeeUpdateDto](doc/EmployeeUpdateDto.md)
+ - [FareCreateInputDto](doc/FareCreateInputDto.md)
+ - [FareCreateInputDtoRulesInner](doc/FareCreateInputDtoRulesInner.md)
+ - [FareListResponseDtoOutput](doc/FareListResponseDtoOutput.md)
+ - [FareListResponseDtoOutputItemsInner](doc/FareListResponseDtoOutputItemsInner.md)
+ - [FareResponseDtoOutput](doc/FareResponseDtoOutput.md)
+ - [FareResponseDtoOutputRulesInner](doc/FareResponseDtoOutputRulesInner.md)
+ - [FareRevisionListResponseDtoOutput](doc/FareRevisionListResponseDtoOutput.md)
+ - [FareRevisionListResponseDtoOutputItemsInner](doc/FareRevisionListResponseDtoOutputItemsInner.md)
+ - [FareRevisionListResponseDtoOutputItemsInnerAfter](doc/FareRevisionListResponseDtoOutputItemsInnerAfter.md)
+ - [FareRevisionListResponseDtoOutputItemsInnerBefore](doc/FareRevisionListResponseDtoOutputItemsInnerBefore.md)
+ - [FareUpdateInputDto](doc/FareUpdateInputDto.md)
  - [HealthResponseDtoOutput](doc/HealthResponseDtoOutput.md)
  - [MessageResponseDtoOutput](doc/MessageResponseDtoOutput.md)
  - [MfaChallengeResponse](doc/MfaChallengeResponse.md)

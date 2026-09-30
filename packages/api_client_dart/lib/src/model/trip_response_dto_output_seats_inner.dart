@@ -18,6 +18,7 @@ part 'trip_response_dto_output_seats_inner.g.dart';
 /// * [column] 
 /// * [type] 
 /// * [status] 
+/// * [price] 
 @BuiltValue()
 abstract class TripResponseDtoOutputSeatsInner implements Built<TripResponseDtoOutputSeatsInner, TripResponseDtoOutputSeatsInnerBuilder> {
   @BuiltValueField(wireName: r'code')
@@ -39,6 +40,9 @@ abstract class TripResponseDtoOutputSeatsInner implements Built<TripResponseDtoO
   @BuiltValueField(wireName: r'status')
   TripResponseDtoOutputSeatsInnerStatusEnum get status;
   // enum statusEnum {  AVAILABLE,  HOLDING,  BOOKED,  CHECKED_IN,  BLOCKED,  };
+
+  @BuiltValueField(wireName: r'price')
+  int? get price;
 
   TripResponseDtoOutputSeatsInner._();
 
@@ -92,6 +96,11 @@ class _$TripResponseDtoOutputSeatsInnerSerializer implements PrimitiveSerializer
     yield serializers.serialize(
       object.status,
       specifiedType: const FullType(TripResponseDtoOutputSeatsInnerStatusEnum),
+    );
+    yield r'price';
+    yield object.price == null ? null : serializers.serialize(
+      object.price,
+      specifiedType: const FullType.nullable(int),
     );
   }
 
@@ -157,6 +166,14 @@ class _$TripResponseDtoOutputSeatsInnerSerializer implements PrimitiveSerializer
             specifiedType: const FullType(TripResponseDtoOutputSeatsInnerStatusEnum),
           ) as TripResponseDtoOutputSeatsInnerStatusEnum;
           result.status = valueDes;
+          break;
+        case r'price':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(int),
+          ) as int?;
+          if (valueDes == null) continue;
+          result.price = valueDes;
           break;
         default:
           unhandled.add(key);
