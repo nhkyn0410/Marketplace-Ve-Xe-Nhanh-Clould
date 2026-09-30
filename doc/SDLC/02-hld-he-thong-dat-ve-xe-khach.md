@@ -13,17 +13,16 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent                  |
 | Người duyệt   | Nguyễn Hồng Khanh                            |
 | Ngày tạo      | 11/05/2026                                   |
-| Ngày cập nhật | 08/09/2026                                   |
+| Ngày cập nhật | 03/06/2026                                   |
 
 ### 1.2. Lịch sử thay đổi
 
-| Phiên bản | Ngày       | Người cập nhật | Nội dung thay đổi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| --------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v0.1      | 11/05/2026 | AI Agent       | Tạo bản nháp HLD từ SRS `01-srs-he-thong-dat-ve-xe-khach.md` và context hiện tại                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| v0.2      | 25/05/2026 | AI Agent       | Align với `context/DOMAIN-MAP`, `context/GLOSSARY`, `context/PROJECT-STATE`; cập nhật module boundary sang target state; đóng HLD-OQ-02..08 theo các OQ đã chốt; bổ sung VNPay Sandbox và Email OTP                                                                                                                                                                                                                                                                                                                                                                                   |
-| v0.3      | 25/05/2026 | AI Agent       | Rebrand sang `Marketplace-Ve-Xe-Nhanh`; gỡ tham chiếu tới 2 context file đã xóa `PROJECT-STRUCTURE.md` và `TECH-STACK.md` ở §4.1. Không thay đổi nội dung normative.                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Phiên bản | Ngày       | Người cập nhật | Nội dung thay đổi                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------- | ---------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v0.1      | 11/05/2026 | AI Agent       | Tạo bản nháp HLD từ SRS `01-srs-he-thong-dat-ve-xe-khach.md` và context hiện tại                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| v0.2      | 25/05/2026 | AI Agent       | Align với `context/DOMAIN-MAP`, `context/GLOSSARY`, `context/PROJECT-STATE`; cập nhật module boundary sang target state; đóng HLD-OQ-02..08 theo các OQ đã chốt; bổ sung VNPay Sandbox và Email OTP                                                                                                                                                                                                                                                                                                                                                                                    |
+| v0.3      | 25/05/2026 | AI Agent       | Rebrand sang `Marketplace-Ve-Xe-Nhanh`; gỡ tham chiếu tới 2 context file đã xóa `PROJECT-STRUCTURE.md` và `TECH-STACK.md` ở §4.1. Không thay đổi nội dung normative.                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 5 Rework** — reset toàn bộ tech stack theo 18 ADR đã chốt (ADR-002, ADR-009..022): Hybrid-A DB (Postgres+Prisma ops / Mongo audit cluster riêng), nestjs-zod, BullMQ, Redis Upstash, Better Auth 3-namespace, Next.js 16 monorepo, Expo 2-app, VNPay+MoMo, Resend+Expo Push+OAuth, Goong, R2, manual payout. Đóng HLD-OQ-09 (R2), HLD-OQ-10 (manual payout); cập nhật HLD-OQ-07 (Mongo cluster riêng). Raise HLD-OQ-11 (realtime transport chưa thuộc 15-layer selection). Reframe §4.3 giả định, §5 kiến trúc, §13 tích hợp ngoài, §14 deployment, §16 quyết định theo ADR. |
-| v0.5      | 27/09/2026 | AI Agent       | **TASK-IAM-006 (Khanh chốt):** Identity boundary tách Owner / nhân viên trong namespace Operator-side — nhân viên `{slug}/nv.{tên}` qua cổng `/auth/employee/login` (chỉ Bearer), Owner giữ `/auth/operator/login` (amend ADR-017). Không đổi trạng thái Approved. |
 
 ---
 
@@ -80,14 +79,14 @@ Tài liệu này KHÔNG mô tả chi tiết schema, migration, DTO, endpoint, UI
 
 ### 4.1. Tài liệu đầu vào
 
-| Mã / File                            | Vai trò trong HLD                                                                                                     |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `00-quy-chuan-cho-lap-trinh-vien.md` | Quy chuẩn SDLC và điều kiện dùng tài liệu để triển khai                                                               |
+| Mã / File                                    | Vai trò trong HLD                                                                                                     |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `00-quy-chuan-cho-lap-trinh-vien.md`         | Quy chuẩn SDLC và điều kiện dùng tài liệu để triển khai                                                               |
 | `01-srs-he-thong-dat-ve-xe-khach.md` | Nguồn yêu cầu chính, các FR/BR/NFR và OQ đã chốt                                                                      |
 | `10-architecture-decision-record.md` | **Toàn bộ ADR chốt tech stack + DevOps** (ADR-002, ADR-009..027) — nguồn chuẩn cho mọi quyết định công nghệ trong HLD |
-| `context/DOMAIN-MAP.md`              | Mapping ba lớp dịch vụ ↔ module backend ở trạng thái target                                                           |
-| `context/GLOSSARY.md`                | Thuật ngữ song ngữ Việt - Anh, nguồn đặt tên chuẩn                                                                    |
-| `context/PROJECT-STATE.md`           | Trạng thái tài liệu, quyết định chiến lược và OQ/MQ đã chốt                                                           |
+| `context/DOMAIN-MAP.md`                      | Mapping ba lớp dịch vụ ↔ module backend ở trạng thái target                                                           |
+| `context/GLOSSARY.md`                        | Thuật ngữ song ngữ Việt - Anh, nguồn đặt tên chuẩn                                                                    |
+| `context/PROJECT-STATE.md`                   | Trạng thái tài liệu, quyết định chiến lược và OQ/MQ đã chốt                                                           |
 
 ### 4.2. Phạm vi thiết kế trong bản nháp
 
@@ -96,8 +95,8 @@ Tài liệu này KHÔNG mô tả chi tiết schema, migration, DTO, endpoint, UI
 | Marketplace layer       | Có                   | User / Guest search, booking, payment, ticket, support                                                    |
 | Operator OS layer       | Có                   | Operator profile, resources, trips, finance, employee                                                     |
 | Platform admin layer    | Có                   | KYC, catalog, policy, payment, dispute, audit                                                             |
-| Mobile Passenger        | Có                   | App riêng `apps/passenger_mobile` (ADR-028)                                                               |
-| Mobile Employee         | Có                   | App riêng `apps/employee_mobile` — check-in, trip status, journey log, incident, background geo (ADR-028) |
+| Mobile Passenger        | Có                   | App riêng `apps/passenger-mobile` (ADR-014)                                                               |
+| Mobile Employee         | Có                   | App riêng `apps/employee-mobile` — check-in, trip status, journey log, incident, background geo (ADR-014) |
 | External Operator API   | Ngoài phạm vi v1     | Theo SRS §6.4                                                                                             |
 | Multi-language/currency | Ngoài phạm vi v1     | Theo SRS §6.4 và OQ-12                                                                                    |
 
@@ -105,13 +104,13 @@ Tài liệu này KHÔNG mô tả chi tiết schema, migration, DTO, endpoint, UI
 
 Các tiền đề dưới đây không còn là giả định mở; chúng phản ánh quyết định công nghệ đã chốt trong các ADR (`PROJECT-STATE §1`, file 10 v0.21). Adapter boundary vẫn giữ để vendor swappable (ADR-006).
 
-| ID        | Tiền đề (grounded in ADR)                                                                                                                                                                                                         | Tham chiếu                     |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| HLD-AS-01 | Backend = NestJS 11 modular monolith (framework-agnostic boundary) trong monorepo Turborepo `apps/api/`, 1 module per business domain theo DOMAIN-MAP §1, §2.                                                                     | ADR-002, ADR-010               |
-| HLD-AS-02 | Persistence Hybrid-A: **Postgres 16 + Prisma 5** cho toàn bộ operational; **MongoDB 7 + Mongoose** cluster RIÊNG cho audit/log (append-only); **Redis 7 (Upstash)** cho cache + distributed lock + BullMQ backend.                | ADR-011, ADR-015, ADR-016      |
-| HLD-AS-03 | Frontend web = **Next.js 16 App Router** trong Turborepo + pnpm monorepo; Marketplace RSC+SSG/ISR cho SEO, Operator OS + Admin CSR sau auth. Số app cụ thể chốt LLD.                                                              | ADR-013                        |
-| HLD-AS-04 | Mobile = **Flutter 3.x + Dart 3.x**, **2 app tách biệt**: `apps/passenger_mobile` (public) + `apps/employee_mobile` (internal, background geo).                                                                                   | ADR-028                        |
-| HLD-AS-05 | Vendor tích hợp ngoài đã chốt (payment VNPay+MoMo, email Resend, push FCM + APNs, OAuth Google/FB/Apple, routing Goong, storage R2, payout manual); mọi vendor đứng sau adapter port `external/<provider>/` để swap không phá vỡ. | ADR-018..022, ADR-027, ADR-006 |
+| ID        | Tiền đề (grounded in ADR)                                                                                                                                                                                                    | Tham chiếu                |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| HLD-AS-01 | Backend = NestJS 11 modular monolith (framework-agnostic boundary) trong monorepo Turborepo `apps/api/`, 1 module per business domain theo DOMAIN-MAP §1, §2.                                                                | ADR-002, ADR-010          |
+| HLD-AS-02 | Persistence Hybrid-A: **Postgres 16 + Prisma 5** cho toàn bộ operational; **MongoDB 7 + Mongoose** cluster RIÊNG cho audit/log (append-only); **Redis 7 (Upstash)** cho cache + distributed lock + BullMQ backend.           | ADR-011, ADR-015, ADR-016 |
+| HLD-AS-03 | Frontend web = **Next.js 16 App Router** trong Turborepo + pnpm monorepo; Marketplace RSC+SSG/ISR cho SEO, Operator OS + Admin CSR sau auth. Số app cụ thể chốt LLD.                                                         | ADR-013                   |
+| HLD-AS-04 | Mobile = **Expo (managed) SDK 55+** New Architecture, **2 app tách biệt**: `apps/passenger-mobile` (public) + `apps/employee-mobile` (internal, background geo).                                                             | ADR-014                   |
+| HLD-AS-05 | Vendor tích hợp ngoài đã chốt (payment VNPay+MoMo, email Resend, push Expo, OAuth Google/FB/Apple, routing Goong, storage R2, payout manual); mọi vendor đứng sau adapter port `external/<provider>/` để swap không phá vỡ. | ADR-018..022, ADR-027, ADR-006     |
 
 ---
 
@@ -127,8 +126,8 @@ flowchart LR
       Marketplace[Web Marketplace - Next.js 16]
       OperatorOS[Web Operator OS - Next.js 16]
       Admin[Web Admin - Next.js 16]
-      PassengerApp[Mobile Passenger - Flutter]
-      EmployeeApp[Mobile Employee - Flutter]
+      PassengerApp[Mobile Passenger - Expo]
+      EmployeeApp[Mobile Employee - Expo]
     end
 
     Api[NestJS 11 Backend API]
@@ -141,7 +140,7 @@ flowchart LR
 
     Routing[Goong API]
     Payment[VNPay / MoMo]
-    Notify[Resend / FCM + APNs]
+    Notify[Resend / Expo Push]
     Storage[Cloudflare R2]
 
     Marketplace --> Api
@@ -168,15 +167,15 @@ flowchart LR
 
 ### 5.2. Kiến trúc logic theo lớp
 
-| Lớp                    | Trách nhiệm chính                                                                        | Công nghệ / thành phần                                                         |
-| ---------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Client presentation    | UI, form state, route, hiển thị loading/error/empty, gọi API                             | Next.js 16 (App Router), React 19, Flutter 3.x (2 app); component lib chốt LLD |
-| API application layer  | Auth, validation, RBAC, use case orchestration, transaction boundary mức service         | NestJS 11 controller / service / guard / pipe / interceptor + nestjs-zod       |
-| Domain module layer    | Booking, payment, trip, operator, employee, support, notification, audit                 | NestJS modules (1 module per domain)                                           |
-| Persistence layer      | Schema, repository/query, index, state history, soft delete                              | PostgreSQL 16 + Prisma 5 (operational); MongoDB 7 + Mongoose (audit-only)      |
-| Async processing layer | Payment callback retry, notification fan-out, payout cron T+3, reconciliation, reporting | BullMQ + @nestjs/bullmq trên Redis 7 (Upstash)                                 |
-| Realtime layer         | Trip update, check-in sync, notification realtime, admin/operator monitoring             | Transport TBD (chưa thuộc 15-layer selection — xem HLD-OQ-11)                  |
-| Integration layer      | Payment, notification, routing/map, object storage, payout                               | Adapter pattern `external/<provider>/`; vendor đã chốt (ADR-018..022, ADR-027) |
+| Lớp                    | Trách nhiệm chính                                                                        | Công nghệ / thành phần                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Client presentation    | UI, form state, route, hiển thị loading/error/empty, gọi API                             | Next.js 16 (App Router), React 19, Expo SDK 55+ (2 app); component lib chốt LLD |
+| API application layer  | Auth, validation, RBAC, use case orchestration, transaction boundary mức service         | NestJS 11 controller / service / guard / pipe / interceptor + nestjs-zod        |
+| Domain module layer    | Booking, payment, trip, operator, employee, support, notification, audit                 | NestJS modules (1 module per domain)                                            |
+| Persistence layer      | Schema, repository/query, index, state history, soft delete                              | PostgreSQL 16 + Prisma 5 (operational); MongoDB 7 + Mongoose (audit-only)       |
+| Async processing layer | Payment callback retry, notification fan-out, payout cron T+3, reconciliation, reporting | BullMQ + @nestjs/bullmq trên Redis 7 (Upstash)                                  |
+| Realtime layer         | Trip update, check-in sync, notification realtime, admin/operator monitoring             | Transport TBD (chưa thuộc 15-layer selection — xem HLD-OQ-11)                   |
+| Integration layer      | Payment, notification, routing/map, object storage, payout                               | Adapter pattern `external/<provider>/`; vendor đã chốt (ADR-018..022, ADR-027)           |
 
 ### 5.3. Nguyên tắc kiến trúc
 
@@ -205,21 +204,21 @@ Web = Next.js 16 App Router trong Turborepo monorepo (ADR-013). Định hướng
 
 ### 6.2. Mobile app
 
-Mobile = Flutter 3.x + Dart 3.x, **2 app tách biệt**; code Dart dùng chung qua package nội bộ `packages/mobile_shared/`, API contract qua Dart client sinh từ OpenAPI 3.1 (`packages/api_client_dart/`). Flutter app nằm **ngoài** pnpm workspace / Turborepo (ADR-028).
+Mobile = Expo managed SDK 55+, **2 app tách biệt** cùng monorepo, share `packages/types + api-client + ui-mobile-shared` (ADR-014).
 
 | App                     | Actor    | Chức năng chính                                                                                             |
 | ----------------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| `apps/passenger_mobile` | User     | Search, booking, ticket, notification, support; permission minimal, ASO marketing                           |
-| `apps/employee_mobile`  | Employee | Assigned trips, passenger list, QR check-in, trip status, incident report; background geo + full permission |
+| `apps/passenger-mobile` | User     | Search, booking, ticket, notification, support; permission minimal, ASO marketing                           |
+| `apps/employee-mobile`  | Employee | Assigned trips, passenger list, QR check-in, trip status, incident report; background geo + full permission |
 
 ### 6.3. Client state
 
-| Loại state     | Nơi xử lý khuyến nghị               | Ghi chú                                                                |
-| -------------- | ----------------------------------- | ---------------------------------------------------------------------- |
-| Server state   | React Query (khuyến nghị, chốt LLD) | Booking, ticket, trip, operator, catalog, report                       |
-| Local UI state | Component state / Zustand           | Filter, modal, selected seat, stepper state                            |
-| Auth/session   | Better Auth client + secure storage | Web = httpOnly cookie; Mobile = `flutter_secure_storage` (ADR-017/028) |
-| Form state     | React Hook Form + Zod schema        | Backend vẫn phải validate lại bằng nestjs-zod                          |
+| Loại state     | Nơi xử lý khuyến nghị               | Ghi chú                                                       |
+| -------------- | ----------------------------------- | ------------------------------------------------------------- |
+| Server state   | React Query (khuyến nghị, chốt LLD) | Booking, ticket, trip, operator, catalog, report              |
+| Local UI state | Component state / Zustand           | Filter, modal, selected seat, stepper state                   |
+| Auth/session   | Better Auth client + secure storage | Web = httpOnly cookie; Mobile = `expo-secure-store` (ADR-017) |
+| Form state     | React Hook Form + Zod schema        | Backend vẫn phải validate lại bằng nestjs-zod                 |
 
 ---
 
@@ -256,22 +255,22 @@ Mobile = Flutter 3.x + Dart 3.x, **2 app tách biệt**; code Dart dùng chung q
 
 Bảng module HLD dưới đây dùng tên **target state** theo `context/DOMAIN-MAP §1, §2`. Tên module singular (vd `vehicle/`, `booking/`, `trip/`, `iam/auth/`); boundary enforce qua ESLint custom rule (ADR-010).
 
-| Module HLD                   | Backend module nhóm (target)                                                                                                                                                                                 | Trách nhiệm chính                                                                                                                               | Actor dùng chính                |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| Identity & Access Management | `iam/auth/`, `iam/user/`, `iam/session/`, `iam/role/`                                                                                                                                                        | Đăng ký, đăng nhập, session, role, permission, account status; 3 namespace identity (Passenger Email / Operator `{slug}/{username}` / Platform) | User, Operator, Employee, Admin |
-| Operator Profile & KYC       | `operator/`, `operator-kyc/`                                                                                                                                                                                 | Operator profile, hồ sơ KYC, bank account, status history                                                                                       | Operator, Admin                 |
-| Marketplace Search           | `search/`, `catalog/`                                                                                                                                                                                        | Search chuyến, filter, sort, public trip availability; catalog do Platform quản lý                                                              | User, Guest                     |
-| Transport Resource           | `vehicle/`, `route/`, `stop-point/`                                                                                                                                                                          | Vehicle, VehicleType, SeatMap, Route, RouteStop, StopPoint (Operator-owned phần)                                                                | Operator, Admin                 |
-| Trip & Inventory             | `trip/`, `trip-seat/`, `seat-hold/`, `fare/`                                                                                                                                                                 | Trip, TripStop, TripSeat, SeatHold (10 phút TTL, Redis), Fare, FareRule                                                                         | Operator, User, Guest, Employee |
-| Booking & Ticket             | `booking/`, `ticket/`                                                                                                                                                                                        | Booking, PassengerInfo, Ticket, QR token, BookingStatusHistory, snapshot                                                                        | User, Guest, Operator, Employee |
-| Payment & Refund             | `payment/`, `refund/`                                                                                                                                                                                        | Payment intent, callback verify, refund, idempotency, reconciliation                                                                            | User, Operator, Admin           |
-| Escrow & Payout & Commission | `escrow/`, `payout/`, `commission/`                                                                                                                                                                          | EscrowLedger append-only (in-house, ADR-005), commission rule, payout T+3 manual confirm                                                        | Operator, Admin                 |
-| Promotion                    | `promotion/`                                                                                                                                                                                                 | Promotion, PromotionRule, PromotionRedemption, PromotionUsageLimit                                                                              | User, Operator, Admin           |
-| Employee Operations          | `employee/`, `manifest/`, `check-in/`, `journey-log/`, `incident/`                                                                                                                                           | Assignment, manifest, check-in QR, trip status, journey log, incident report                                                                    | Employee, Operator              |
-| Support & Trust              | `support/`, `complaint/`, `review/`, `dispute/`, `scorecard/`                                                                                                                                                | SupportTicket, Complaint, Review, DisputeCase, OperatorScorecard                                                                                | User, Operator, Admin           |
-| Notification                 | `notification/`                                                                                                                                                                                              | Notification event, delivery (email/push/sms-noop), retry, NotificationPreference                                                               | Hệ thống, mọi actor             |
-| Reporting                    | `reporting/`                                                                                                                                                                                                 | Dashboard; Postgres CTE/materialized view (structured) + Mongo aggregation (audit); async export                                                | Operator, Admin                 |
-| Audit & Policy               | `audit/`, `policy/`                                                                                                                                                                                          | AuditLog (Mongo cluster riêng, append-only), PolicyVersion, PolicySnapshot                                                                      | Admin, hệ thống                 |
+| Module HLD                   | Backend module nhóm (target)                                                                                                                                                                                  | Trách nhiệm chính                                                                                                                               | Actor dùng chính                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| Identity & Access Management | `iam/auth/`, `iam/user/`, `iam/session/`, `iam/role/`                                                                                                                                                         | Đăng ký, đăng nhập, session, role, permission, account status; 3 namespace identity (Passenger Email / Operator `{slug}/{username}` / Platform) | User, Operator, Employee, Admin |
+| Operator Profile & KYC       | `operator/`, `operator-kyc/`                                                                                                                                                                                  | Operator profile, hồ sơ KYC, bank account, status history                                                                                       | Operator, Admin                 |
+| Marketplace Search           | `search/`, `catalog/`                                                                                                                                                                                         | Search chuyến, filter, sort, public trip availability; catalog do Platform quản lý                                                              | User, Guest                     |
+| Transport Resource           | `vehicle/`, `route/`, `stop-point/`                                                                                                                                                                           | Vehicle, VehicleType, SeatMap, Route, RouteStop, StopPoint (Operator-owned phần)                                                                | Operator, Admin                 |
+| Trip & Inventory             | `trip/`, `trip-seat/`, `seat-hold/`, `fare/`                                                                                                                                                                  | Trip, TripStop, TripSeat, SeatHold (10 phút TTL, Redis), Fare, FareRule                                                                         | Operator, User, Guest, Employee |
+| Booking & Ticket             | `booking/`, `ticket/`                                                                                                                                                                                         | Booking, PassengerInfo, Ticket, QR token, BookingStatusHistory, snapshot                                                                        | User, Guest, Operator, Employee |
+| Payment & Refund             | `payment/`, `refund/`                                                                                                                                                                                         | Payment intent, callback verify, refund, idempotency, reconciliation                                                                            | User, Operator, Admin           |
+| Escrow & Payout & Commission | `escrow/`, `payout/`, `commission/`                                                                                                                                                                           | EscrowLedger append-only (in-house, ADR-005), commission rule, payout T+3 manual confirm                                                        | Operator, Admin                 |
+| Promotion                    | `promotion/`                                                                                                                                                                                                  | Promotion, PromotionRule, PromotionRedemption, PromotionUsageLimit                                                                              | User, Operator, Admin           |
+| Employee Operations          | `employee/`, `manifest/`, `check-in/`, `journey-log/`, `incident/`                                                                                                                                            | Assignment, manifest, check-in QR, trip status, journey log, incident report                                                                    | Employee, Operator              |
+| Support & Trust              | `support/`, `complaint/`, `review/`, `dispute/`, `scorecard/`                                                                                                                                                 | SupportTicket, Complaint, Review, DisputeCase, OperatorScorecard                                                                                | User, Operator, Admin           |
+| Notification                 | `notification/`                                                                                                                                                                                               | Notification event, delivery (email/push/sms-noop), retry, NotificationPreference                                                               | Hệ thống, mọi actor             |
+| Reporting                    | `reporting/`                                                                                                                                                                                                  | Dashboard; Postgres CTE/materialized view (structured) + Mongo aggregation (audit); async export                                                | Operator, Admin                 |
+| Audit & Policy               | `audit/`, `policy/`                                                                                                                                                                                           | AuditLog (Mongo cluster riêng, append-only), PolicyVersion, PolicySnapshot                                                                      | Admin, hệ thống                 |
 | Cross-cutting                | `common/`, `database/` (Prisma + Mongoose), `redis/`, `external/payment/{vnpay,momo}/`, `external/notification/{email,push,sms}/`, `external/routing/{goong,osrm}/`, `external/storage/`, `external/payout/` | Guard, interceptor, pipe, adapter cho provider ngoài                                                                                            | Hệ thống                        |
 
 ### 8.2. Module phụ thuộc trọng yếu
@@ -290,20 +289,20 @@ Bảng module HLD dưới đây dùng tên **target state** theo `context/DOMAIN
 
 Dữ liệu operational nằm ở **Postgres** (Prisma); riêng AuditLog/notification_log nằm ở **Mongo cluster riêng** (append-only, ADR-011). Money column = `BIGINT` VND (ADR-009/011).
 
-| Nhóm dữ liệu                 | Module sở hữu chính         | Module được đọc / ghi phụ                        | Ghi chú thiết kế                                                                     |
-| ---------------------------- | --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| User / Session               | Identity & Access           | Audit, Notification                              | Session metadata cache Redis; không lộ token / OTP trong log                         |
-| Operator / KYC               | Identity & Access, Operator | Admin, Payment, Reporting                        | Operator phải được duyệt trước khi mở bán; KYC doc ở R2 private bucket               |
-| Vehicle / SeatMap            | Transport Resource          | Booking, Employee Operations, Reporting          | Thay đổi sau khi có vé bán phải kiểm policy                                          |
+| Nhóm dữ liệu                 | Module sở hữu chính         | Module được đọc / ghi phụ                        | Ghi chú thiết kế                                                                      |
+| ---------------------------- | --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| User / Session               | Identity & Access           | Audit, Notification                              | Session metadata cache Redis; không lộ token / OTP trong log                          |
+| Operator / KYC               | Identity & Access, Operator | Admin, Payment, Reporting                        | Operator phải được duyệt trước khi mở bán; KYC doc ở R2 private bucket                |
+| Vehicle / SeatMap            | Transport Resource          | Booking, Employee Operations, Reporting          | Thay đổi sau khi có vé bán phải kiểm policy                                           |
 | Route / StopPoint            | Transport Resource          | Search, Booking, Routing                         | StopPoint chuẩn do Platform quản lý hoặc duyệt; toạ độ cache distance/duration Goong |
-| Trip / TripSeat              | Transport Resource          | Search, Booking, Employee Operations             | Ghế theo chuyến là tài nguyên giao dịch                                              |
-| SeatHold                     | Booking & Ticket            | Search                                           | Redis `SET NX EX 600` (10 phút TTL, ADR-015)                                         |
-| Booking / Ticket             | Booking & Ticket            | Payment, Support, Employee Operations, Reporting | Lưu snapshot bắt buộc theo SRS                                                       |
-| Payment / Refund             | Payment                     | Booking, Support, Reporting, Audit               | Callback / refund phải idempotent; dedup `(provider, providerTxnId)`                 |
-| Escrow / Payout              | Escrow, Payout              | Operator, Admin, Reporting                       | EscrowLedger append-only in-house; payout đối soát hai chiều                         |
-| Review / Complaint / Dispute | Support & Trust             | Operator, Admin, Reporting                       | Attachment ở R2 private bucket nếu có                                                |
-| Notification                 | Notification                | Mọi module phát event                            | Delivery status riêng theo kênh; `notification_log` ở Mongo                          |
-| AuditLog                     | Audit                       | Mọi module ghi, Admin đọc                        | Mongo cluster riêng, append-only (REVOKE UPDATE/DELETE)                              |
+| Trip / TripSeat              | Transport Resource          | Search, Booking, Employee Operations             | Ghế theo chuyến là tài nguyên giao dịch                                               |
+| SeatHold                     | Booking & Ticket            | Search                                           | Redis `SET NX EX 600` (10 phút TTL, ADR-015)                                          |
+| Booking / Ticket             | Booking & Ticket            | Payment, Support, Employee Operations, Reporting | Lưu snapshot bắt buộc theo SRS                                                        |
+| Payment / Refund             | Payment                     | Booking, Support, Reporting, Audit               | Callback / refund phải idempotent; dedup `(provider, providerTxnId)`                  |
+| Escrow / Payout              | Escrow, Payout              | Operator, Admin, Reporting                       | EscrowLedger append-only in-house; payout đối soát hai chiều                          |
+| Review / Complaint / Dispute | Support & Trust             | Operator, Admin, Reporting                       | Attachment ở R2 private bucket nếu có                                                 |
+| Notification                 | Notification                | Mọi module phát event                            | Delivery status riêng theo kênh; `notification_log` ở Mongo                           |
+| AuditLog                     | Audit                       | Mọi module ghi, Admin đọc                        | Mongo cluster riêng, append-only (REVOKE UPDATE/DELETE)                               |
 
 ---
 
@@ -393,11 +392,11 @@ sequenceDiagram
 
 | Chủ đề                    | Thiết kế mức cao                                                                                                                                                                                                      |
 | ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Actor & Identity boundary | 3 namespace tách biệt (ADR-017): Passenger = Email (OTP primary); Operator-side = Owner `{operatorSlug}/{username}` (cổng `/auth/operator/login`) và nhân viên `{operatorSlug}/nv.{tên}` (cổng riêng `/auth/employee/login`, chỉ Bearer — amend 27/09/2026); Platform-side = `platform/{username}`. Mỗi `(scope, username)` là account riêng (Account-separate v1). |
+| Actor & Identity boundary | 3 namespace tách biệt (ADR-017): Passenger = Email (OTP primary); Operator-side = `{operatorSlug}/{username}`; Platform-side = `platform/{username}`. Mỗi `(scope, username)` là account riêng (Account-separate v1). |
 | Provisioning              | Closed enrollment (ADR-017): Platform admin cấp Operator slug + first Owner sau KYC; Operator owner cấp employee; Passenger self-register Email+OTP.                                                                  |
-| Tenant boundary           | Operator/Employee chỉ truy cập dữ liệu theo `operatorId`; defense-in-depth = NestJS `TenantGuard` (JWT claims) + Postgres RLS `SET LOCAL app.operator_id` (ADR-011, ADR-017).                                         |
+| Tenant boundary           | Operator/Employee chỉ truy cập dữ liệu theo `operatorId`; defense-in-depth = NestJS `TenantGuard` (JWT claims) + Postgres RLS `SET LOCAL app.operator_id` (ADR-011, ADR-017).                                       |
 | Admin access              | RBAC 8 role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / TicketStaff / SupportStaff / PlatformAdmin / PlatformSupport); thao tác nhạy cảm cần audit + TOTP.                                    |
-| Token / session           | Hybrid: JWT RS256 15min access (httpOnly cookie Web + `flutter_secure_storage` Mobile) + opaque 32-byte refresh 30d, rotation + family invalidation; Redis cache session metadata (ADR-017).                          |
+| Token / session           | Hybrid: JWT RS256 15min access (httpOnly cookie Web + expo-secure-store Mobile) + opaque 32-byte refresh 30d, rotation + family invalidation; Redis cache session metadata (ADR-017).                                 |
 | MFA                       | TOTP mandatory Owner / PlatformAdmin / PlatformSupport + 10 backup code single-use; optional Driver / TicketStaff / SupportStaff v1 (ADR-017).                                                                        |
 | Sensitive action          | Refund, payout, đổi bank account, đổi policy, khóa Operator, sửa chuyến đã bán vé.                                                                                                                                    |
 | Data masking              | Số điện thoại / PII chỉ hiển thị đầy đủ khi có quyền và lý do vận hành (`0*** *** 789`).                                                                                                                              |
@@ -443,17 +442,17 @@ Job chạy trên **BullMQ + @nestjs/bullmq** (Redis Upstash, ADR-016); worker ch
 
 Tất cả vendor đứng sau adapter port `external/<provider>/` (ADR-006). Webhook async qua BullMQ (Layer 9) + verify HMAC + idempotent dedup.
 
-| Tích hợp          | Quyết định v1                                                                              | Boundary thiết kế trong HLD                                                                                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Payment gateway   | **VNPay primary + MoMo phương thức 2** (ADR-019)                                           | `external/payment/{vnpay,momo}/`; VnpayAdapter HMAC-SHA512, MomoAdapter HMAC-SHA256; verify callback + idempotency key; escrow in-house                               |
-| Email             | **Resend** (ADR-020)                                                                       | `external/notification/email/`; React Email templates; fan-out async qua BullMQ                                                                                       |
-| SMS               | **Defer v1** (ADR-020)                                                                     | `external/notification/sms/` chỉ adapter port + LocalLoggerAdapter; kích hoạt v1.x (eSMS.vn candidate)                                                                |
-| Push notification | **FCM (Android) + APNs (iOS) trực tiếp** — trong phạm vi v1 (ADR-020/028)                  | `external/notification/push/fcm/`; `firebase-admin` (FCM HTTP v1); client `firebase_messaging` (Flutter)                                                              |
-| OAuth provider    | **Google + Facebook + Apple**, Passenger-only (ADR-020)                                    | Better Auth built-in providers; Apple Sign-In mandatory App Store 4.8; Operator/Platform không OAuth                                                                  |
+| Tích hợp          | Quyết định v1                                           | Boundary thiết kế trong HLD                                                                                                             |
+| ----------------- | ------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Payment gateway   | **VNPay primary + MoMo phương thức 2** (ADR-019)        | `external/payment/{vnpay,momo}/`; VnpayAdapter HMAC-SHA512, MomoAdapter HMAC-SHA256; verify callback + idempotency key; escrow in-house |
+| Email             | **Resend** (ADR-020)                                    | `external/notification/email/`; React Email templates; fan-out async qua BullMQ                                                         |
+| SMS               | **Defer v1** (ADR-020)                                  | `external/notification/sms/` chỉ adapter port + LocalLoggerAdapter; kích hoạt v1.x (eSMS.vn candidate)                                  |
+| Push notification | **Expo Push Service** — trong phạm vi v1 (ADR-020)      | `external/notification/push/`; `expo-server-sdk-node` route FCM + APNs                                                                  |
+| OAuth provider    | **Google + Facebook + Apple**, Passenger-only (ADR-020) | Better Auth built-in providers; Apple Sign-In mandatory App Store 4.8; Operator/Platform không OAuth                                    |
 | Routing + map     | **Goong** Direction + Distance Matrix + Maps + Geocoding (ADR-027, Make-in-VN thay Mapbox) | `external/routing/goong/`; Web `@goongmaps/goong-js`, Mobile MapLibre RN; distance/duration cache DB; `external/routing/osrm/` = escape-hatch (cần VN-corrected data) |
-| Object storage    | **Cloudflare R2** (ADR-018)                                                                | `external/storage/`; 2 bucket public/private; `@aws-sdk/client-s3` (S3-compatible); KYC production location defer OQ-21                                               |
-| Bank payout       | **Manual admin-confirm + batch** (ADR-022)                                                 | `external/payout/`; `ManualPayoutAdapter`; auto-disbursement defer v1.x tied OQ-22                                                                                    |
-| Cache + lock      | **Redis 7 (Upstash managed SG)** (ADR-015)                                                 | `redis/`; `ioredis` + cache-manager + custom lock service (`SET NX EX` + Lua release)                                                                                 |
+| Object storage    | **Cloudflare R2** (ADR-018)                             | `external/storage/`; 2 bucket public/private; `@aws-sdk/client-s3` (S3-compatible); KYC production location defer OQ-21                 |
+| Bank payout       | **Manual admin-confirm + batch** (ADR-022)              | `external/payout/`; `ManualPayoutAdapter`; auto-disbursement defer v1.x tied OQ-22                                                      |
+| Cache + lock      | **Redis 7 (Upstash managed SG)** (ADR-015)              | `redis/`; `ioredis` + cache-manager + custom lock service (`SET NX EX` + Lua release)                                                   |
 
 ---
 
@@ -461,11 +460,11 @@ Tất cả vendor đứng sau adapter port `external/<provider>/` (ADR-006). Web
 
 ### 14.1. Môi trường
 
-| Môi trường | Mục đích                           | Ghi chú                                                                                                                                        |
-| ---------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Môi trường | Mục đích                           | Ghi chú                                                                                                                                         |
+| ---------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | Local      | Dev, test thủ công, docker-compose | Postgres + Mongo local; Redis = Upstash managed (hoặc local redis dev); Goong/R2 = API key; storage KYC dev = local adapter (filesystem/MinIO) |
-| Staging    | Kiểm thử tích hợp trước production | Cần sandbox VNPay/MoMo + Resend + FCM/APNs                                                                                                     |
-| Production | Vận hành thật                      | Cần HTTPS, backup, monitoring, secret manager; **blocker OQ-21 (KYC storage) + OQ-22 (giấy phép TGTT)**                                        |
+| Staging    | Kiểm thử tích hợp trước production | Cần sandbox VNPay/MoMo + Resend + Expo Push                                                                                                     |
+| Production | Vận hành thật                      | Cần HTTPS, backup, monitoring, secret manager; **blocker OQ-21 (KYC storage) + OQ-22 (giấy phép TGTT)**                                         |
 
 ### 14.2. Thành phần triển khai
 
@@ -479,8 +478,8 @@ Deploy target + CI-CD + monitoring đã chốt Phase 4 (Sprint 4): **Render mana
 | MongoDB 7            | Audit / log (cluster riêng, append-only)                                                                           |
 | Redis 7 (Upstash)    | Cache, distributed lock, BullMQ backend (managed SG)                                                               |
 | Web frontend         | Marketplace, Operator OS, Admin (Next.js 16 monorepo)                                                              |
-| Mobile app           | Passenger app + Employee app (Codemagic build + submit; iOS cần macOS runner; **không có OTA** — ADR-028)          |
-| Routing              | Goong API (managed); OSRM self-host = escape-hatch                                                                 |
+| Mobile app           | Passenger app + Employee app (EAS Build / Update / Submit)                                                         |
+| Routing              | Goong API (managed); OSRM self-host = escape-hatch                                                                |
 | Object storage       | Cloudflare R2 (2 bucket public/private)                                                                            |
 | Monitoring / logging | **Sentry** (error+perf+trace BE+FE+Mobile) + Pino logs + OpenTelemetry (ADR-026)                                   |
 
@@ -510,7 +509,7 @@ Các quyết định công nghệ đã được hình thức hóa thành ADR (fi
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------- |
 | HLD-DEC-01 | V1 dùng modular monolith framework-agnostic, NestJS 11; strangler-ready qua `@nestjs/microservices`; chưa tách microservice.                                 | ADR-002, ADR-010                            |
 | HLD-DEC-02 | Seat hold = Redis `SET seat:{tripId}:{seatId}:hold {bookingId} NX EX 600` (10 phút, platform-wide); BullMQ làm async backend trên cùng Redis Upstash.        | OQ-06; ADR-015, ADR-016                     |
-| HLD-DEC-03 | Vendor v1: payment VNPay+MoMo, email Resend, push FCM + APNs, OAuth Google/FB/Apple, routing Goong, storage R2, payout manual — đều sau adapter port.        | ADR-018, ADR-019, ADR-020, ADR-027, ADR-022 |
+| HLD-DEC-03 | Vendor v1: payment VNPay+MoMo, email Resend, push Expo, OAuth Google/FB/Apple, routing Goong, storage R2, payout manual — đều sau adapter port.             | ADR-018, ADR-019, ADR-020, ADR-027, ADR-022 |
 | HLD-DEC-04 | Reporting bất đồng bộ: Postgres CTE / materialized view cho structured report; Mongo aggregation cho audit query; không chặn luồng booking/payment/check-in. | OQ-15; ADR-011                              |
 | HLD-DEC-05 | Audit là cross-cutting bắt buộc cho thao tác tiền, vé, ghế, quyền, policy, tenant-sensitive; lưu **Mongo cluster RIÊNG** (time-series, append-only).         | OQ-14 re-closed; ADR-011                    |
 | HLD-DEC-06 | Build mới hoàn toàn (fresh build `Marketplace-Ve-Xe-Nhanh`); module boundary HLD viết theo target state DOMAIN-MAP, không theo skeleton legacy.              | `PROJECT-STATE §2`                          |

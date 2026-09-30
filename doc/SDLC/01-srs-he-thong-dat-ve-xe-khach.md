@@ -4,16 +4,15 @@
 
 ### 1.1. Metadata
 
-| Thuộc tính    | Giá trị                                                        |
-| ------------- | -------------------------------------------------------------- |
-| Tên tài liệu  | Software Requirements Specification - Hệ thống đặt vé xe khách |
-| Mã tài liệu   | 01-srs-he-thong-dat-ve-xe-khach                                |
-| Dự án         | Hệ thống đặt vé xe khách                                       |
-| Trạng thái    | Approved                                                       |
-| Người viết    | Nguyễn Hồng Khanh, AI Agent                                    |
-| Người duyệt   | Nguyễn Hồng Khanh                                              |
-| Ngày tạo      | 05/05/2026                                                     |
-| Ngày cập nhật | 11/09/2026                                                     |
+| Thuộc tính   | Giá trị                                                        |
+| ------------ | -------------------------------------------------------------- |
+| Tên tài liệu | Software Requirements Specification - Hệ thống đặt vé xe khách |
+| Mã tài liệu  | 01-srs-he-thong-dat-ve-xe-khach                                |
+| Dự án        | Hệ thống đặt vé xe khách                                       |
+| Trạng thái   | Approved                                                       |
+| Người viết   | Nguyễn Hồng Khanh, AI Agent                                    |
+| Người duyệt  | Nguyễn Hồng Khanh                                              |
+| Ngày tạo     | 05/05/2026                                                     |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -203,12 +202,12 @@ Platform **KHÔNG trực tiếp** sở hữu xe, vận hành tuyến, ký hợp 
 
 Hệ thống gồm 3 ứng dụng client và 1 backend:
 
-| Client               | Đối tượng                                                                                                                                                                                                           |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Web user portal      | Hành khách (Marketplace layer)                                                                                                                                                                                      |
-| Web operator portal  | Operator (Operator OS layer)                                                                                                                                                                                        |
-| Web admin portal     | Admin Platform (Platform admin layer)                                                                                                                                                                               |
-| Mobile app (Flutter) | Hai app Flutter tách biệt (`passenger_mobile` + `employee_mobile`); giao diện, session, quyền và luồng nghiệp vụ tách theo actor. Hành khách dùng đặt vé / quản lý vé; Employee dùng check-in / nhật trình / sự cố. |
+| Client              | Đối tượng                                                                                                                                                                                                |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web user portal     | Hành khách (Marketplace layer)                                                                                                                                                                           |
+| Web operator portal | Operator (Operator OS layer)                                                                                                                                                                             |
+| Web admin portal    | Admin Platform (Platform admin layer)                                                                                                                                                                    |
+| Mobile app (Expo)   | Một codebase mobile phục vụ Hành khách và Employee; giao diện, session, quyền và luồng nghiệp vụ phải tách theo actor. Hành khách dùng đặt vé / quản lý vé; Employee dùng check-in / nhật trình / sự cố. |
 
 Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.IO + JWT + Helmet + OSRM. Phiên bản chi tiết và pin version sẽ được đặc tả ở Deployment & Operation Standard (`09-deployment-operation-standard.md`) khi đóng các OQ về hạ tầng.
 
@@ -500,7 +499,7 @@ Các external actor không có quyền truy cập tài khoản nội bộ; mọi
 | ----- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | DP-01 | Backend NestJS, MongoDB, Redis, Bull queue, Socket.IO, JWT, Helmet.                                               | Lõi API, lưu dữ liệu, khóa ghế, queue xử lý callback / notification, realtime vận hành.       |
 | DP-02 | Frontend Next.js, React, Ant Design, Tailwind, React Query, Zustand.                                              | Web hành khách, operator portal, admin portal.                                                |
-| DP-03 | Mobile Flutter (Dart).                                                                                            | App hành khách và app / portal nhân viên cho check-in, nhật trình, báo sự cố.                 |
+| DP-03 | Mobile Expo / React Native.                                                                                       | App hành khách và app / portal nhân viên cho check-in, nhật trình, báo sự cố.                 |
 | DP-04 | Redis hoặc lock service tương đương.                                                                              | Bắt buộc cho seat locking, chống double booking và chống spam thanh toán.                     |
 | DP-05 | Payment gateway.                                                                                                  | Bắt buộc cho thanh toán online, callback, tra soát giao dịch và hoàn tiền.                    |
 | DP-06 | Email / SMS / push notification provider.                                                                         | Bắt buộc để gửi vé điện tử, OTP, nhắc giờ đi, thông báo đổi / hủy chuyến.                     |
@@ -874,7 +873,7 @@ Các yêu cầu phi chức năng dưới đây áp dụng cho toàn bộ hệ th
 | ID          | Yêu cầu phi chức năng                                                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | NFR-COMP-01 | Website phải tương thích với các trình duyệt phổ biến phiên bản hiện đại.                                                             |
-| NFR-COMP-02 | Mobile app phải hỗ trợ Android / iOS theo phạm vi Flutter SDK đang dùng trong dự án.                                                  |
+| NFR-COMP-02 | Mobile app phải hỗ trợ Android / iOS theo phạm vi Expo SDK đang dùng trong dự án.                                                     |
 | NFR-COMP-03 | Email / SMS / push notification phải hiển thị thông tin cốt lõi đủ rõ khi provider hỗ trợ.                                            |
 | NFR-COMP-04 | QR code trên vé phải quét được bằng app / portal Employee trong điều kiện ánh sáng và chất lượng màn hình phổ biến.                   |
 | NFR-COMP-05 | Payment gateway, notification provider, routing service và object storage cụ thể không được hard-code vào SRS khi chưa chốt provider. |
@@ -907,379 +906,110 @@ Các yêu cầu phi chức năng dưới đây áp dụng cho toàn bộ hệ th
 
 ### 12.1. Sơ đồ Use Case
 
-#### 12.1.1. Actor generalization
-
 ```mermaid
 flowchart LR
-    Passenger["«abstract actor»<br/>Hành khách"]
-    User["Người dùng<br/>(User)"]
-    Guest["Khách vãng lai<br/>(Guest)"]
+    User[Người dùng]
+    Guest[Khách vãng lai]
+    Operator[Nhà xe]
+    Admin[Admin toàn hệ thống]
+    Employee[Nhân viên nhà xe]
+    System[Hệ thống]
 
-    Employee["«abstract actor»<br/>Nhân viên nhà xe"]
-    TicketStaff["Nhân viên vé<br/>(TICKET_STAFF)"]
-    Driver["Tài xế<br/>(DRIVER)"]
-    SupportStaff["Nhân viên hỗ trợ<br/>(SUPPORT_STAFF)"]
+    UC01((Đăng nhập / xác thực))
+    UC02((Tìm kiếm và so sánh chuyến))
+    UC03((Xem chi tiết chuyến / Operator))
+    UC04((Chọn ghế và giữ ghế))
+    UC05((Tạo booking))
+    UC06((Thanh toán))
+    UC07((Nhận vé điện tử))
+    UC08((Hủy vé / yêu cầu hoàn tiền))
+    UC09((Đánh giá / hỗ trợ / khiếu nại))
 
-    ExternalProvider["«abstract actor»<br/>External Provider"]
-    PaymentGateway["Cổng thanh toán"]
-    NotificationProvider["Dịch vụ thông báo"]
-    RoutingProvider["Dịch vụ định tuyến"]
-    StorageProvider["Dịch vụ lưu trữ tệp"]
-    PayoutBank["Dịch vụ ngân hàng payout"]
+    UC10((Đăng ký Operator / KYC))
+    UC11((Quản lý hồ sơ và tài chính Operator))
+    UC12((Quản lý Vehicle / SeatMap))
+    UC13((Quản lý route / stop point))
+    UC14((Quản lý trip / fare / inventory))
+    UC15((Quản lý booking / ticket))
+    UC16((Quản lý Employee / phân công))
+    UC17((Xem báo cáo Operator))
 
-    User -->|«generalization»| Passenger
-    Guest -->|«generalization»| Passenger
+    UC18((Xem nhiệm vụ được phân công))
+    UC19((Xem danh sách hành khách))
+    UC20((Check-in ticket))
+    UC21((Cập nhật trạng thái chuyến))
+    UC22((Ghi nhật trình / báo cáo sự cố))
 
-    TicketStaff -->|«generalization»| Employee
-    Driver -->|«generalization»| Employee
-    SupportStaff -->|«generalization»| Employee
+    UC23((Duyệt KYC / quản lý Operator))
+    UC24((Quản lý catalog chuẩn))
+    UC25((Cấu hình policy / commission / payout))
+    UC26((Giám sát payment / refund / escrow / payout))
+    UC27((Xử lý dispute case / refund thủ công))
+    UC28((Kiểm duyệt nội dung / review))
+    UC29((Báo cáo toàn hệ thống))
+    UC30((Truy xuất audit log))
 
-    PaymentGateway -->|«generalization»| ExternalProvider
-    NotificationProvider -->|«generalization»| ExternalProvider
-    RoutingProvider -->|«generalization»| ExternalProvider
-    StorageProvider -->|«generalization»| ExternalProvider
-    PayoutBank -->|«generalization»| ExternalProvider
+    UC31((Gửi notification))
+    UC32((Đối soát và retry job))
+    UC33((Quản lý promotion))
+    UC34((Cấu hình notification preference))
+    UC35((Tra cứu vé khách vãng lai))
+
+    User --> UC01
+    User --> UC02
+    User --> UC03
+    User --> UC04
+    User --> UC05
+    User --> UC06
+    User --> UC07
+    User --> UC08
+    User --> UC09
+    User --> UC34
+
+    Guest --> UC02
+    Guest --> UC03
+    Guest --> UC04
+    Guest --> UC05
+    Guest --> UC06
+    Guest --> UC07
+    Guest --> UC08
+    Guest --> UC09
+    Guest --> UC35
+
+    Operator --> UC01
+    Operator --> UC10
+    Operator --> UC11
+    Operator --> UC12
+    Operator --> UC13
+    Operator --> UC14
+    Operator --> UC15
+    Operator --> UC16
+    Operator --> UC17
+    Operator --> UC33
+    Operator --> UC34
+
+    Employee --> UC01
+    Employee --> UC18
+    Employee --> UC19
+    Employee --> UC20
+    Employee --> UC21
+    Employee --> UC22
+    Employee --> UC34
+
+    Admin --> UC01
+    Admin --> UC23
+    Admin --> UC24
+    Admin --> UC25
+    Admin --> UC26
+    Admin --> UC27
+    Admin --> UC28
+    Admin --> UC29
+    Admin --> UC30
+    Admin --> UC33
+
+    System --> UC31
+    System --> UC32
 ```
-
-`Hành khách`, `Nhân viên nhà xe` và `External Provider` trong view này là actor trừu tượng để gom hành vi chung, không phải actor nghiệp vụ mới. Mũi tên generalization đi từ actor chuyên biệt đến actor tổng quát. Do Mermaid flowchart không có đầu mũi tên tam giác rỗng của UML, nhãn `«generalization»` là ký hiệu ngữ nghĩa chính thức của sơ đồ. Quyền Employee vẫn phải kiểm tra theo role và phân công tại §15.4; generalization không đồng nghĩa mọi role có toàn bộ quyền của nhau.
-
-#### 12.1.2. Phạm vi use case theo lớp dịch vụ
-
-```mermaid
-flowchart LR
-    Passenger["«abstract actor»<br/>Hành khách"]
-    User["Người dùng<br/>(User)"]
-    Guest["Khách vãng lai<br/>(Guest)"]
-    Operator["Nhà xe<br/>(Operator)"]
-    Employee["Nhân viên nhà xe<br/>(Employee)"]
-    Admin["Admin toàn hệ thống<br/>(Admin)"]
-
-    User -->|«generalization»| Passenger
-    Guest -->|«generalization»| Passenger
-
-    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
-        direction LR
-
-        subgraph Marketplace["Marketplace layer"]
-            direction TB
-            UC02(["UC-02<br/>Tìm kiếm và so sánh chuyến"])
-            UC03(["UC-03<br/>Xem chi tiết chuyến / Operator"])
-            UC04(["UC-04<br/>Chọn ghế và giữ ghế"])
-            UC05(["UC-05<br/>Tạo booking"])
-            UC06(["UC-06<br/>Thanh toán booking"])
-            UC07(["UC-07<br/>Nhận và xem vé điện tử"])
-            UC08(["UC-08<br/>Hủy vé / yêu cầu hoàn tiền"])
-            UC09(["UC-09<br/>Đánh giá / hỗ trợ / khiếu nại"])
-            UC35(["UC-35<br/>Tra cứu vé Guest"])
-        end
-
-        subgraph OperatorOS["Operator OS layer"]
-            direction TB
-            UC10(["UC-10<br/>Đăng ký Operator / KYC"])
-            UC11(["UC-11<br/>Hồ sơ và tài chính Operator"])
-            UC12(["UC-12<br/>Vehicle / VehicleType / SeatMap"])
-            UC13(["UC-13<br/>Route / stop point"])
-            UC14(["UC-14<br/>Trip / fare / inventory"])
-            UC15(["UC-15<br/>Booking / ticket Operator"])
-            UC16(["UC-16<br/>Employee / phân công"])
-            UC17(["UC-17<br/>Báo cáo Operator"])
-        end
-
-        subgraph EmployeeOps["Employee app / portal"]
-            direction TB
-            UC18(["UC-18<br/>Nhiệm vụ được phân công"])
-            UC19(["UC-19<br/>Danh sách hành khách"])
-            UC20(["UC-20<br/>Check-in ticket"])
-            UC21(["UC-21<br/>Cập nhật trạng thái chuyến"])
-            UC22(["UC-22<br/>Nhật trình / báo cáo sự cố"])
-        end
-
-        subgraph PlatformAdmin["Platform admin layer"]
-            direction TB
-            UC23(["UC-23<br/>Duyệt KYC / quản lý Operator"])
-            UC24(["UC-24<br/>Catalog chuẩn"])
-            UC25(["UC-25<br/>Policy / commission / payout"])
-            UC26(["UC-26<br/>Giám sát chuỗi tài chính"])
-            UC27(["UC-27<br/>Dispute / refund thủ công"])
-            UC28(["UC-28<br/>Kiểm duyệt nội dung / review"])
-            UC29(["UC-29<br/>Báo cáo toàn hệ thống"])
-            UC30(["UC-30<br/>Truy xuất audit log"])
-        end
-
-        subgraph CrossCutting["Cross-cutting"]
-            direction TB
-            UC01(["UC-01<br/>Xác thực theo actor"])
-            UC31(["UC-31<br/>Gửi notification"])
-            UC32(["UC-32<br/>Đối soát / chạy lại job"])
-            UC33(["UC-33<br/>Quản lý promotion"])
-            UC34(["UC-34<br/>Notification preference"])
-        end
-    end
-
-    PaymentGateway["Cổng thanh toán"]
-    NotificationProvider["Dịch vụ thông báo"]
-    RoutingProvider["Dịch vụ định tuyến"]
-    StorageProvider["Dịch vụ lưu trữ tệp"]
-    PayoutBank["Dịch vụ ngân hàng payout"]
-
-    Passenger --- UC02
-    Passenger --- UC03
-    Passenger --- UC04
-    Passenger --- UC05
-    Passenger --- UC06
-    Passenger --- UC07
-    Passenger --- UC08
-    User --- UC01
-    User --- UC09
-    User --- UC34
-    Guest ---|hỗ trợ / khiếu nại| UC09
-    Guest --- UC35
-
-    Operator --- UC01
-    Operator --- UC10
-    Operator --- UC11
-    Operator --- UC12
-    Operator --- UC13
-    Operator --- UC14
-    Operator --- UC15
-    Operator --- UC16
-    Operator --- UC17
-    Operator --- UC33
-    Operator --- UC34
-
-    Employee --- UC01
-    Employee --- UC18
-    Employee --- UC19
-    Employee --- UC20
-    Employee --- UC21
-    Employee --- UC22
-    Employee --- UC34
-
-    Admin --- UC01
-    Admin --- UC08
-    Admin --- UC13
-    Admin --- UC23
-    Admin --- UC24
-    Admin --- UC25
-    Admin --- UC26
-    Admin --- UC27
-    Admin --- UC28
-    Admin --- UC29
-    Admin --- UC30
-    Admin --- UC32
-    Admin --- UC33
-
-    PaymentGateway --- UC06
-    PaymentGateway --- UC08
-    PaymentGateway --- UC26
-    PaymentGateway --- UC32
-    NotificationProvider --- UC31
-    NotificationProvider --- UC32
-    RoutingProvider --- UC02
-    RoutingProvider --- UC13
-    RoutingProvider --- UC14
-    StorageProvider --- UC10
-    StorageProvider --- UC17
-    StorageProvider --- UC22
-    StorageProvider --- UC27
-    StorageProvider --- UC29
-    PayoutBank --- UC26
-    PayoutBank --- UC32
-```
-
-Association trong view này chỉ cho biết actor có tham gia use case; quyền thực thi cuối cùng vẫn theo §15, tenant boundary, ownership, role và assignment. `Hệ thống` không được vẽ như actor của chính nó: UC tự động nằm trong system boundary và được kích hoạt bởi sự kiện nghiệp vụ, lịch chạy, Admin hoặc external provider phù hợp.
-
-#### 12.1.3. Quan hệ `«include»` và `«extend»`
-
-```mermaid
-flowchart LR
-    UC06(["UC-06<br/>Thanh toán booking"])
-    UC07(["UC-07<br/>Nhận / xem vé điện tử"])
-    UC08(["UC-08<br/>Hủy vé / hoàn tiền"])
-    UC09(["UC-09<br/>Đánh giá / hỗ trợ / khiếu nại"])
-    UC27(["UC-27<br/>Dispute / refund thủ công"])
-    UC31(["UC-31<br/>Gửi notification"])
-    UC32(["UC-32<br/>Đối soát / chạy lại job"])
-    UC35(["UC-35<br/>Tra cứu vé Guest"])
-
-    UC06 -.->|«include»| UC31
-    UC07 -.->|«include»| UC31
-    UC08 -.->|«include»| UC31
-    UC27 -.->|«include»| UC31
-
-    UC27 -.->|«extend» khi cần phân xử| UC09
-    UC27 -.->|«extend» refund thủ công / tranh chấp| UC08
-    UC32 -.->|«extend» callback payment bất thường| UC06
-    UC32 -.->|«extend» refund cần đối soát| UC08
-
-    UC07 -.->|«extend» Guest chọn xem vé| UC35
-    UC08 -.->|«extend» Guest chọn hủy / hoàn tiền| UC35
-    UC09 -.->|«extend» Guest chọn hỗ trợ / khiếu nại| UC35
-```
-
-Quy ước áp dụng:
-
-- `A «include» B`: mỗi lần thực hiện nhánh thành công liên quan của A phải phát / enqueue hành vi B. Với `UC-31`, việc gửi qua provider chạy bất đồng bộ; lỗi delivery không rollback nghiệp vụ chính.
-- `A «extend» B`: A chỉ chèn thêm hành vi tại điều kiện ghi trên mũi tên; B vẫn hoàn chỉnh khi extension không xảy ra. Các extension từ `UC-35` chỉ áp dụng cho Guest đã xác minh, không thay luồng trực tiếp của User.
-- Chuỗi `UC-02 → UC-03 → UC-04 → UC-05 → UC-06 → UC-07` là workflow / tiền điều kiện trong §16, không phải chuỗi `«include»`. Đặc biệt, `UC-05` không include `UC-04` vì SeatHold hợp lệ là tiền điều kiện của `UC-05`.
-- `UC-31` không include `UC-34`: `UC-34` là use case quản lý cấu hình, còn `UC-31` chỉ đọc và áp dụng preference. `UC-33` cũng không extend `UC-05` vì quản lý promotion khác với hành vi áp dụng promotion trong checkout.
-
-#### 12.1.4. Sơ đồ Use Case tổng hợp
-
-```mermaid
-flowchart TB
-    Admin["Admin toàn hệ thống<br/>(Admin)"]
-    User["Người dùng<br/>(User)"]
-    Guest["Khách vãng lai<br/>(Guest)"]
-    Passenger["«abstract actor»<br/>Hành khách"]
-    Operator["Nhà xe<br/>(Operator)"]
-    TicketStaff["Nhân viên vé<br/>(TICKET_STAFF)"]
-    Driver["Tài xế<br/>(DRIVER)"]
-    SupportStaff["Nhân viên hỗ trợ<br/>(SUPPORT_STAFF)"]
-    Employee["«abstract actor»<br/>Nhân viên nhà xe"]
-
-    User -->|«generalization»| Passenger
-    Guest -->|«generalization»| Passenger
-    TicketStaff -->|«generalization»| Employee
-    Driver -->|«generalization»| Employee
-    SupportStaff -->|«generalization»| Employee
-
-    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
-        subgraph PlatformAdmin["Platform admin layer"]
-            UC23(["UC-23<br/>Duyệt KYC / quản lý Operator"])
-            UC24(["UC-24<br/>Catalog chuẩn"])
-            UC25(["UC-25<br/>Policy / commission / payout"])
-            UC26(["UC-26<br/>Giám sát chuỗi tài chính"])
-            UC27(["UC-27<br/>Dispute / refund thủ công"])
-            UC28(["UC-28<br/>Kiểm duyệt nội dung / review"])
-            UC29(["UC-29<br/>Báo cáo toàn hệ thống"])
-            UC30(["UC-30<br/>Truy xuất audit log"])
-        end
-
-        subgraph Marketplace["Marketplace layer"]
-            subgraph PassengerShared["Dùng chung Hành khách"]
-                UC02(["UC-02<br/>Tìm kiếm và so sánh chuyến"])
-                UC03(["UC-03<br/>Xem chi tiết chuyến / Operator"])
-                UC04(["UC-04<br/>Chọn ghế và giữ ghế"])
-                UC05(["UC-05<br/>Tạo booking"])
-                UC06(["UC-06<br/>Thanh toán booking"])
-                UC07(["UC-07<br/>Nhận và xem vé điện tử"])
-                UC08(["UC-08<br/>Hủy vé / yêu cầu hoàn tiền"])
-            end
-            UC09(["UC-09<br/>Đánh giá / hỗ trợ / khiếu nại"])
-            UC35(["UC-35<br/>Tra cứu vé Guest"])
-        end
-
-        subgraph CrossCutting["Cross-cutting"]
-            UC01(["UC-01<br/>Xác thực theo actor"])
-            UC33(["UC-33<br/>Quản lý promotion"])
-            UC34(["UC-34<br/>Notification preference"])
-            UC32(["UC-32<br/>Đối soát / chạy lại job"])
-            UC31(["UC-31<br/>Gửi notification"])
-        end
-
-        subgraph OperatorOS["Operator OS layer"]
-            UC10(["UC-10<br/>Đăng ký Operator / KYC"])
-            UC11(["UC-11<br/>Hồ sơ và tài chính Operator"])
-            UC12(["UC-12<br/>Vehicle / VehicleType / SeatMap"])
-            UC13(["UC-13<br/>Route / stop point"])
-            UC14(["UC-14<br/>Trip / fare / inventory"])
-            UC15(["UC-15<br/>Booking / ticket Operator"])
-            UC16(["UC-16<br/>Employee / phân công"])
-            UC17(["UC-17<br/>Báo cáo Operator"])
-        end
-
-        subgraph EmployeeOps["Employee app / portal"]
-            UC18(["UC-18<br/>Nhiệm vụ được phân công"])
-            UC19(["UC-19<br/>Danh sách hành khách"])
-            UC20(["UC-20<br/>Check-in ticket"])
-            UC21(["UC-21<br/>Cập nhật trạng thái chuyến"])
-            UC22(["UC-22<br/>Nhật trình / báo cáo sự cố"])
-        end
-    end
-
-    PaymentGateway["Cổng thanh toán"]
-    PayoutBank["Dịch vụ ngân hàng payout"]
-    NotificationProvider["Dịch vụ thông báo"]
-    StorageProvider["Dịch vụ lưu trữ tệp"]
-    RoutingProvider["Dịch vụ định tuyến"]
-    ExternalProvider["«abstract actor»<br/>External Provider"]
-
-    %% Liên kết ẩn chỉ để xếp UC thành cột theo lớp, không mang ngữ nghĩa UML
-    UC02 ~~~ UC03 ~~~ UC04 ~~~ UC05 ~~~ UC06 ~~~ UC07 ~~~ UC08 ~~~ UC09 ~~~ UC35
-    UC23 ~~~ UC24 ~~~ UC25 ~~~ UC26 ~~~ UC27 ~~~ UC28 ~~~ UC29 ~~~ UC30
-    UC01 ~~~ UC33 ~~~ UC34 ~~~ UC32 ~~~ UC31
-    UC10 ~~~ UC11 ~~~ UC12 ~~~ UC13 ~~~ UC14 ~~~ UC15 ~~~ UC16 ~~~ UC17
-    UC18 ~~~ UC19 ~~~ UC20 ~~~ UC21 ~~~ UC22
-
-    Passenger --- PassengerShared
-    User --- UC01
-    User --- UC09
-    User --- UC34
-    Guest ---|hỗ trợ / khiếu nại| UC09
-    Guest --- UC35
-
-    Admin --- PlatformAdmin
-    Admin --- UC01
-    Admin --- UC08
-    Admin --- UC13
-    Admin --- UC32
-    Admin --- UC33
-
-    Operator --- OperatorOS
-    Operator --- UC01
-    Operator --- UC33
-    Operator --- UC34
-
-    Employee --- EmployeeOps
-    Employee --- UC01
-    Employee --- UC34
-
-    UC06 -.->|«include»| UC31
-    UC07 -.->|«include»| UC31
-    UC08 -.->|«include»| UC31
-    UC27 -.->|«include»| UC31
-    UC27 -.->|«extend»| UC09
-    UC27 -.->|«extend»| UC08
-    UC32 -.->|«extend»| UC06
-    UC32 -.->|«extend»| UC08
-    UC07 -.->|«extend»| UC35
-    UC08 -.->|«extend»| UC35
-    UC09 -.->|«extend»| UC35
-
-    UC06 --- PaymentGateway
-    UC08 --- PaymentGateway
-    UC26 --- PaymentGateway
-    UC32 --- PaymentGateway
-    UC26 --- PayoutBank
-    UC32 --- PayoutBank
-    UC31 --- NotificationProvider
-    UC32 --- NotificationProvider
-    UC10 --- StorageProvider
-    UC17 --- StorageProvider
-    UC22 --- StorageProvider
-    UC27 --- StorageProvider
-    UC29 --- StorageProvider
-    UC02 --- RoutingProvider
-    UC13 --- RoutingProvider
-    UC14 --- RoutingProvider
-
-    PaymentGateway -->|«generalization»| ExternalProvider
-    PayoutBank -->|«generalization»| ExternalProvider
-    NotificationProvider -->|«generalization»| ExternalProvider
-    StorageProvider -->|«generalization»| ExternalProvider
-    RoutingProvider -->|«generalization»| ExternalProvider
-
-    classDef abstractActor stroke-dasharray: 5 3,font-style:italic
-    class Passenger,Employee,ExternalProvider abstractActor
-```
-
-Sơ đồ này gộp ba view §12.1.1 (generalization), §12.1.2 (association theo lớp dịch vụ) và §12.1.3 (`«include»` / `«extend»`) thành một hình; không bổ sung actor, use case hay quan hệ mới. Nếu có khác biệt, ba view chi tiết là nguồn chuẩn. Quy ước đọc riêng cho view tổng hợp:
-
-- Actor nối vào **khung** (`Dùng chung Hành khách`, `Platform admin layer`, `Operator OS layer`, `Employee app / portal`) nghĩa là actor tham gia **mọi** use case trong khung đó; ví dụ `Admin --- Platform admin layer` tương đương association tới `UC-23..UC-30`.
-- Actor trừu tượng (viền nét đứt, chữ nghiêng) giữ nguyên ý nghĩa như §12.1.1; association của `Hành khách` được kế thừa bởi cả `User` và `Guest`.
-- Nhãn `«extend»` được rút gọn; điều kiện / extension point của từng quan hệ xem §12.1.3.
-- Actor phụ liệt kê trong bảng từng use case ở §13 (ví dụ Operator phản hồi dispute, Employee cung cấp sự cố) không vẽ ở view này để tránh rối; quyền thực thi cuối cùng vẫn theo §15.
 
 ### 12.2. Danh sách Use Case
 
@@ -3272,33 +3002,33 @@ Mục này ghi nhận các rủi ro cấp SRS cần được theo dõi khi chuy�
 
 Toàn bộ Open Questions (`OQ-*`) và Marketplace Questions (`MQ-*`) phát sinh trong quá trình viết SRS đã được chốt và liệt kê dưới đây làm nguồn chính thức. Các tài liệu HLD / LLD / DB / API / UI / Security / Test Plan cần đồng bộ theo các quyết định này ở lượt hiệu chỉnh riêng. Open Question mới phát sinh trong các phase thiết kế sẽ được ghi nhận tại `context/PROJECT-STATE.md` và được đồng bộ ngược về SRS khi ảnh hưởng yêu cầu.
 
-| ID        | Quyết định / nội dung chốt                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Ghi chú / hệ quả                                                                           |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| ~~OQ-01~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Trip của SRS. Code phải mở rộng từ 5 → 10 trạng thái theo §17.3.                                                                                                                                                                                                                                                                                                                                                                      | Đã chốt                                                                                    |
-| ~~OQ-02~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Booking của SRS. Code phải bổ sung `PAID`, `PARTIALLY_CANCELLED`, `REFUND_FAILED`, `PENDING_PAYMENT`, `PENDING_CONFIRMATION` theo §17.6.                                                                                                                                                                                                                                                                                              | Đã chốt                                                                                    |
-| ~~OQ-03~~ | **CHỐT (05/05/2026):** Payment status chuẩn hóa tên `SUCCESS`. Code phải đổi `COMPLETED` → `SUCCESS` và bổ sung `INITIATED`, `EXPIRED`, `CANCELLED`, `RECONCILING` theo §17.8.                                                                                                                                                                                                                                                                                                      | Đã chốt                                                                                    |
-| ~~OQ-04~~ | **CHỐT (05/05/2026):** dùng `Employee` với hệ role `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`. SRS đã được cập nhật ở §7.4, §10.1 (`FR-IAM-05..06`) và §10.7 (`FR-EMP-*`).                                                                                                                                                                                                                                                                                                           | Đã chốt                                                                                    |
-| ~~OQ-05~~ | **CHỐT (11/05/2026):** cổng thanh toán tích hợp đầu tiên là **VNPay Sandbox**. Thiết kế vẫn phải dùng adapter để có thể bổ sung provider khác sau này.                                                                                                                                                                                                                                                                                                                              | Ảnh hưởng `05-API Specification`, schema Payment, callback flow                            |
-| ~~OQ-06~~ | **CHỐT (11/05/2026):** thời gian giữ ghế mặc định là **10 phút**, cấu hình ở cấp Platform cho v1. Không cấu hình riêng per Operator trong v1.                                                                                                                                                                                                                                                                                                                                       | Ảnh hưởng Booking flow, UI timer, Redis / SeatHold TTL, test chống bán trùng ghế           |
-| ~~OQ-07~~ | **CHỐT (11/05/2026):** v1 ưu tiên luồng **thanh toán trước** cho Marketplace. `PENDING_CONFIRMATION` vẫn giữ trong enum để hỗ trợ vận hành / thanh toán sau ở phase sau, nhưng không mở mặc định cho passenger checkout v1.                                                                                                                                                                                                                                                         | Ảnh hưởng `06-UI/UX Flow`, `FR-BTP-07..10`, `FR-OPS-14`                                    |
-| ~~OQ-08~~ | **CHỐT (11/05/2026):** `Fare` / `FareRule` là bảng / collection riêng. `Trip` tham chiếu rule đang hiệu lực và booking phải lưu fare snapshot. Giá theo chặng (`segment-based fare`) chưa hỗ trợ trong v1.                                                                                                                                                                                                                                                                          | Ảnh hưởng `04-Database Design`, Pricing service, Booking snapshot                          |
-| ~~OQ-09~~ | **CHỐT (11/05/2026):** v1 dùng **email OTP** cho đăng ký / đăng nhập / xác minh thao tác nhạy cảm. SMS OTP chưa thuộc phạm vi v1; hệ thống giữ notification adapter để bổ sung SMS provider sau.                                                                                                                                                                                                                                                                                    | Ảnh hưởng `FR-IAM-01`, `FR-IAM-02a`, `FR-IAM-03a`, Notification Service                    |
-| ~~OQ-10~~ | **CHỐT (10/05/2026) → RE-CHỐT (25/05/2026, ADR-014) → RE-CHỐT (08/09/2026, ADR-028):** Mobile = **hai app Flutter tách biệt** — `passenger_mobile` (Hành khách: đặt / quản lý vé) và `employee_mobile` (Employee: check-in / nhật trình / sự cố); mỗi app tách giao diện, session, quyền và luồng nghiệp vụ theo actor. _(Closure gốc 10/05 là "một codebase Expo dùng chung"; ADR-014 đổi thành 2-app split; ADR-028 đổi framework Expo/React Native → Flutter, giữ 2-app split.)_ | Đã chốt                                                                                    |
-| ~~OQ-11~~ | **CHỐT (11/05/2026):** số điện thoại hành khách hiển thị cho Employee theo mặc định phải mask dạng giữ 1 số đầu và 3 số cuối, ví dụ `0*** *** 789`. Chỉ actor có quyền hỗ trợ / xử lý sự cố được xem số đầy đủ và thao tác này phải ghi audit log.                                                                                                                                                                                                                                  | Ảnh hưởng `BR-19`, `NFR-PRIV-04`, UI manifest hành khách                                   |
-| ~~OQ-12~~ | **CHỐT (11/05/2026):** v1 chỉ hỗ trợ **VND** và **tiếng Việt**. Multi-currency / multi-language không thuộc phạm vi v1.                                                                                                                                                                                                                                                                                                                                                             | Ảnh hưởng Payment, Fare, UI                                                                |
-| ~~OQ-13~~ | **CHỐT (11/05/2026):** chính sách hủy vé / hoàn tiền dùng **Platform default policy** làm nền; Admin có thể duyệt override theo Operator nếu được cấu hình. Booking luôn lưu policy snapshot tại thời điểm tạo booking.                                                                                                                                                                                                                                                             | Ảnh hưởng `BR-07`, `FR-ADM-06`, `FR-BTP-12..13`, dispute / refund workflow                 |
-| ~~OQ-14~~ | **CHỐT (11/05/2026):** audit log lưu trong MongoDB cùng cluster ở v1, theo collection append-only và không xóa cứng. Tách storage / archive riêng là hướng mở rộng khi cần retention dài hoặc chi phí lưu trữ tăng.                                                                                                                                                                                                                                                                 | Ảnh hưởng NFR-AUDIT-01..04, Audit module, vận hành backup                                  |
-| ~~OQ-15~~ | **CHỐT (11/05/2026):** reporting v1 dùng MongoDB aggregation và job bất đồng bộ cho báo cáo lớn. Chưa tách data warehouse; read model chỉ thêm khi báo cáo ảnh hưởng hiệu năng giao dịch chính.                                                                                                                                                                                                                                                                                     | Ảnh hưởng NFR-PERF-05, NFR-SCALE-04, Reporting module                                      |
-| ~~MQ-01~~ | **CHỐT (05/05/2026):** Payment flow = **escrow**. Platform giữ tiền trong escrow account và chuyển cho Operator theo chu kỳ T+3 sau khi chuyến hoàn thành. Đã phản ánh trong §4.2, §6.1, §6.2 và chốt chi tiết tại `OQ-16`.                                                                                                                                                                                                                                                         | Chi tiết payout đã chốt tại `OQ-16`                                                        |
-| ~~MQ-02~~ | **CHỐT (05/05/2026):** Operator tự định giá theo những gì đã kê khai với cơ quan nhà nước. Platform có quyền kiểm tra và áp khung giá trần / sàn theo quy định pháp luật vào các dịp quan trọng. Đã phản ánh trong §5.3, §6.2, §6.3.                                                                                                                                                                                                                                                | Quy tắc cảnh báo / chặn đã chốt tại `OQ-17`                                                |
-| ~~MQ-03~~ | **CHỐT (05/05/2026):** Platform là **arbiter cuối cùng** trong tranh chấp. Có quyền refund đơn phương qua đầu Operator, có audit log và thông báo bắt buộc cho Operator. Đã phản ánh trong §4.2, §6.3, `FR-ADM-11`, `FR-DSP-*` và `UC-27`.                                                                                                                                                                                                                                          | Đã chốt                                                                                    |
-| ~~MQ-04~~ | **CHỐT (05/05/2026):** mô hình thu phí = **commission % mặc định** trên mỗi giao dịch vé bán thành công, cấu hình per Operator hoặc theo tier. Service fee phụ thu khách và subsidy promotion chưa hỗ trợ ở v1. Đã phản ánh trong §4.3, §6.3.                                                                                                                                                                                                                                       | Commission mặc định đã chốt tại `OQ-18`                                                    |
-| ~~MQ-05~~ | **CHỐT (05/05/2026):** mô hình marketplace = **B (Managed marketplace)**. Platform cung cấp đủ 3 lớp: Marketplace, Operator OS và Platform admin. Pure marketplace và pure SaaS bị loại. Hybrid API integration cho Operator lớn chưa hỗ trợ ở v1, đặt vào §6.4. SRS §4, §5, §6 đã được tái cấu trúc theo MQ-05.                                                                                                                                                                    | Đã chốt                                                                                    |
-| ~~OQ-16~~ | **CHỐT (11/05/2026):** escrow payout dùng chu kỳ **T+3 ngày sau khi chuyến hoàn thành**. V1 không đặt ngưỡng tối thiểu để tạo payout. Kênh chi trả là chuyển khoản ngân hàng trực tiếp, Admin xác nhận thủ công trước khi đánh dấu payout thành công.                                                                                                                                                                                                                               | Ảnh hưởng `04-Database Design` (Payout collection), Operator OS Finance UI, reconciliation |
-| ~~OQ-17~~ | **CHỐT (10/05/2026):** khi giá vé Operator vượt khung trần / sàn pháp luật vào dịp quan trọng, Platform chỉ cảnh báo cho Operator và ghi nhận dữ liệu phục vụ kiểm tra; không tự động chặn mở bán ở v1.                                                                                                                                                                                                                                                                             | Đã phản ánh trong `FR-OPS-09` và `FR-ADM-09`                                               |
-| ~~OQ-18~~ | **CHỐT (11/05/2026):** commission mặc định cho Operator mới là **5% trên giá vé bán thành công**. V1 chưa dùng tier tự động; Admin có thể cấu hình override theo Operator bằng commission rule có ngày hiệu lực.                                                                                                                                                                                                                                                                    | Ảnh hưởng commission engine, báo cáo, Operator dashboard                                   |
-| ~~OQ-19~~ | **CHỐT (11/05/2026):** bộ KYC Operator v1 bắt buộc gồm giấy phép đăng ký kinh doanh / giấy tờ pháp nhân tương đương, giấy phép kinh doanh vận tải, giấy tờ người đại diện hoặc giấy ủy quyền hợp lệ, thông tin tài khoản ngân hàng nhận payout. Hồ sơ xe như đăng ký / đăng kiểm / bảo hiểm được xử lý ở luồng Vehicle nếu cần.                                                                                                                                                     | Ảnh hưởng `FR-OPR-03`, `FR-ADM-03`, UI onboarding nhà xe, FileStorage provider             |
-| ~~OQ-20~~ | **CHỐT (11/05/2026):** Platform dùng định vị **managed marketplace trung lập**: thương hiệu Platform hiển thị để bảo chứng giao dịch / hỗ trợ / tranh chấp, nhưng thông tin nhà xe, tuyến, giờ chạy và điều kiện dịch vụ vẫn là tín hiệu chính với hành khách.                                                                                                                                                                                                                      | Ảnh hưởng UI hành khách, scorecard, review, dispute và nội dung public Operator profile    |
+| ID        | Quyết định / nội dung chốt                                                                                                                                                                                                                                                                                                      | Ghi chú / hệ quả                                                                           |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| ~~OQ-01~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Trip của SRS. Code phải mở rộng từ 5 → 10 trạng thái theo §17.3.                                                                                                                                                                                                                  | Đã chốt                                                                                    |
+| ~~OQ-02~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Booking của SRS. Code phải bổ sung `PAID`, `PARTIALLY_CANCELLED`, `REFUND_FAILED`, `PENDING_PAYMENT`, `PENDING_CONFIRMATION` theo §17.6.                                                                                                                                          | Đã chốt                                                                                    |
+| ~~OQ-03~~ | **CHỐT (05/05/2026):** Payment status chuẩn hóa tên `SUCCESS`. Code phải đổi `COMPLETED` → `SUCCESS` và bổ sung `INITIATED`, `EXPIRED`, `CANCELLED`, `RECONCILING` theo §17.8.                                                                                                                                                  | Đã chốt                                                                                    |
+| ~~OQ-04~~ | **CHỐT (05/05/2026):** dùng `Employee` với hệ role `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`. SRS đã được cập nhật ở §7.4, §10.1 (`FR-IAM-05..06`) và §10.7 (`FR-EMP-*`).                                                                                                                                                       | Đã chốt                                                                                    |
+| ~~OQ-05~~ | **CHỐT (11/05/2026):** cổng thanh toán tích hợp đầu tiên là **VNPay Sandbox**. Thiết kế vẫn phải dùng adapter để có thể bổ sung provider khác sau này.                                                                                                                                                                          | Ảnh hưởng `05-API Specification`, schema Payment, callback flow                            |
+| ~~OQ-06~~ | **CHỐT (11/05/2026):** thời gian giữ ghế mặc định là **10 phút**, cấu hình ở cấp Platform cho v1. Không cấu hình riêng per Operator trong v1.                                                                                                                                                                                   | Ảnh hưởng Booking flow, UI timer, Redis / SeatHold TTL, test chống bán trùng ghế           |
+| ~~OQ-07~~ | **CHỐT (11/05/2026):** v1 ưu tiên luồng **thanh toán trước** cho Marketplace. `PENDING_CONFIRMATION` vẫn giữ trong enum để hỗ trợ vận hành / thanh toán sau ở phase sau, nhưng không mở mặc định cho passenger checkout v1.                                                                                                     | Ảnh hưởng `06-UI/UX Flow`, `FR-BTP-07..10`, `FR-OPS-14`                                    |
+| ~~OQ-08~~ | **CHỐT (11/05/2026):** `Fare` / `FareRule` là bảng / collection riêng. `Trip` tham chiếu rule đang hiệu lực và booking phải lưu fare snapshot. Giá theo chặng (`segment-based fare`) chưa hỗ trợ trong v1.                                                                                                                      | Ảnh hưởng `04-Database Design`, Pricing service, Booking snapshot                          |
+| ~~OQ-09~~ | **CHỐT (11/05/2026):** v1 dùng **email OTP** cho đăng ký / đăng nhập / xác minh thao tác nhạy cảm. SMS OTP chưa thuộc phạm vi v1; hệ thống giữ notification adapter để bổ sung SMS provider sau.                                                                                                                                | Ảnh hưởng `FR-IAM-01`, `FR-IAM-02a`, `FR-IAM-03a`, Notification Service                    |
+| ~~OQ-10~~ | **CHỐT (10/05/2026):** Mobile app dùng chung một codebase Expo cho User và Employee; app phải tách giao diện, session, quyền và luồng nghiệp vụ theo actor. User dùng đặt / quản lý vé, Employee dùng check-in / nhật trình / sự cố.                                                                                            | Đã chốt                                                                                    |
+| ~~OQ-11~~ | **CHỐT (11/05/2026):** số điện thoại hành khách hiển thị cho Employee theo mặc định phải mask dạng giữ 1 số đầu và 3 số cuối, ví dụ `0*** *** 789`. Chỉ actor có quyền hỗ trợ / xử lý sự cố được xem số đầy đủ và thao tác này phải ghi audit log.                                                                              | Ảnh hưởng `BR-19`, `NFR-PRIV-04`, UI manifest hành khách                                   |
+| ~~OQ-12~~ | **CHỐT (11/05/2026):** v1 chỉ hỗ trợ **VND** và **tiếng Việt**. Multi-currency / multi-language không thuộc phạm vi v1.                                                                                                                                                                                                         | Ảnh hưởng Payment, Fare, UI                                                                |
+| ~~OQ-13~~ | **CHỐT (11/05/2026):** chính sách hủy vé / hoàn tiền dùng **Platform default policy** làm nền; Admin có thể duyệt override theo Operator nếu được cấu hình. Booking luôn lưu policy snapshot tại thời điểm tạo booking.                                                                                                         | Ảnh hưởng `BR-07`, `FR-ADM-06`, `FR-BTP-12..13`, dispute / refund workflow                 |
+| ~~OQ-14~~ | **CHỐT (11/05/2026):** audit log lưu trong MongoDB cùng cluster ở v1, theo collection append-only và không xóa cứng. Tách storage / archive riêng là hướng mở rộng khi cần retention dài hoặc chi phí lưu trữ tăng.                                                                                                             | Ảnh hưởng NFR-AUDIT-01..04, Audit module, vận hành backup                                  |
+| ~~OQ-15~~ | **CHỐT (11/05/2026):** reporting v1 dùng MongoDB aggregation và job bất đồng bộ cho báo cáo lớn. Chưa tách data warehouse; read model chỉ thêm khi báo cáo ảnh hưởng hiệu năng giao dịch chính.                                                                                                                                 | Ảnh hưởng NFR-PERF-05, NFR-SCALE-04, Reporting module                                      |
+| ~~MQ-01~~ | **CHỐT (05/05/2026):** Payment flow = **escrow**. Platform giữ tiền trong escrow account và chuyển cho Operator theo chu kỳ T+3 sau khi chuyến hoàn thành. Đã phản ánh trong §4.2, §6.1, §6.2 và chốt chi tiết tại `OQ-16`.                                                                                                     | Chi tiết payout đã chốt tại `OQ-16`                                                        |
+| ~~MQ-02~~ | **CHỐT (05/05/2026):** Operator tự định giá theo những gì đã kê khai với cơ quan nhà nước. Platform có quyền kiểm tra và áp khung giá trần / sàn theo quy định pháp luật vào các dịp quan trọng. Đã phản ánh trong §5.3, §6.2, §6.3.                                                                                            | Quy tắc cảnh báo / chặn đã chốt tại `OQ-17`                                                |
+| ~~MQ-03~~ | **CHỐT (05/05/2026):** Platform là **arbiter cuối cùng** trong tranh chấp. Có quyền refund đơn phương qua đầu Operator, có audit log và thông báo bắt buộc cho Operator. Đã phản ánh trong §4.2, §6.3, `FR-ADM-11`, `FR-DSP-*` và `UC-27`.                                                                                      | Đã chốt                                                                                    |
+| ~~MQ-04~~ | **CHỐT (05/05/2026):** mô hình thu phí = **commission % mặc định** trên mỗi giao dịch vé bán thành công, cấu hình per Operator hoặc theo tier. Service fee phụ thu khách và subsidy promotion chưa hỗ trợ ở v1. Đã phản ánh trong §4.3, §6.3.                                                                                   | Commission mặc định đã chốt tại `OQ-18`                                                    |
+| ~~MQ-05~~ | **CHỐT (05/05/2026):** mô hình marketplace = **B (Managed marketplace)**. Platform cung cấp đủ 3 lớp: Marketplace, Operator OS và Platform admin. Pure marketplace và pure SaaS bị loại. Hybrid API integration cho Operator lớn chưa hỗ trợ ở v1, đặt vào §6.4. SRS §4, §5, §6 đã được tái cấu trúc theo MQ-05.                | Đã chốt                                                                                    |
+| ~~OQ-16~~ | **CHỐT (11/05/2026):** escrow payout dùng chu kỳ **T+3 ngày sau khi chuyến hoàn thành**. V1 không đặt ngưỡng tối thiểu để tạo payout. Kênh chi trả là chuyển khoản ngân hàng trực tiếp, Admin xác nhận thủ công trước khi đánh dấu payout thành công.                                                                           | Ảnh hưởng `04-Database Design` (Payout collection), Operator OS Finance UI, reconciliation |
+| ~~OQ-17~~ | **CHỐT (10/05/2026):** khi giá vé Operator vượt khung trần / sàn pháp luật vào dịp quan trọng, Platform chỉ cảnh báo cho Operator và ghi nhận dữ liệu phục vụ kiểm tra; không tự động chặn mở bán ở v1.                                                                                                                         | Đã phản ánh trong `FR-OPS-09` và `FR-ADM-09`                                               |
+| ~~OQ-18~~ | **CHỐT (11/05/2026):** commission mặc định cho Operator mới là **5% trên giá vé bán thành công**. V1 chưa dùng tier tự động; Admin có thể cấu hình override theo Operator bằng commission rule có ngày hiệu lực.                                                                                                                | Ảnh hưởng commission engine, báo cáo, Operator dashboard                                   |
+| ~~OQ-19~~ | **CHỐT (11/05/2026):** bộ KYC Operator v1 bắt buộc gồm giấy phép đăng ký kinh doanh / giấy tờ pháp nhân tương đương, giấy phép kinh doanh vận tải, giấy tờ người đại diện hoặc giấy ủy quyền hợp lệ, thông tin tài khoản ngân hàng nhận payout. Hồ sơ xe như đăng ký / đăng kiểm / bảo hiểm được xử lý ở luồng Vehicle nếu cần. | Ảnh hưởng `FR-OPR-03`, `FR-ADM-03`, UI onboarding nhà xe, FileStorage provider             |
+| ~~OQ-20~~ | **CHỐT (11/05/2026):** Platform dùng định vị **managed marketplace trung lập**: thương hiệu Platform hiển thị để bảo chứng giao dịch / hỗ trợ / tranh chấp, nhưng thông tin nhà xe, tuyến, giờ chạy và điều kiện dịch vụ vẫn là tín hiệu chính với hành khách.                                                                  | Ảnh hưởng UI hành khách, scorecard, review, dispute và nội dung public Operator profile    |
 
 ---
 
