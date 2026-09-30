@@ -47,7 +47,9 @@ describe("OpenAPI generation", () => {
         "/v1/auth/otp/request",
         "/v1/auth/otp/verify",
         "/v1/auth/oauth/{provider}",
+        "/v1/auth/oauth/session",
         "/v1/auth/operator/login",
+        "/v1/auth/employee/login",
         "/v1/auth/platform/login",
         "/v1/auth/refresh",
         "/v1/auth/logout",
@@ -74,6 +76,7 @@ describe("OpenAPI generation", () => {
         "/v1/auth/otp/verify",
         "/v1/auth/oauth/{provider}",
         "/v1/auth/operator/login",
+        "/v1/auth/employee/login",
         "/v1/auth/platform/login",
         "/v1/auth/refresh",
         "/v1/auth/re-auth",
@@ -129,12 +132,56 @@ describe("OpenAPI generation", () => {
           expect.arrayContaining([
             expect.arrayContaining(["accessToken", "refreshToken", "mfaRequired"]),
             expect.arrayContaining(["mfaRequired", "challengeToken", "challengeExpiresIn"]),
-            expect.arrayContaining(["passwordChangeRequired", "passwordChangeToken", "passwordChangeExpiresIn"])
+            expect.arrayContaining(["passwordChangeRequired", "passwordChangeToken", "passwordChangeExpiresIn"]),
+            // IAM-006 cookie mode: phiên nằm trong cookie, body chỉ metadata.
+            expect.arrayContaining(["authenticated", "scope", "role", "expiresIn", "refreshExpiresIn"])
           ])
         );
       }
       expect(schemas?.MfaVerifyDto?.required).toEqual(expect.arrayContaining(["challengeToken", "code"]));
-      expect(schemas?.MfaVerifyResponseDto_Output?.properties?.backupCodes).toBeDefined();
+      // MFA verify / refresh: token JSON (Mobile) HOẶC metadata phiên web (cookie) — client thấy cả hai nhánh.
+      const mfaVariants = schemas?.MfaVerifyResponseDto_Output?.anyOf ?? [];
+      expect(mfaVariants.map((variant) => variant.required ?? [])).toEqual(
+        expect.arrayContaining([
+          expect.arrayContaining(["accessToken", "refreshToken"]),
+          expect.arrayContaining(["authenticated", "expiresIn"])
+        ])
+      );
+      expect(mfaVariants.every((variant) => variant.properties?.backupCodes)).toBe(true);
+      const refreshVariants = schemas?.RefreshResponseDto_Output?.anyOf ?? [];
+      expect(refreshVariants.map((variant) => variant.required ?? [])).toEqual(
+        expect.arrayContaining([
+          expect.arrayContaining(["accessToken", "refreshToken"]),
+          expect.arrayContaining(["authenticated", "refreshExpiresIn"])
+        ])
+      );
+      // Bearer mode vẫn gửi refreshToken trong body; cookie mode không → field optional.
+      expect(schemas?.RefreshTokenDto?.properties?.refreshToken).toBeDefined();
+      expect(schemas?.RefreshTokenDto?.required ?? []).not.toContain("refreshToken");
+
+      // IAM-006: bootstrap web — /auth/csrf công khai, /auth/me cần đăng nhập; header transport được khai.
+      expect(document.paths["/v1/auth/csrf"]?.get?.security).toBeUndefined();
+      expect(document.paths["/v1/auth/csrf"]?.get?.responses?.[200]).toBeDefined();
+      expect(document.paths["/v1/auth/me"]?.get?.security).toEqual([{ bearer: [] }]);
+      expect(schemas?.AuthMeResponseDto_Output?.required).toEqual(
+        expect.arrayContaining(["subjectId", "scope", "role", "username", "sessionId", "accessExpiresAt", "mfaVerified"])
+      );
+      for (const path of [
+        "/v1/auth/operator/login",
+        "/v1/auth/platform/login",
+        "/v1/auth/mfa/verify",
+        "/v1/auth/password/change-required",
+        "/v1/auth/refresh",
+        "/v1/auth/logout",
+        "/v1/auth/re-auth"
+      ]) {
+        const headers = (document.paths[path]?.post?.parameters ?? []).map((param) =>
+          "in" in param && param.in === "header" ? param.name : ""
+        );
+        expect(headers, `${path} thiếu header dual transport`).toEqual(
+          expect.arrayContaining(["X-Auth-Transport", "X-CSRF-Token"])
+        );
+      }
       expect(schemas?.ReauthDto?.properties?.mfaCode).toBeDefined();
       expect(schemas?.PasswordChangeRequiredDto?.required).toEqual(
         expect.arrayContaining(["passwordChangeToken", "newPassword"])

@@ -16,6 +16,10 @@ const REDACT_PATHS = [
   "req.headers['x-bull-board-token']",
   "req.headers['x-api-key']",
   "res.headers['set-cookie']",
+  // TASK-IAM-006: CSRF token web sống 30 ngày — đi cả chiều request lẫn response.
+  "req.headers['x-csrf-token']",
+  "res.headers['x-csrf-token']",
+  "csrfToken",
   "authorization",
   "cookie",
   "password",

@@ -148,6 +148,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/employee/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_employeeLogin"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/platform/login": {
         parameters: {
             query?: never;
@@ -196,6 +212,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/auth/oauth/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["AuthController_oauthSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/auth/oauth/{provider}": {
         parameters: {
             query?: never;
@@ -212,16 +244,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/v1/auth/oauth/session": {
+    "/v1/auth/csrf": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["AuthController_csrf"];
         put?: never;
-        post: operations["AuthController_oauthSession"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuthController_me"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -709,6 +757,14 @@ export interface components {
             passwordChangeRequired: true;
             passwordChangeToken: string;
             passwordChangeExpiresIn: number;
+        } | {
+            /** @constant */
+            authenticated: true;
+            /** @enum {string} */
+            scope: "passenger" | "operator" | "platform";
+            role: string;
+            expiresIn: number;
+            refreshExpiresIn: number;
         };
         MfaVerifyDto: {
             challengeToken: string;
@@ -727,6 +783,15 @@ export interface components {
             /** @constant */
             mfaRequired: false;
             backupCodes?: string[];
+        } | {
+            /** @constant */
+            authenticated: true;
+            /** @enum {string} */
+            scope: "passenger" | "operator" | "platform";
+            role: string;
+            expiresIn: number;
+            refreshExpiresIn: number;
+            backupCodes?: string[];
         };
         PasswordChangeRequiredDto: {
             passwordChangeToken: string;
@@ -740,8 +805,44 @@ export interface components {
             /** Format: uri */
             redirectUrl: string;
         };
+        CsrfTokenResponseDto_Output: {
+            csrfToken: string;
+        };
+        AuthMeResponseDto_Output: {
+            subjectId: string;
+            /** @enum {string} */
+            scope: "passenger" | "operator" | "platform";
+            role: string;
+            username: string;
+            /** Format: uuid */
+            sessionId: string;
+            /** Format: date-time */
+            accessExpiresAt: string;
+            mfaVerified: boolean;
+            operatorId?: string;
+            operatorSlug?: string;
+        };
         RefreshTokenDto: {
+            refreshToken?: string;
+        };
+        RefreshResponseDto_Output: {
+            accessToken: string;
+            /** @constant */
+            tokenType: "Bearer";
+            expiresIn: number;
+            /** @enum {string} */
+            scope: "passenger" | "operator" | "platform";
+            role: string;
             refreshToken: string;
+            refreshExpiresIn: number;
+        } | {
+            /** @constant */
+            authenticated: true;
+            /** @enum {string} */
+            scope: "passenger" | "operator" | "platform";
+            role: string;
+            expiresIn: number;
+            refreshExpiresIn: number;
         };
         ReauthDto: {
             password?: string;
@@ -1441,6 +1542,62 @@ export interface operations {
     AuthController_operatorLogin: {
         parameters: {
             query?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CredentialLoginDto"];
+            };
+        };
+        responses: {
+            /** @description Login Owner nhà xe `{slug}/{username}`; Owner nhận challenge đổi mật khẩu/MFA trước khi có phiên. Tài khoản nhân viên không dùng cổng này (401 chung). Cookie mode: cấp phiên vào cookie, body chỉ metadata. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialLoginResponseDto_Output"];
+                };
+            };
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Sai thông tin đăng nhập. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    AuthController_employeeLogin: {
+        parameters: {
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;
@@ -1451,13 +1608,22 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Login Operator/Employee; role bắt buộc MFA nhận challenge thay vì token. */
+            /** @description Login nhân viên `{slug}/nv.{tên}` (app Nhân viên, chỉ Bearer): token JSON hoặc challenge đổi mật khẩu tạm. Tài khoản Owner không dùng cổng này (401 chung). */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["CredentialLoginResponseDto_Output"];
+                };
+            };
+            /** @description Gửi `X-Auth-Transport: cookie` (`AUTH_TRANSPORT_INVALID`) — cổng nhân viên không có cookie mode. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
             /** @description Sai thông tin đăng nhập. */
@@ -1483,7 +1649,12 @@ export interface operations {
     AuthController_platformLogin: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1502,6 +1673,15 @@ export interface operations {
                     "application/json": components["schemas"]["CredentialLoginResponseDto_Output"];
                 };
             };
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
             /** @description Sai thông tin đăng nhập. */
             401: {
                 headers: {
@@ -1511,7 +1691,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
-            /** @description Tài khoản bị khóa. */
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1525,7 +1705,12 @@ export interface operations {
     AuthController_verifyMfa: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1535,13 +1720,22 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Xác thực pre-auth challenge bằng TOTP/backup code rồi mới cấp token. */
+            /** @description Xác thực pre-auth challenge bằng TOTP/backup code rồi mới cấp token (Bearer) hoặc cookie phiên (web). */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["MfaVerifyResponseDto_Output"];
+                };
+            };
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
             /** @description Challenge/mã sai, hết hạn, đã dùng hoặc quá 5 lần thử — cùng một lỗi generic. */
@@ -1553,7 +1747,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
-            /** @description Tài khoản bị khóa trong lúc challenge còn sống. */
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1576,7 +1770,12 @@ export interface operations {
     AuthController_changeRequiredPassword: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1586,7 +1785,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token. */
+            /** @description Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token. Cookie mode: rotate CSRF qua header `X-CSRF-Token`. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1595,7 +1794,7 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponseDto_Output"];
                 };
             };
-            /** @description Mật khẩu mới trùng mật khẩu tạm. */
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). Mật khẩu mới trùng mật khẩu tạm (`AUTH_PASSWORD_REUSE_FORBIDDEN`). */
             400: {
                 headers: {
                     [name: string]: unknown;
@@ -1613,6 +1812,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
             /** @description Redis không khả dụng (fail-closed). */
             503: {
                 headers: {
@@ -1620,6 +1828,26 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    AuthController_oauthSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Đổi Better Auth session (sau OAuth callback) → access token. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthTokenResponseDto_Output"];
                 };
             };
         };
@@ -1651,7 +1879,7 @@ export interface operations {
             };
         };
     };
-    AuthController_oauthSession: {
+    AuthController_csrf: {
         parameters: {
             query?: never;
             header?: never;
@@ -1660,13 +1888,51 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Đổi Better Auth session (sau OAuth callback) → access token. */
+            /** @description Cấp (hoặc khôi phục sau reload) CSRF token signed double-submit: cookie `vxn_csrf` + body `{csrfToken}`. Web giữ token trong memory. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthTokenResponseDto_Output"];
+                    "application/json": components["schemas"]["CsrfTokenResponseDto_Output"];
+                };
+            };
+        };
+    };
+    AuthController_me: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Phiên hiện tại (Bearer hoặc cookie `vxn_access`). Không trả token/secret, KHÔNG tự refresh — web nhận 401 thì refresh một lần rồi gọi lại. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthMeResponseDto_Output"];
+                };
+            };
+            /** @description Gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu/sai/hết hạn access token hoặc phiên đã bị thu hồi. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
         };
@@ -1674,7 +1940,12 @@ export interface operations {
     AuthController_refresh: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1684,16 +1955,25 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Đổi refresh token lấy cặp token mới (rotation). Token cũ chết ngay; dùng lại nó = revoke cả family. */
+            /** @description Đổi refresh token lấy cặp token mới (rotation). Token cũ chết ngay; dùng lại nó = revoke cả family. Cookie mode đọc `vxn_refresh`, ghi lại cookie và rotate CSRF. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthTokenResponseDto_Output"];
+                    "application/json": components["schemas"]["RefreshResponseDto_Output"];
                 };
             };
-            /** @description Refresh token không hợp lệ / hết hạn / đã dùng (`AUTH_SESSION_EXPIRED`); phiên owner/admin cấp trước khi bật MFA (`AUTH_MFA_REQUIRED`) → đăng nhập lại qua MFA. */
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). Bearer mode thiếu `refreshToken`; cookie mode gửi kèm `refreshToken` trong body. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Refresh token không hợp lệ / hết hạn / đã dùng (`AUTH_SESSION_EXPIRED`); phiên owner/admin cấp trước khi bật MFA (`AUTH_MFA_REQUIRED`) → đăng nhập lại qua MFA. Cookie mode xoá cookie phiên. */
             401: {
                 headers: {
                     [name: string]: unknown;
@@ -1702,7 +1982,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
-            /** @description Tài khoản bị khóa. */
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -1734,13 +2014,18 @@ export interface operations {
     AuthController_logout: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Thu hồi phiên (cả family). Idempotent. */
+            /** @description Thu hồi phiên (cả family). Idempotent. Cookie mode xoá `vxn_access`/`vxn_refresh`/`vxn_csrf`. */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1749,8 +2034,26 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponseDto_Output"];
                 };
             };
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
             /** @description Thiếu hoặc sai access token. */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1763,7 +2066,12 @@ export interface operations {
     AuthController_reauth: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). */
+                "X-Auth-Transport"?: "cookie" | "bearer";
+                /** @description Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). */
+                "X-CSRF-Token"?: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1782,6 +2090,15 @@ export interface operations {
                     "application/json": components["schemas"]["MessageResponseDto_Output"];
                 };
             };
+            /** @description `X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
             /** @description Sai mật khẩu/OTP hoặc phiên đã hết. */
             401: {
                 headers: {
@@ -1791,7 +2108,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
-            /** @description Tài khoản bị khóa. */
+            /** @description Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa. */
             403: {
                 headers: {
                     [name: string]: unknown;

@@ -15,7 +15,7 @@ Rules:
 | User     | Người dùng        | Passenger who has an account on the platform; can buy, manage and review tickets.                                                 |
 | Guest    | Khách vãng lai    | Passenger who has not logged in or has no account; uses guest session for browsing, holding seats, booking, paying and lookup.    |
 | Operator | Nhà xe            | Transport business onboarded onto the platform; owns and runs vehicles, routes, trips, fares and employees within its own tenant. |
-| Employee | Nhân viên nhà xe  | Operator-internal staff with role `TICKET_STAFF`, `DRIVER` or `SUPPORT_STAFF`; logs in via operator-issued credentials.            |
+| Employee | Nhân viên nhà xe  | Operator-internal staff with role `TICKET_STAFF`, `DRIVER` or `SUPPORT_STAFF`; logs in via operator-issued credentials `{operatorSlug}/nv.{name}` on the dedicated employee login (`/auth/employee/login`, Bearer only; TASK-IAM-006).            |
 | Admin    | Admin toàn hệ thống | Platform administrator running the marketplace; final arbiter for disputes; manages KYC, policy, commission, payout.            |
 | Platform | Nền tảng          | The marketplace operator itself; not a transport company; provides Marketplace / Operator OS / Platform admin layers.             |
 
@@ -99,7 +99,7 @@ Rules:
 
 | Code | Nghĩa | HTTP |
 | ---- | ----- | ---- |
-| `AUTH_TRANSPORT_INVALID` | `X-Auth-Transport` không thuộc `cookie \| bearer`. | 400 |
+| `AUTH_TRANSPORT_INVALID` | `X-Auth-Transport` không thuộc `cookie \| bearer`, hoặc gửi `cookie` tới endpoint chỉ Bearer (employee login, OTP verify, OAuth session). | 400 |
 | `AUTH_TRANSPORT_AMBIGUOUS` | Request đồng thời mang Bearer và access cookie; hệ thống không chọn ngầm. | 400 |
 | `AUTH_CSRF_INVALID` | CSRF token thiếu, sai chữ ký, không khớp cookie/session hoặc đã rotate. | 403 |
-| `AUTH_ORIGIN_FORBIDDEN` | Unsafe cookie request thiếu `Origin` hoặc origin không thuộc allowlist. | 403 |
+| `AUTH_ORIGIN_FORBIDDEN` | Unsafe cookie request thiếu `Origin` hoặc origin không thuộc allowlist; hoặc phiên cookie gọi từ origin của app khác scope (Operator OS ↔ Admin). | 403 |

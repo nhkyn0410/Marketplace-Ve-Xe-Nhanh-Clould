@@ -24,6 +24,7 @@
 | v0.3      | 25/05/2026 | AI Agent       | Rebrand `Marketplace-Ve-Xe-Nhanh`; gỡ tham chiếu `TECH-STACK.md`. Không thay đổi normative.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 4 Rework** — bake Phase 4 DevOps **ADR-023..026** + stack ADR. §4 môi trường: Render (SG) + Postgres Supabase/Neon + Mongo Atlas; §5 build Turborepo + Docker + EAS mobile; §6 secret theo vendor đã chốt (VNPay/MoMo/Resend/Expo/OAuth/Goong/R2/Sentry); §7 Prisma Migrate + Mongo + RLS; §8 observability Sentry + Pino + OTel; §10 Render rollback; §11 checklist BullMQ/Postgres/Mongo. **Đóng OPS-OQ-01** (Render ADR-023) + **OPS-OQ-02** (Render env + GitHub secrets ADR-026) + **OPS-OQ-03** (Sentry ADR-026) + **OPS-OQ-05** (EAS ADR-014); refine OPS-OQ-04. |
 | v0.5      | 25/09/2026 | AI Agent       | **TASK-OQ-05 / TASK-IAM-006:** chốt topology same-site API/Operator/Admin cho staging/production, exact CORS allowlist, cookie Secure và CSRF secret/config fail-fast; thêm smoke auth web vào release checklist. Không đổi trạng thái Approved. |
+| v0.6      | 27/09/2026 | AI Agent       | **TASK-IAM-006:** env web auth đổi `CORS_ALLOWED_ORIGINS` → `OPERATOR_WEB_ORIGINS` + `ADMIN_WEB_ORIGINS` (ràng origin ↔ scope phiên, security M1). Không đổi trạng thái Approved. |
 
 ---
 
@@ -119,7 +120,7 @@ Secret quản lý qua **Render env group** + **GitHub Actions secrets** (ADR-026
 | Database       | Postgres URI (Supabase/Neon), Mongo URI (Atlas)                                  | Không commit; env theo môi trường (ADR-011)   |
 | Redis/Queue    | Upstash `REDIS_URL` (ioredis)                                                    | Cache + lock + BullMQ (ADR-015/016)           |
 | Auth           | Better Auth secret, JWT RS256 private/public key                                 | Rotation policy; refresh opaque (ADR-017)     |
-| Web auth       | `CORS_ALLOWED_ORIGINS`, `WEB_CSRF_SECRET` (base64 32 byte)                        | Exact HTTPS origin; staging/prod thiếu/sai → fail startup; không tái dùng OAuth callback list |
+| Web auth       | `OPERATOR_WEB_ORIGINS`, `ADMIN_WEB_ORIGINS`, `WEB_CSRF_SECRET` (base64 32 byte)   | Exact HTTPS origin theo từng app (ràng scope phiên); staging/prod thiếu/sai → fail startup; không tái dùng OAuth callback list |
 | Payment        | VNPay TmnCode/HashSecret (SHA512); MoMo partnerCode/accessKey/secretKey (SHA256) | Chỉ staging/production secret store (ADR-019) |
 | Notification   | Resend API key; Firebase (FCM service account JSON + APNs auth key)              | SMS defer (chỉ adapter) (ADR-020/028)         |
 | OAuth          | Google/Facebook/Apple client id + secret                                         | Passenger-only (ADR-020)                      |
@@ -128,7 +129,7 @@ Secret quản lý qua **Render env group** + **GitHub Actions secrets** (ADR-026
 | Payout         | Manual (không credential v1); bank info trong DB verified                        | Auto-disbursement defer v1.x (ADR-022)        |
 | Monitoring     | Sentry DSN (BE/FE/Mobile); OTel endpoint                                         | Không log secret (ADR-026)                    |
 
-`CORS_ALLOWED_ORIGINS` local mặc định đúng hai origin Operator/Admin ở bảng §4; staging/production bắt buộc khai tường minh. API bật `credentials: true`, echo exact origin, `Vary: Origin`, không wildcard. Cookie `Secure=true` ở staging/production; chỉ local HTTP được false. `WEB_CSRF_SECRET` tách khỏi JWT/Better Auth/MFA key và không log.
+`OPERATOR_WEB_ORIGINS` / `ADMIN_WEB_ORIGINS` local mặc định lần lượt là origin Operator OS / Admin ở bảng §4; staging/production bắt buộc khai tường minh, một origin không được thuộc cả hai app (TASK-IAM-006: phiên cookie chỉ dùng được từ app đúng scope). CORS allowlist = hợp của hai danh sách. API bật `credentials: true`, echo exact origin, `Vary: Origin`, không wildcard. Cookie `Secure=true` ở staging/production; chỉ local HTTP được false. `WEB_CSRF_SECRET` tách khỏi JWT/Better Auth/MFA key và không log.
 
 ---
 

@@ -29,9 +29,12 @@ export class OAuthInitDto extends createZodDto(
   z.object({ callbackURL: z.url().optional() })
 ) {}
 
-/** Refresh token opaque (43 ký tự base64url); trần 200 chỉ để chặn payload rác. */
+/**
+ * Refresh token opaque (43 ký tự base64url); trần 200 chỉ để chặn payload rác. Bearer mode (Mobile)
+ * bắt buộc gửi; cookie mode (web) KHÔNG gửi — server đọc cookie `vxn_refresh` (TASK-IAM-006).
+ */
 export class RefreshTokenDto extends createZodDto(
-  z.object({ refreshToken: z.string().min(1).max(200) })
+  z.object({ refreshToken: z.string().min(1).max(200).optional() })
 ) {}
 
 /**
@@ -108,12 +111,26 @@ const CredentialTokenResponseSchema = AuthTokenResponseSchema.extend({
   mfaRequired: z.literal(false)
 });
 
-/** Login Operator/Platform: token (role không bắt buộc MFA) HOẶC challenge (role bắt buộc MFA). */
+/**
+ * Cookie mode (`X-Auth-Transport: cookie`, API §7.1.1): phiên đã nằm trong cookie httpOnly nên body
+ * chỉ có metadata, KHÔNG access/refresh token thô. CSRF token mới đi qua header `X-CSRF-Token`.
+ */
+export const WebSessionResponseSchema = z.object({
+  authenticated: z.literal(true),
+  scope: z.enum(["passenger", "operator", "platform"]),
+  role: z.string(),
+  expiresIn: z.number().int().positive(),
+  refreshExpiresIn: z.number().int().positive()
+});
+export type WebSessionResponse = z.infer<typeof WebSessionResponseSchema>;
+
+/** Login Operator/Platform: token/phiên web (role không bắt buộc MFA) HOẶC challenge (MFA / đổi mật khẩu). */
 // `title`: generator Dart đặt tên model theo nó (thiếu thì ra `...OutputAnyOf1`).
 export const CredentialLoginResponseSchema = z.union([
   CredentialTokenResponseSchema.meta({ title: "CredentialTokenResponse" }),
   MfaChallengeResponseSchema.meta({ title: "MfaChallengeResponse" }),
-  PasswordChangeChallengeResponseSchema.meta({ title: "PasswordChangeChallengeResponse" })
+  PasswordChangeChallengeResponseSchema.meta({ title: "PasswordChangeChallengeResponse" }),
+  WebSessionResponseSchema.meta({ title: "CredentialWebSessionResponse" })
 ]);
 export type CredentialLoginResponse = z.infer<typeof CredentialLoginResponseSchema>;
 // Union không `extends` được (TS2509) → DTO dạng hằng. nestjs-zod đặt tên component OpenAPI theo
@@ -121,12 +138,49 @@ export type CredentialLoginResponse = z.infer<typeof CredentialLoginResponseSche
 export const CredentialLoginResponseDto = createZodDto(CredentialLoginResponseSchema);
 Object.defineProperty(CredentialLoginResponseDto, "name", { value: "CredentialLoginResponseDto" });
 
-export const MfaVerifyResponseSchema = CredentialTokenResponseSchema.extend({
-  /** Chỉ xuất hiện đúng một lần khi enrollment thành công. */
-  backupCodes: z.array(z.string()).length(10).optional()
-});
+/** Chỉ xuất hiện đúng một lần khi enrollment thành công. */
+const BackupCodesSchema = z.array(z.string()).length(10).optional();
+
+/** MFA verify: token JSON (Bearer/Mobile) HOẶC metadata phiên web (cookie), cả hai kèm backup code lần đầu. */
+export const MfaVerifyResponseSchema = z.union([
+  CredentialTokenResponseSchema.extend({ backupCodes: BackupCodesSchema }).meta({ title: "MfaVerifyTokenResponse" }),
+  WebSessionResponseSchema.extend({ backupCodes: BackupCodesSchema }).meta({ title: "MfaVerifyWebSessionResponse" })
+]);
 export type MfaVerifyResponse = z.infer<typeof MfaVerifyResponseSchema>;
-export class MfaVerifyResponseDto extends createZodDto(MfaVerifyResponseSchema) {}
+export const MfaVerifyResponseDto = createZodDto(MfaVerifyResponseSchema);
+Object.defineProperty(MfaVerifyResponseDto, "name", { value: "MfaVerifyResponseDto" });
+
+/** Refresh: cặp token mới (Bearer/Mobile) HOẶC metadata phiên web sau khi rotate cookie. */
+export const RefreshResponseSchema = z.union([
+  AuthTokenResponseSchema.meta({ title: "RefreshTokenPairResponse" }),
+  WebSessionResponseSchema.meta({ title: "RefreshWebSessionResponse" })
+]);
+export type RefreshResponse = z.infer<typeof RefreshResponseSchema>;
+export const RefreshResponseDto = createZodDto(RefreshResponseSchema);
+Object.defineProperty(RefreshResponseDto, "name", { value: "RefreshResponseDto" });
+
+export const CsrfTokenResponseSchema = z.object({ csrfToken: z.string() });
+export type CsrfTokenResponse = z.infer<typeof CsrfTokenResponseSchema>;
+/** `GET /auth/csrf`: token giữ trong memory của web, gửi lại qua header `X-CSRF-Token`. */
+export class CsrfTokenResponseDto extends createZodDto(CsrfTokenResponseSchema) {}
+
+/** `GET /auth/me` (API §7.1.2): bootstrap phiên hiện tại — không token, secret hay backup code. */
+export const AuthMeResponseSchema = z.object({
+  subjectId: z.string(),
+  scope: z.enum(["passenger", "operator", "platform"]),
+  role: z.string(),
+  /** Operator/Platform: username trong namespace; Passenger: email đăng nhập. */
+  username: z.string(),
+  /** Public session family id (cùng id với `GET /auth/sessions`), không phải row id của refresh rotation. */
+  sessionId: z.uuid(),
+  accessExpiresAt: z.iso.datetime(),
+  mfaVerified: z.boolean(),
+  operatorId: z.string().optional(),
+  operatorSlug: z.string().optional()
+});
+export type AuthMeResponse = z.infer<typeof AuthMeResponseSchema>;
+/** DTO response `GET /auth/me` cho OpenAPI + serializer. */
+export class AuthMeResponseDto extends createZodDto(AuthMeResponseSchema) {}
 
 export const MessageResponseSchema = z.object({ status: z.literal("ok") });
 export type MessageResponse = z.infer<typeof MessageResponseSchema>;

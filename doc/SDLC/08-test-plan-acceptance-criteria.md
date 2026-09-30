@@ -22,6 +22,8 @@
 | v0.1      | 11/05/2026 | AI Agent       | Tạo bản nháp Test Plan & Acceptance Criteria |
 | v0.2      | 01/06/2026 | AI Agent       | **Sprint 4 Rework** — bake **ADR-025** test framework (Vitest + Supertest + Playwright + Maestro) + stack ADR. §4 strategy map tool cụ thể; §6 môi trường Postgres/Mongo Testcontainers + VNPay/MoMo sandbox; §8/§9 thêm mandatory test money BIGINT/idempotency dedup/tenant RLS/webhook HMAC/OAuth (ADR-009/011/015/017/019). Đóng TEST-OQ-02 (sandbox VNPay+MoMo+Resend+Expo per ADR-019/020); refine TEST-OQ-01. |
 | v0.3      | 25/09/2026 | AI Agent       | **TASK-OQ-05 / TASK-IAM-006:** thêm acceptance + Supertest/Playwright cho dual transport, cookie flags, CSRF/CORS, `/auth/me`, first-login/TOTP, refresh single-flight và hồi quy Mobile JSON/Bearer. Giữ trạng thái Draft. |
+| v0.4      | 27/09/2026 | AI Agent       | **TASK-IAM-006 Q4:** TC-SEC-008 thêm kịch bản Employee đăng nhập Operator OS web → báo không có dữ liệu + thu hồi phiên. Giữ trạng thái Draft. |
+| v0.5      | 27/09/2026 | AI Agent       | **TASK-IAM-006:** TC-SEC-008 cập nhật (nhân viên nhận lỗi chung ở Operator OS); thêm TC-SEC-009 (cổng nhân viên tách, quy tắc `nv.`) và TC-SEC-010 (ràng origin ↔ scope phiên). Giữ trạng thái Draft. |
 
 ---
 
@@ -144,7 +146,9 @@ Mandatory (rủi ro cao, ADR-025): money math, idempotency, tenant RLS, seat-hol
 | TC-SEC-005 | CSRF thiếu/sai/cũ và unsafe request có Origin ngoài allowlist/`null` bị từ chối; preflight hợp lệ không qua auth | Security | Rất cao |
 | TC-SEC-006 | Bearer và access cookie đồng thời bị `AUTH_TRANSPORT_AMBIGUOUS`; transport lạ bị `AUTH_TRANSPORT_INVALID` | Security | Cao |
 | TC-SEC-007 | `/auth/me` không trả secret/không tự refresh; access hết hạn → web refresh single-flight rồi retry | API/E2E Web | Cao |
-| TC-SEC-008 | Playwright Operator: temp password → đổi → login lại → TOTP enrollment → backup code một lần → reload/protected route; Admin password → TOTP → protected route | E2E Web | Rất cao |
+| TC-SEC-008 | Playwright Operator: temp password → đổi → login lại → TOTP enrollment → backup code một lần → reload/protected route; Admin password → TOTP → protected route; nhân viên nhập vào Operator OS → lỗi đăng nhập chung, không có phiên | E2E Web | Rất cao |
+| TC-SEC-009 | Cổng nhân viên `/auth/employee/login` (`{slug}/nv.{tên}`) trả token Bearer, cookie mode → 400; nhân viên ở cổng Owner và Owner ở cổng nhân viên → 401 chung, không tạo phiên; DB từ chối nhân viên thiếu `nv.` và Owner dùng `nv.` | API/DB | Rất cao |
+| TC-SEC-010 | Phiên cookie gọi từ origin của app khác scope (Operator ↔ Admin) → 403 `AUTH_ORIGIN_FORBIDDEN` cho GET/mutation/login; refresh sai origin bị chặn trước khi xoay token và không xoá cookie | API | Cao |
 | TC-EMP-001 | Employee check-in ticket hợp lệ được phân công (Maestro) | E2E | Cao |
 | TC-EMP-002 | Employee không check-in chuyến ngoài assignment | Security | Cao |
 | TC-ADM-001 | Admin refund/payout thủ công yêu cầu re-auth/TOTP + audit | E2E/Security | Cao |

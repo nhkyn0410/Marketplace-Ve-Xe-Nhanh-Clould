@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseAppConfig } from "./env.config";
+import { parseAppConfig, webAllowedOrigins, webOriginScopes } from "./env.config";
 
 describe("parseAppConfig", () => {
   it("applies defaults when env is empty", () => {
@@ -87,10 +87,73 @@ describe("parseAppConfig", () => {
       JWT_ACCESS_PRIVATE_KEY: "test-key",
       MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
       RESEND_API_KEY: "test-resend-key",
+      WEB_CSRF_SECRET: Buffer.alloc(32, 2).toString("base64"),
+      OPERATOR_WEB_ORIGINS: "https://operator.example.com",
+      ADMIN_WEB_ORIGINS: "https://admin.example.com",
     };
     expect(() => parseAppConfig(production)).toThrow(/GOONG_API_KEY/);
     expect(parseAppConfig({ ...production, GOONG_API_KEY: "k" }).GOONG_API_KEY).toBe("k");
     expect(parseAppConfig({}).GOONG_API_KEY).toBeUndefined();
+  });
+
+  describe("web auth cookie mode (TASK-IAM-006)", () => {
+    const production = {
+      NODE_ENV: "production",
+      BETTER_AUTH_SECRET: "test-secret",
+      BETTER_AUTH_URL: "https://api.example.com",
+      JWT_ACCESS_PRIVATE_KEY: "test-key",
+      MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
+      RESEND_API_KEY: "test-resend-key",
+      GOONG_API_KEY: "k",
+      WEB_CSRF_SECRET: Buffer.alloc(32, 2).toString("base64"),
+      OPERATOR_WEB_ORIGINS: "https://operator.vexenhanh.vn",
+      ADMIN_WEB_ORIGINS: "https://admin.vexenhanh.vn, https://admin2.vexenhanh.vn",
+    };
+
+    it("ràng từng origin với scope của app (M1): operator ↔ Operator OS, platform ↔ Admin", () => {
+      expect([...webOriginScopes(parseAppConfig(production))]).toEqual([
+        ["https://operator.vexenhanh.vn", "operator"],
+        ["https://admin.vexenhanh.vn", "platform"],
+        ["https://admin2.vexenhanh.vn", "platform"],
+      ]);
+    });
+
+    it("defaults to local Operator/Admin origins outside production", () => {
+      const config = parseAppConfig({});
+      expect(config.OPERATOR_WEB_ORIGINS).toBeUndefined();
+      expect(webAllowedOrigins(config)).toEqual(["http://localhost:3002", "http://localhost:3003"]);
+      expect(webOriginScopes(config).get("http://localhost:3003")).toBe("platform");
+    });
+
+    it.each([
+      ["WEB_CSRF_SECRET", { WEB_CSRF_SECRET: undefined }],
+      ["OPERATOR_WEB_ORIGINS", { OPERATOR_WEB_ORIGINS: undefined }],
+      ["ADMIN_WEB_ORIGINS", { ADMIN_WEB_ORIGINS: undefined }],
+      ["OPERATOR_WEB_ORIGINS", { OPERATOR_WEB_ORIGINS: "http://operator.vexenhanh.vn" }],
+      ["ADMIN_WEB_ORIGINS", { ADMIN_WEB_ORIGINS: "https://localhost:3003" }],
+      ["WEB_CSRF_SECRET", { WEB_CSRF_SECRET: Buffer.alloc(32, 1).toString("base64") }],
+    ])("production fails fast on %s %o", (key, override) => {
+      expect(() => parseAppConfig({ ...production, ...override })).toThrow(new RegExp(key));
+    });
+
+    it.each(["*", "https://operator.vexenhanh.vn/", "https://operator.vexenhanh.vn/app", "operator.vexenhanh.vn"])(
+      "rejects non-exact origin %s in any environment",
+      (origin) => {
+        expect(() => parseAppConfig({ OPERATOR_WEB_ORIGINS: origin })).toThrow(/OPERATOR_WEB_ORIGINS/);
+      },
+    );
+
+    it("một origin không được thuộc cả hai app", () => {
+      expect(() =>
+        parseAppConfig({ OPERATOR_WEB_ORIGINS: "http://localhost:3002", ADMIN_WEB_ORIGINS: "http://localhost:3002" }),
+      ).toThrow(/must not share an origin/);
+    });
+
+    it("rejects a CSRF secret that is not 32 bytes of base64", () => {
+      expect(() => parseAppConfig({ WEB_CSRF_SECRET: Buffer.alloc(16).toString("base64") })).toThrow(
+        /WEB_CSRF_SECRET/,
+      );
+    });
   });
 
   it("treats empty / whitespace strings as unset", () => {

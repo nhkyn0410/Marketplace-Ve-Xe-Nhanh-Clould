@@ -9,9 +9,11 @@ import 'package:built_value/serializer.dart';
 import 'package:dio/dio.dart';
 
 import 'package:api_client_dart/src/api_util.dart';
+import 'package:api_client_dart/src/model/auth_me_response_dto_output.dart';
 import 'package:api_client_dart/src/model/auth_token_response_dto_output.dart';
 import 'package:api_client_dart/src/model/credential_login_dto.dart';
 import 'package:api_client_dart/src/model/credential_login_response_dto_output.dart';
+import 'package:api_client_dart/src/model/csrf_token_response_dto_output.dart';
 import 'package:api_client_dart/src/model/message_response_dto_output.dart';
 import 'package:api_client_dart/src/model/mfa_verify_dto.dart';
 import 'package:api_client_dart/src/model/mfa_verify_response_dto_output.dart';
@@ -22,6 +24,7 @@ import 'package:api_client_dart/src/model/otp_verify_dto.dart';
 import 'package:api_client_dart/src/model/password_change_required_dto.dart';
 import 'package:api_client_dart/src/model/problem_details_dto.dart';
 import 'package:api_client_dart/src/model/reauth_dto.dart';
+import 'package:api_client_dart/src/model/refresh_response_dto_output.dart';
 import 'package:api_client_dart/src/model/refresh_token_dto.dart';
 import 'package:api_client_dart/src/model/register_dto.dart';
 import 'package:api_client_dart/src/model/session_list_response_dto_output.dart';
@@ -39,6 +42,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [passwordChangeRequiredDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -50,6 +55,8 @@ class AuthApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<MessageResponseDtoOutput>> authControllerChangeRequiredPassword({ 
     required PasswordChangeRequiredDto passwordChangeRequiredDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -61,6 +68,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -129,7 +138,7 @@ class AuthApi {
     );
   }
 
-  /// authControllerLogout
+  /// authControllerCsrf
   /// 
   ///
   /// Parameters:
@@ -140,9 +149,181 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
+  /// Returns a [Future] containing a [Response] with a [CsrfTokenResponseDtoOutput] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<CsrfTokenResponseDtoOutput>> authControllerCsrf({ 
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/v1/auth/csrf';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    CsrfTokenResponseDtoOutput? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(CsrfTokenResponseDtoOutput),
+      ) as CsrfTokenResponseDtoOutput;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<CsrfTokenResponseDtoOutput>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// authControllerEmployeeLogin
+  /// 
+  ///
+  /// Parameters:
+  /// * [credentialLoginDto] 
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [CredentialLoginResponseDtoOutput] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<CredentialLoginResponseDtoOutput>> authControllerEmployeeLogin({ 
+    required CredentialLoginDto credentialLoginDto,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/v1/auth/employee/login';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(CredentialLoginDto);
+      _bodyData = _serializers.serialize(credentialLoginDto, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    CredentialLoginResponseDtoOutput? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(CredentialLoginResponseDtoOutput),
+      ) as CredentialLoginResponseDtoOutput;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<CredentialLoginResponseDtoOutput>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// authControllerLogout
+  /// 
+  ///
+  /// Parameters:
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
   /// Returns a [Future] containing a [Response] with a [MessageResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
   Future<Response<MessageResponseDtoOutput>> authControllerLogout({ 
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -154,6 +335,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -197,6 +380,85 @@ class AuthApi {
     }
 
     return Response<MessageResponseDtoOutput>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// authControllerMe
+  /// 
+  ///
+  /// Parameters:
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AuthMeResponseDtoOutput] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AuthMeResponseDtoOutput>> authControllerMe({ 
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/v1/auth/me';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[
+          {
+            'type': 'http',
+            'scheme': 'bearer',
+            'name': 'bearer',
+          },
+        ],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AuthMeResponseDtoOutput? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(AuthMeResponseDtoOutput),
+      ) as AuthMeResponseDtoOutput;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AuthMeResponseDtoOutput>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -383,6 +645,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [credentialLoginDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -394,6 +658,8 @@ class AuthApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<CredentialLoginResponseDtoOutput>> authControllerOperatorLogin({ 
     required CredentialLoginDto credentialLoginDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -405,6 +671,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -478,6 +746,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [credentialLoginDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -489,6 +759,8 @@ class AuthApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<CredentialLoginResponseDtoOutput>> authControllerPlatformLogin({ 
     required CredentialLoginDto credentialLoginDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -500,6 +772,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -573,6 +847,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [reauthDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -584,6 +860,8 @@ class AuthApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<MessageResponseDtoOutput>> authControllerReauth({ 
     required ReauthDto reauthDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -595,6 +873,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -674,6 +954,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [refreshTokenDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -681,10 +963,12 @@ class AuthApi {
   /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
   /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
   ///
-  /// Returns a [Future] containing a [Response] with a [AuthTokenResponseDtoOutput] as data
+  /// Returns a [Future] containing a [Response] with a [RefreshResponseDtoOutput] as data
   /// Throws [DioException] if API call or serialization fails
-  Future<Response<AuthTokenResponseDtoOutput>> authControllerRefresh({ 
+  Future<Response<RefreshResponseDtoOutput>> authControllerRefresh({ 
     required RefreshTokenDto refreshTokenDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -696,6 +980,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{
@@ -733,14 +1019,14 @@ class AuthApi {
       onReceiveProgress: onReceiveProgress,
     );
 
-    AuthTokenResponseDtoOutput? _responseData;
+    RefreshResponseDtoOutput? _responseData;
 
     try {
       final rawResponse = _response.data;
       _responseData = rawResponse == null ? null : _serializers.deserialize(
         rawResponse,
-        specifiedType: const FullType(AuthTokenResponseDtoOutput),
-      ) as AuthTokenResponseDtoOutput;
+        specifiedType: const FullType(RefreshResponseDtoOutput),
+      ) as RefreshResponseDtoOutput;
 
     } catch (error, stackTrace) {
       throw DioException(
@@ -752,7 +1038,7 @@ class AuthApi {
       );
     }
 
-    return Response<AuthTokenResponseDtoOutput>(
+    return Response<RefreshResponseDtoOutput>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,
@@ -959,6 +1245,8 @@ class AuthApi {
   ///
   /// Parameters:
   /// * [mfaVerifyDto] 
+  /// * [xAuthTransport] - `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+  /// * [xCSRFToken] - Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
   /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
   /// * [headers] - Can be used to add additional headers to the request
   /// * [extras] - Can be used to add flags to the request
@@ -970,6 +1258,8 @@ class AuthApi {
   /// Throws [DioException] if API call or serialization fails
   Future<Response<MfaVerifyResponseDtoOutput>> authControllerVerifyMfa({ 
     required MfaVerifyDto mfaVerifyDto,
+    String? xAuthTransport,
+    String? xCSRFToken,
     CancelToken? cancelToken,
     Map<String, dynamic>? headers,
     Map<String, dynamic>? extra,
@@ -981,6 +1271,8 @@ class AuthApi {
     final _options = Options(
       method: r'POST',
       headers: <String, dynamic>{
+        if (xAuthTransport != null) r'X-Auth-Transport': xAuthTransport,
+        if (xCSRFToken != null) r'X-CSRF-Token': xCSRFToken,
         ...?headers,
       },
       extra: <String, dynamic>{

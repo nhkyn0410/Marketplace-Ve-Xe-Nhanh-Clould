@@ -9,6 +9,7 @@ import { AuthController } from "../iam/auth/auth.controller";
 import { AuthService } from "../iam/auth/auth.service";
 import { TokenService } from "../iam/auth/token.service";
 import { SessionService } from "../iam/session/session.service";
+import { WebAuthService } from "../iam/auth/web/web-auth.service";
 import { LoginHistoryService } from "../iam/auth/login-history.service";
 import { OtpRateLimiter } from "../iam/auth/otp-rate-limiter";
 import { ProblemDetailsExceptionFilter } from "./errors/problem-details.filter";
@@ -101,7 +102,10 @@ async function createFixture() {
     JWT_ACCESS_PRIVATE_KEY: "test-key",
     MFA_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString("base64"),
     RESEND_API_KEY: "test-resend-key",
-    GOONG_API_KEY: "test-goong-key"
+    GOONG_API_KEY: "test-goong-key",
+    WEB_CSRF_SECRET: Buffer.alloc(32, 2).toString("base64"),
+    OPERATOR_WEB_ORIGINS: "https://operator.example.com",
+    ADMIN_WEB_ORIGINS: "https://admin.example.com"
   });
   const history = new LoginHistoryService(audit as never);
   const limiter = new OtpRateLimiter(redis as never);
@@ -126,7 +130,8 @@ async function createFixture() {
         { provide: APP_CONFIG, useValue: config },
         // Dependency của AccessTokenGuard (logout, re-auth) — test này không đi qua hai route đó.
         { provide: TokenService, useValue: {} },
-        { provide: SessionService, useValue: {} }
+        { provide: SessionService, useValue: {} },
+        { provide: WebAuthService, useValue: new WebAuthService(config) }
       ]
     },
     { logger: false }

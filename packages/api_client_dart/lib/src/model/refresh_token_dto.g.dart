@@ -8,12 +8,12 @@ part of 'refresh_token_dto.dart';
 
 class _$RefreshTokenDto extends RefreshTokenDto {
   @override
-  final String refreshToken;
+  final String? refreshToken;
 
   factory _$RefreshTokenDto([void Function(RefreshTokenDtoBuilder)? updates]) =>
       (RefreshTokenDtoBuilder()..update(updates))._build();
 
-  _$RefreshTokenDto._({required this.refreshToken}) : super._();
+  _$RefreshTokenDto._({this.refreshToken}) : super._();
   @override
   RefreshTokenDto rebuild(void Function(RefreshTokenDtoBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -80,8 +80,7 @@ class RefreshTokenDtoBuilder
   _$RefreshTokenDto _build() {
     final _$result = _$v ??
         _$RefreshTokenDto._(
-          refreshToken: BuiltValueNullFieldError.checkNotNull(
-              refreshToken, r'RefreshTokenDto', 'refreshToken'),
+          refreshToken: refreshToken,
         );
     replace(_$result);
     return _$result;

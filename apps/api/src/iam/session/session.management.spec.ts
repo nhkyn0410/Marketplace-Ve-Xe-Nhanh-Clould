@@ -6,6 +6,7 @@ import type { AppConfig } from "../../config/env.config";
 import type { PrismaService } from "../../database/prisma.service";
 import { SubjectType } from "../../database/prisma.types";
 import type { VerifiedAccessToken } from "../auth/token.service";
+import type { WebAuthService } from "../auth/web/web-auth.service";
 import { SessionController } from "./session.controller";
 import { RefreshTokenService } from "./refresh-token.service";
 import type { SessionCache } from "./session-cache";
@@ -88,9 +89,10 @@ describe("Session management", () => {
       items: [],
       nextCursor: null,
     });
-    const controller = new SessionController({
-      listForSubject,
-    } as unknown as SessionService);
+    const controller = new SessionController(
+      { listForSubject } as unknown as SessionService,
+      {} as WebAuthService,
+    );
     const base = { sub: randomUUID(), sid: randomUUID() };
     const actors = [
       { scope: "passenger", role: "PASSENGER", type: SubjectType.PASSENGER },

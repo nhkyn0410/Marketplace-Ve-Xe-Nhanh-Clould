@@ -312,6 +312,90 @@
     "/v1/auth/operator/login": {
       "post": {
         "operationId": "AuthController_operatorLogin",
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CredentialLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login Owner nhà xe `{slug}/{username}`; Owner nhận challenge đổi mật khẩu/MFA trước khi có phiên. Tài khoản nhân viên không dùng cổng này (401 chung). Cookie mode: cấp phiên vào cookie, body chỉ metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialLoginResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sai thông tin đăng nhập.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/employee/login": {
+      "post": {
+        "operationId": "AuthController_employeeLogin",
         "parameters": [],
         "requestBody": {
           "required": true,
@@ -325,11 +409,21 @@
         },
         "responses": {
           "200": {
-            "description": "Login Operator/Employee; role bắt buộc MFA nhận challenge thay vì token.",
+            "description": "Login nhân viên `{slug}/nv.{tên}` (app Nhân viên, chỉ Bearer): token JSON hoặc challenge đổi mật khẩu tạm. Tài khoản Owner không dùng cổng này (401 chung).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CredentialLoginResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gửi `X-Auth-Transport: cookie` (`AUTH_TRANSPORT_INVALID`) — cổng nhân viên không có cookie mode.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
                 }
               }
             }
@@ -363,7 +457,30 @@
     "/v1/auth/platform/login": {
       "post": {
         "operationId": "AuthController_platformLogin",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -385,6 +502,16 @@
               }
             }
           },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Sai thông tin đăng nhập.",
             "content": {
@@ -396,7 +523,7 @@
             }
           },
           "403": {
-            "description": "Tài khoản bị khóa.",
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -414,7 +541,30 @@
     "/v1/auth/mfa/verify": {
       "post": {
         "operationId": "AuthController_verifyMfa",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -427,11 +577,21 @@
         },
         "responses": {
           "200": {
-            "description": "Xác thực pre-auth challenge bằng TOTP/backup code rồi mới cấp token.",
+            "description": "Xác thực pre-auth challenge bằng TOTP/backup code rồi mới cấp token (Bearer) hoặc cookie phiên (web).",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MfaVerifyResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
                 }
               }
             }
@@ -447,7 +607,7 @@
             }
           },
           "403": {
-            "description": "Tài khoản bị khóa trong lúc challenge còn sống.",
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -475,7 +635,30 @@
     "/v1/auth/password/change-required": {
       "post": {
         "operationId": "AuthController_changeRequiredPassword",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -488,7 +671,7 @@
         },
         "responses": {
           "200": {
-            "description": "Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token.",
+            "description": "Đổi mật khẩu tạm một lần; phải đăng nhập lại để tiếp tục MFA/token. Cookie mode: rotate CSRF qua header `X-CSRF-Token`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -498,7 +681,7 @@
             }
           },
           "400": {
-            "description": "Mật khẩu mới trùng mật khẩu tạm.",
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). Mật khẩu mới trùng mật khẩu tạm (`AUTH_PASSWORD_REUSE_FORBIDDEN`).",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -517,12 +700,43 @@
               }
             }
           },
+          "403": {
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
           "503": {
             "description": "Redis không khả dụng (fail-closed).",
             "content": {
               "application/problem+json": {
                 "schema": {
                   "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/v1/auth/oauth/session": {
+      "post": {
+        "operationId": "AuthController_oauthSession",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Đổi Better Auth session (sau OAuth callback) → access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthTokenResponseDto_Output"
                 }
               }
             }
@@ -577,17 +791,17 @@
         ]
       }
     },
-    "/v1/auth/oauth/session": {
-      "post": {
-        "operationId": "AuthController_oauthSession",
+    "/v1/auth/csrf": {
+      "get": {
+        "operationId": "AuthController_csrf",
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Đổi Better Auth session (sau OAuth callback) → access token.",
+            "description": "Cấp (hoặc khôi phục sau reload) CSRF token signed double-submit: cookie `vxn_csrf` + body `{csrfToken}`. Web giữ token trong memory.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthTokenResponseDto_Output"
+                  "$ref": "#/components/schemas/CsrfTokenResponseDto_Output"
                 }
               }
             }
@@ -598,10 +812,79 @@
         ]
       }
     },
+    "/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Phiên hiện tại (Bearer hoặc cookie `vxn_access`). Không trả token/secret, KHÔNG tự refresh — web nhận 401 thì refresh một lần rồi gọi lại.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMeResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Thiếu/sai/hết hạn access token hoặc phiên đã bị thu hồi.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/v1/auth/refresh": {
       "post": {
         "operationId": "AuthController_refresh",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -614,17 +897,27 @@
         },
         "responses": {
           "200": {
-            "description": "Đổi refresh token lấy cặp token mới (rotation). Token cũ chết ngay; dùng lại nó = revoke cả family.",
+            "description": "Đổi refresh token lấy cặp token mới (rotation). Token cũ chết ngay; dùng lại nó = revoke cả family. Cookie mode đọc `vxn_refresh`, ghi lại cookie và rotate CSRF.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AuthTokenResponseDto_Output"
+                  "$ref": "#/components/schemas/RefreshResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`). Bearer mode thiếu `refreshToken`; cookie mode gửi kèm `refreshToken` trong body.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
                 }
               }
             }
           },
           "401": {
-            "description": "Refresh token không hợp lệ / hết hạn / đã dùng (`AUTH_SESSION_EXPIRED`); phiên owner/admin cấp trước khi bật MFA (`AUTH_MFA_REQUIRED`) → đăng nhập lại qua MFA.",
+            "description": "Refresh token không hợp lệ / hết hạn / đã dùng (`AUTH_SESSION_EXPIRED`); phiên owner/admin cấp trước khi bật MFA (`AUTH_MFA_REQUIRED`) → đăng nhập lại qua MFA. Cookie mode xoá cookie phiên.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -634,7 +927,7 @@
             }
           },
           "403": {
-            "description": "Tài khoản bị khóa.",
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -672,10 +965,33 @@
     "/v1/auth/logout": {
       "post": {
         "operationId": "AuthController_logout",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Thu hồi phiên (cả family). Idempotent.",
+            "description": "Thu hồi phiên (cả family). Idempotent. Cookie mode xoá `vxn_access`/`vxn_refresh`/`vxn_csrf`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -684,8 +1000,28 @@
               }
             }
           },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Thiếu hoặc sai access token.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -708,7 +1044,30 @@
     "/v1/auth/re-auth": {
       "post": {
         "operationId": "AuthController_reauth",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "X-Auth-Transport",
+            "in": "header",
+            "description": "`cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "bearer"
+              ]
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "description": "Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -730,6 +1089,16 @@
               }
             }
           },
+          "400": {
+            "description": "`X-Auth-Transport` sai (`AUTH_TRANSPORT_INVALID`) hoặc gửi cả Bearer lẫn cookie (`AUTH_TRANSPORT_AMBIGUOUS`).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Sai mật khẩu/OTP hoặc phiên đã hết.",
             "content": {
@@ -741,7 +1110,7 @@
             }
           },
           "403": {
-            "description": "Tài khoản bị khóa.",
+            "description": "Cookie mode: CSRF thiếu/sai (`AUTH_CSRF_INVALID`), Origin ngoài allowlist (`AUTH_ORIGIN_FORBIDDEN`) hoặc tài khoản bị khóa.",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3532,6 +3901,45 @@
             ],
             "additionalProperties": false,
             "title": "PasswordChangeChallengeResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "authenticated": {
+                "type": "boolean",
+                "const": true
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "passenger",
+                  "operator",
+                  "platform"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "expiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "refreshExpiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "authenticated",
+              "scope",
+              "role",
+              "expiresIn",
+              "refreshExpiresIn"
+            ],
+            "additionalProperties": false,
+            "title": "CredentialWebSessionResponse"
           }
         ]
       },
@@ -3554,63 +3962,115 @@
         ]
       },
       "MfaVerifyResponseDto_Output": {
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string"
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "tokenType": {
+                "type": "string",
+                "const": "Bearer"
+              },
+              "expiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "passenger",
+                  "operator",
+                  "platform"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              },
+              "refreshExpiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "mfaRequired": {
+                "type": "boolean",
+                "const": false
+              },
+              "backupCodes": {
+                "minItems": 10,
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "accessToken",
+              "tokenType",
+              "expiresIn",
+              "scope",
+              "role",
+              "refreshToken",
+              "refreshExpiresIn",
+              "mfaRequired"
+            ],
+            "additionalProperties": false,
+            "title": "MfaVerifyTokenResponse"
           },
-          "tokenType": {
-            "type": "string",
-            "const": "Bearer"
-          },
-          "expiresIn": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
-          },
-          "scope": {
-            "type": "string",
-            "enum": [
-              "passenger",
-              "operator",
-              "platform"
-            ]
-          },
-          "role": {
-            "type": "string"
-          },
-          "refreshToken": {
-            "type": "string"
-          },
-          "refreshExpiresIn": {
-            "type": "integer",
-            "exclusiveMinimum": 0,
-            "maximum": 9007199254740991
-          },
-          "mfaRequired": {
-            "type": "boolean",
-            "const": false
-          },
-          "backupCodes": {
-            "type": "array",
-            "minItems": 10,
-            "maxItems": 10,
-            "items": {
-              "type": "string"
-            }
+          {
+            "type": "object",
+            "properties": {
+              "authenticated": {
+                "type": "boolean",
+                "const": true
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "passenger",
+                  "operator",
+                  "platform"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "expiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "refreshExpiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "backupCodes": {
+                "minItems": 10,
+                "maxItems": 10,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "authenticated",
+              "scope",
+              "role",
+              "expiresIn",
+              "refreshExpiresIn"
+            ],
+            "additionalProperties": false,
+            "title": "MfaVerifyWebSessionResponse"
           }
-        },
-        "required": [
-          "accessToken",
-          "tokenType",
-          "expiresIn",
-          "scope",
-          "role",
-          "refreshToken",
-          "refreshExpiresIn",
-          "mfaRequired"
-        ],
-        "additionalProperties": false
+        ]
       },
       "PasswordChangeRequiredDto": {
         "type": "object",
@@ -3653,6 +4113,69 @@
         ],
         "additionalProperties": false
       },
+      "CsrfTokenResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "csrfToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "csrfToken"
+        ],
+        "additionalProperties": false
+      },
+      "AuthMeResponseDto_Output": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "passenger",
+              "operator",
+              "platform"
+            ]
+          },
+          "role": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "accessExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "mfaVerified": {
+            "type": "boolean"
+          },
+          "operatorId": {
+            "type": "string"
+          },
+          "operatorSlug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "subjectId",
+          "scope",
+          "role",
+          "username",
+          "sessionId",
+          "accessExpiresAt",
+          "mfaVerified"
+        ],
+        "additionalProperties": false
+      },
       "RefreshTokenDto": {
         "type": "object",
         "properties": {
@@ -3661,9 +4184,96 @@
             "minLength": 1,
             "maxLength": 200
           }
-        },
-        "required": [
-          "refreshToken"
+        }
+      },
+      "RefreshResponseDto_Output": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "tokenType": {
+                "type": "string",
+                "const": "Bearer"
+              },
+              "expiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "passenger",
+                  "operator",
+                  "platform"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              },
+              "refreshExpiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "accessToken",
+              "tokenType",
+              "expiresIn",
+              "scope",
+              "role",
+              "refreshToken",
+              "refreshExpiresIn"
+            ],
+            "additionalProperties": false,
+            "title": "RefreshTokenPairResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "authenticated": {
+                "type": "boolean",
+                "const": true
+              },
+              "scope": {
+                "type": "string",
+                "enum": [
+                  "passenger",
+                  "operator",
+                  "platform"
+                ]
+              },
+              "role": {
+                "type": "string"
+              },
+              "expiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              },
+              "refreshExpiresIn": {
+                "type": "integer",
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "authenticated",
+              "scope",
+              "role",
+              "expiresIn",
+              "refreshExpiresIn"
+            ],
+            "additionalProperties": false,
+            "title": "RefreshWebSessionResponse"
+          }
         ]
       },
       "ReauthDto": {
@@ -3854,9 +4464,8 @@
         "properties": {
           "username": {
             "type": "string",
-            "minLength": 3,
             "maxLength": 64,
-            "pattern": "^[A-Za-z0-9._-]+$"
+            "pattern": "^nv\\.[a-z0-9._-]{2,61}$"
           },
           "contactEmail": {
             "type": "string",
@@ -3954,9 +4563,8 @@
         "properties": {
           "username": {
             "type": "string",
-            "minLength": 3,
             "maxLength": 64,
-            "pattern": "^[A-Za-z0-9._-]+$"
+            "pattern": "^nv\\.[a-z0-9._-]{2,61}$"
           },
           "contactEmail": {
             "type": "string",

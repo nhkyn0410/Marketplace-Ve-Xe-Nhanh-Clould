@@ -15,7 +15,7 @@ part 'refresh_token_dto.g.dart';
 @BuiltValue()
 abstract class RefreshTokenDto implements Built<RefreshTokenDto, RefreshTokenDtoBuilder> {
   @BuiltValueField(wireName: r'refreshToken')
-  String get refreshToken;
+  String? get refreshToken;
 
   RefreshTokenDto._();
 
@@ -40,11 +40,13 @@ class _$RefreshTokenDtoSerializer implements PrimitiveSerializer<RefreshTokenDto
     RefreshTokenDto object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'refreshToken';
-    yield serializers.serialize(
-      object.refreshToken,
-      specifiedType: const FullType(String),
-    );
+    if (object.refreshToken != null) {
+      yield r'refreshToken';
+      yield serializers.serialize(
+        object.refreshToken,
+        specifiedType: const FullType(String),
+      );
+    }
   }
 
   @override
@@ -71,8 +73,9 @@ class _$RefreshTokenDtoSerializer implements PrimitiveSerializer<RefreshTokenDto
         case r'refreshToken':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.refreshToken = valueDes;
           break;
         default:

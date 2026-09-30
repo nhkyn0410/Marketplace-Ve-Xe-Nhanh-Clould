@@ -73,8 +73,8 @@ describe.skipIf(!url && !requireDb)("Tenant RLS — Postgres thật, role app", 
       });
       await tx.employeeAccount.createMany({
         data: [
-          { id: employeeA, operatorId: tenantA, username: `a-${tag}`, passwordHash: "x", role: "DRIVER" },
-          { id: employeeB, operatorId: tenantB, username: `b-${tag}`, passwordHash: "x", role: "DRIVER" },
+          { id: employeeA, operatorId: tenantA, username: `nv.a-${tag}`, passwordHash: "x", role: "DRIVER" },
+          { id: employeeB, operatorId: tenantB, username: `nv.b-${tag}`, passwordHash: "x", role: "DRIVER" },
         ],
       });
       await tx.authSession.createMany({
@@ -116,7 +116,7 @@ describe.skipIf(!url && !requireDb)("Tenant RLS — Postgres thật, role app", 
 
   it("UPDATE/DELETE row tenant B từ ngữ cảnh A → 0 row, dữ liệu B nguyên vẹn", async () => {
     const [updated, deleted] = await prisma.withTenant(tenantA, async (tx) => [
-      await tx.employeeAccount.updateMany({ where: { id: employeeB }, data: { username: "hacked" } }),
+      await tx.employeeAccount.updateMany({ where: { id: employeeB }, data: { username: "nv.hacked" } }),
       await tx.authSession.deleteMany({ where: { id: sessionB } }),
     ]);
     expect(updated.count).toBe(0);
@@ -126,7 +126,7 @@ describe.skipIf(!url && !requireDb)("Tenant RLS — Postgres thật, role app", 
       employee: await tx.employeeAccount.findUnique({ where: { id: employeeB } }),
       session: await tx.authSession.findUnique({ where: { id: sessionB } }),
     }));
-    expect(intact.employee?.username).toBe(`b-${tag}`);
+    expect(intact.employee?.username).toBe(`nv.b-${tag}`);
     expect(intact.session).not.toBeNull();
   });
 
@@ -134,7 +134,7 @@ describe.skipIf(!url && !requireDb)("Tenant RLS — Postgres thật, role app", 
     const text = await rejectionText(
       prisma.withTenant(tenantA, (tx) =>
         tx.employeeAccount.create({
-          data: { operatorId: tenantB, username: `smuggled-${tag}`, passwordHash: "x", role: "DRIVER" },
+          data: { operatorId: tenantB, username: `nv.smuggled-${tag}`, passwordHash: "x", role: "DRIVER" },
         }),
       ),
     );

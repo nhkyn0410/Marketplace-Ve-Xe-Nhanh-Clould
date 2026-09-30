@@ -100,6 +100,26 @@ final BuiltSet<CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum>
   _$credentialLoginResponseDtoOutputPasswordChangeRequiredEnum_true_,
 ]);
 
+const CredentialLoginResponseDtoOutputAuthenticatedEnum
+    _$credentialLoginResponseDtoOutputAuthenticatedEnum_true_ =
+    const CredentialLoginResponseDtoOutputAuthenticatedEnum._('true_');
+
+CredentialLoginResponseDtoOutputAuthenticatedEnum
+    _$credentialLoginResponseDtoOutputAuthenticatedEnumValueOf(String name) {
+  switch (name) {
+    case 'true_':
+      return _$credentialLoginResponseDtoOutputAuthenticatedEnum_true_;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<CredentialLoginResponseDtoOutputAuthenticatedEnum>
+    _$credentialLoginResponseDtoOutputAuthenticatedEnumValues = BuiltSet<
+        CredentialLoginResponseDtoOutputAuthenticatedEnum>(const <CredentialLoginResponseDtoOutputAuthenticatedEnum>[
+  _$credentialLoginResponseDtoOutputAuthenticatedEnum_true_,
+]);
+
 Serializer<CredentialLoginResponseDtoOutputTokenTypeEnum>
     _$credentialLoginResponseDtoOutputTokenTypeEnumSerializer =
     _$CredentialLoginResponseDtoOutputTokenTypeEnumSerializer();
@@ -112,6 +132,9 @@ Serializer<CredentialLoginResponseDtoOutputMfaRequiredEnum>
 Serializer<CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum>
     _$credentialLoginResponseDtoOutputPasswordChangeRequiredEnumSerializer =
     _$CredentialLoginResponseDtoOutputPasswordChangeRequiredEnumSerializer();
+Serializer<CredentialLoginResponseDtoOutputAuthenticatedEnum>
+    _$credentialLoginResponseDtoOutputAuthenticatedEnumSerializer =
+    _$CredentialLoginResponseDtoOutputAuthenticatedEnumSerializer();
 
 class _$CredentialLoginResponseDtoOutputTokenTypeEnumSerializer
     implements
@@ -239,6 +262,37 @@ class _$CredentialLoginResponseDtoOutputPasswordChangeRequiredEnumSerializer
           Serializers serializers, Object serialized,
           {FullType specifiedType = FullType.unspecified}) =>
       CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+}
+
+class _$CredentialLoginResponseDtoOutputAuthenticatedEnumSerializer
+    implements
+        PrimitiveSerializer<CredentialLoginResponseDtoOutputAuthenticatedEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'true_': 'true',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'true': 'true_',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[
+    CredentialLoginResponseDtoOutputAuthenticatedEnum
+  ];
+  @override
+  final String wireName = 'CredentialLoginResponseDtoOutputAuthenticatedEnum';
+
+  @override
+  Object serialize(Serializers serializers,
+          CredentialLoginResponseDtoOutputAuthenticatedEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  CredentialLoginResponseDtoOutputAuthenticatedEnum deserialize(
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      CredentialLoginResponseDtoOutputAuthenticatedEnum.valueOf(
           _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 

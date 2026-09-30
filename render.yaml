@@ -41,6 +41,15 @@ services:
         value: vexenhanh
       - key: AUTH_ALLOWED_CALLBACK_ORIGINS
         sync: false
+      # TASK-IAM-006: web auth cookie mode. Thiếu → API không khởi động. Exact HTTPS origin TỪNG app
+      # (vd https://operator.vexenhanh.vn và https://admin.vexenhanh.vn) — phiên chỉ dùng được từ app đúng scope;
+      # WEB_CSRF_SECRET = `openssl rand -base64 32`, khác MFA_ENCRYPTION_KEY/BETTER_AUTH_SECRET.
+      - key: OPERATOR_WEB_ORIGINS
+        sync: false
+      - key: ADMIN_WEB_ORIGINS
+        sync: false
+      - key: WEB_CSRF_SECRET
+        sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_FROM_EMAIL

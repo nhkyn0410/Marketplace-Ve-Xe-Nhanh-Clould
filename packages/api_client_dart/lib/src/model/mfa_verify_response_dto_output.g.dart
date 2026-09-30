@@ -78,6 +78,26 @@ final BuiltSet<MfaVerifyResponseDtoOutputMfaRequiredEnum>
   _$mfaVerifyResponseDtoOutputMfaRequiredEnum_false_,
 ]);
 
+const MfaVerifyResponseDtoOutputAuthenticatedEnum
+    _$mfaVerifyResponseDtoOutputAuthenticatedEnum_true_ =
+    const MfaVerifyResponseDtoOutputAuthenticatedEnum._('true_');
+
+MfaVerifyResponseDtoOutputAuthenticatedEnum
+    _$mfaVerifyResponseDtoOutputAuthenticatedEnumValueOf(String name) {
+  switch (name) {
+    case 'true_':
+      return _$mfaVerifyResponseDtoOutputAuthenticatedEnum_true_;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<MfaVerifyResponseDtoOutputAuthenticatedEnum>
+    _$mfaVerifyResponseDtoOutputAuthenticatedEnumValues = BuiltSet<
+        MfaVerifyResponseDtoOutputAuthenticatedEnum>(const <MfaVerifyResponseDtoOutputAuthenticatedEnum>[
+  _$mfaVerifyResponseDtoOutputAuthenticatedEnum_true_,
+]);
+
 Serializer<MfaVerifyResponseDtoOutputTokenTypeEnum>
     _$mfaVerifyResponseDtoOutputTokenTypeEnumSerializer =
     _$MfaVerifyResponseDtoOutputTokenTypeEnumSerializer();
@@ -87,6 +107,9 @@ Serializer<MfaVerifyResponseDtoOutputScopeEnum>
 Serializer<MfaVerifyResponseDtoOutputMfaRequiredEnum>
     _$mfaVerifyResponseDtoOutputMfaRequiredEnumSerializer =
     _$MfaVerifyResponseDtoOutputMfaRequiredEnumSerializer();
+Serializer<MfaVerifyResponseDtoOutputAuthenticatedEnum>
+    _$mfaVerifyResponseDtoOutputAuthenticatedEnumSerializer =
+    _$MfaVerifyResponseDtoOutputAuthenticatedEnumSerializer();
 
 class _$MfaVerifyResponseDtoOutputTokenTypeEnumSerializer
     implements PrimitiveSerializer<MfaVerifyResponseDtoOutputTokenTypeEnum> {
@@ -182,41 +205,46 @@ class _$MfaVerifyResponseDtoOutputMfaRequiredEnumSerializer
           _fromWire[serialized] ?? (serialized is String ? serialized : ''));
 }
 
+class _$MfaVerifyResponseDtoOutputAuthenticatedEnumSerializer
+    implements
+        PrimitiveSerializer<MfaVerifyResponseDtoOutputAuthenticatedEnum> {
+  static const Map<String, Object> _toWire = const <String, Object>{
+    'true_': 'true',
+  };
+  static const Map<Object, String> _fromWire = const <Object, String>{
+    'true': 'true_',
+  };
+
+  @override
+  final Iterable<Type> types = const <Type>[
+    MfaVerifyResponseDtoOutputAuthenticatedEnum
+  ];
+  @override
+  final String wireName = 'MfaVerifyResponseDtoOutputAuthenticatedEnum';
+
+  @override
+  Object serialize(Serializers serializers,
+          MfaVerifyResponseDtoOutputAuthenticatedEnum object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      _toWire[object.name] ?? object.name;
+
+  @override
+  MfaVerifyResponseDtoOutputAuthenticatedEnum deserialize(
+          Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      MfaVerifyResponseDtoOutputAuthenticatedEnum.valueOf(
+          _fromWire[serialized] ?? (serialized is String ? serialized : ''));
+}
+
 class _$MfaVerifyResponseDtoOutput extends MfaVerifyResponseDtoOutput {
   @override
-  final String accessToken;
-  @override
-  final MfaVerifyResponseDtoOutputTokenTypeEnum tokenType;
-  @override
-  final int expiresIn;
-  @override
-  final MfaVerifyResponseDtoOutputScopeEnum scope;
-  @override
-  final String role;
-  @override
-  final String refreshToken;
-  @override
-  final int refreshExpiresIn;
-  @override
-  final MfaVerifyResponseDtoOutputMfaRequiredEnum mfaRequired;
-  @override
-  final BuiltList<String>? backupCodes;
+  final AnyOf anyOf;
 
   factory _$MfaVerifyResponseDtoOutput(
           [void Function(MfaVerifyResponseDtoOutputBuilder)? updates]) =>
       (MfaVerifyResponseDtoOutputBuilder()..update(updates))._build();
 
-  _$MfaVerifyResponseDtoOutput._(
-      {required this.accessToken,
-      required this.tokenType,
-      required this.expiresIn,
-      required this.scope,
-      required this.role,
-      required this.refreshToken,
-      required this.refreshExpiresIn,
-      required this.mfaRequired,
-      this.backupCodes})
-      : super._();
+  _$MfaVerifyResponseDtoOutput._({required this.anyOf}) : super._();
   @override
   MfaVerifyResponseDtoOutput rebuild(
           void Function(MfaVerifyResponseDtoOutputBuilder) updates) =>
@@ -229,30 +257,13 @@ class _$MfaVerifyResponseDtoOutput extends MfaVerifyResponseDtoOutput {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is MfaVerifyResponseDtoOutput &&
-        accessToken == other.accessToken &&
-        tokenType == other.tokenType &&
-        expiresIn == other.expiresIn &&
-        scope == other.scope &&
-        role == other.role &&
-        refreshToken == other.refreshToken &&
-        refreshExpiresIn == other.refreshExpiresIn &&
-        mfaRequired == other.mfaRequired &&
-        backupCodes == other.backupCodes;
+    return other is MfaVerifyResponseDtoOutput && anyOf == other.anyOf;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
-    _$hash = $jc(_$hash, accessToken.hashCode);
-    _$hash = $jc(_$hash, tokenType.hashCode);
-    _$hash = $jc(_$hash, expiresIn.hashCode);
-    _$hash = $jc(_$hash, scope.hashCode);
-    _$hash = $jc(_$hash, role.hashCode);
-    _$hash = $jc(_$hash, refreshToken.hashCode);
-    _$hash = $jc(_$hash, refreshExpiresIn.hashCode);
-    _$hash = $jc(_$hash, mfaRequired.hashCode);
-    _$hash = $jc(_$hash, backupCodes.hashCode);
+    _$hash = $jc(_$hash, anyOf.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -260,15 +271,7 @@ class _$MfaVerifyResponseDtoOutput extends MfaVerifyResponseDtoOutput {
   @override
   String toString() {
     return (newBuiltValueToStringHelper(r'MfaVerifyResponseDtoOutput')
-          ..add('accessToken', accessToken)
-          ..add('tokenType', tokenType)
-          ..add('expiresIn', expiresIn)
-          ..add('scope', scope)
-          ..add('role', role)
-          ..add('refreshToken', refreshToken)
-          ..add('refreshExpiresIn', refreshExpiresIn)
-          ..add('mfaRequired', mfaRequired)
-          ..add('backupCodes', backupCodes))
+          ..add('anyOf', anyOf))
         .toString();
   }
 }
@@ -278,48 +281,9 @@ class MfaVerifyResponseDtoOutputBuilder
         Builder<MfaVerifyResponseDtoOutput, MfaVerifyResponseDtoOutputBuilder> {
   _$MfaVerifyResponseDtoOutput? _$v;
 
-  String? _accessToken;
-  String? get accessToken => _$this._accessToken;
-  set accessToken(String? accessToken) => _$this._accessToken = accessToken;
-
-  MfaVerifyResponseDtoOutputTokenTypeEnum? _tokenType;
-  MfaVerifyResponseDtoOutputTokenTypeEnum? get tokenType => _$this._tokenType;
-  set tokenType(MfaVerifyResponseDtoOutputTokenTypeEnum? tokenType) =>
-      _$this._tokenType = tokenType;
-
-  int? _expiresIn;
-  int? get expiresIn => _$this._expiresIn;
-  set expiresIn(int? expiresIn) => _$this._expiresIn = expiresIn;
-
-  MfaVerifyResponseDtoOutputScopeEnum? _scope;
-  MfaVerifyResponseDtoOutputScopeEnum? get scope => _$this._scope;
-  set scope(MfaVerifyResponseDtoOutputScopeEnum? scope) =>
-      _$this._scope = scope;
-
-  String? _role;
-  String? get role => _$this._role;
-  set role(String? role) => _$this._role = role;
-
-  String? _refreshToken;
-  String? get refreshToken => _$this._refreshToken;
-  set refreshToken(String? refreshToken) => _$this._refreshToken = refreshToken;
-
-  int? _refreshExpiresIn;
-  int? get refreshExpiresIn => _$this._refreshExpiresIn;
-  set refreshExpiresIn(int? refreshExpiresIn) =>
-      _$this._refreshExpiresIn = refreshExpiresIn;
-
-  MfaVerifyResponseDtoOutputMfaRequiredEnum? _mfaRequired;
-  MfaVerifyResponseDtoOutputMfaRequiredEnum? get mfaRequired =>
-      _$this._mfaRequired;
-  set mfaRequired(MfaVerifyResponseDtoOutputMfaRequiredEnum? mfaRequired) =>
-      _$this._mfaRequired = mfaRequired;
-
-  ListBuilder<String>? _backupCodes;
-  ListBuilder<String> get backupCodes =>
-      _$this._backupCodes ??= ListBuilder<String>();
-  set backupCodes(ListBuilder<String>? backupCodes) =>
-      _$this._backupCodes = backupCodes;
+  AnyOf? _anyOf;
+  AnyOf? get anyOf => _$this._anyOf;
+  set anyOf(AnyOf? anyOf) => _$this._anyOf = anyOf;
 
   MfaVerifyResponseDtoOutputBuilder() {
     MfaVerifyResponseDtoOutput._defaults(this);
@@ -328,15 +292,7 @@ class MfaVerifyResponseDtoOutputBuilder
   MfaVerifyResponseDtoOutputBuilder get _$this {
     final $v = _$v;
     if ($v != null) {
-      _accessToken = $v.accessToken;
-      _tokenType = $v.tokenType;
-      _expiresIn = $v.expiresIn;
-      _scope = $v.scope;
-      _role = $v.role;
-      _refreshToken = $v.refreshToken;
-      _refreshExpiresIn = $v.refreshExpiresIn;
-      _mfaRequired = $v.mfaRequired;
-      _backupCodes = $v.backupCodes?.toBuilder();
+      _anyOf = $v.anyOf;
       _$v = null;
     }
     return this;
@@ -356,41 +312,11 @@ class MfaVerifyResponseDtoOutputBuilder
   MfaVerifyResponseDtoOutput build() => _build();
 
   _$MfaVerifyResponseDtoOutput _build() {
-    _$MfaVerifyResponseDtoOutput _$result;
-    try {
-      _$result = _$v ??
-          _$MfaVerifyResponseDtoOutput._(
-            accessToken: BuiltValueNullFieldError.checkNotNull(
-                accessToken, r'MfaVerifyResponseDtoOutput', 'accessToken'),
-            tokenType: BuiltValueNullFieldError.checkNotNull(
-                tokenType, r'MfaVerifyResponseDtoOutput', 'tokenType'),
-            expiresIn: BuiltValueNullFieldError.checkNotNull(
-                expiresIn, r'MfaVerifyResponseDtoOutput', 'expiresIn'),
-            scope: BuiltValueNullFieldError.checkNotNull(
-                scope, r'MfaVerifyResponseDtoOutput', 'scope'),
-            role: BuiltValueNullFieldError.checkNotNull(
-                role, r'MfaVerifyResponseDtoOutput', 'role'),
-            refreshToken: BuiltValueNullFieldError.checkNotNull(
-                refreshToken, r'MfaVerifyResponseDtoOutput', 'refreshToken'),
-            refreshExpiresIn: BuiltValueNullFieldError.checkNotNull(
-                refreshExpiresIn,
-                r'MfaVerifyResponseDtoOutput',
-                'refreshExpiresIn'),
-            mfaRequired: BuiltValueNullFieldError.checkNotNull(
-                mfaRequired, r'MfaVerifyResponseDtoOutput', 'mfaRequired'),
-            backupCodes: _backupCodes?.build(),
-          );
-    } catch (_) {
-      late String _$failedField;
-      try {
-        _$failedField = 'backupCodes';
-        _backupCodes?.build();
-      } catch (e) {
-        throw BuiltValueNestedFieldError(
-            r'MfaVerifyResponseDtoOutput', _$failedField, e.toString());
-      }
-      rethrow;
-    }
+    final _$result = _$v ??
+        _$MfaVerifyResponseDtoOutput._(
+          anyOf: BuiltValueNullFieldError.checkNotNull(
+              anyOf, r'MfaVerifyResponseDtoOutput', 'anyOf'),
+        );
     replace(_$result);
     return _$result;
   }

@@ -6,8 +6,11 @@ import {
   HttpCode,
   Param,
   Query,
+  Req,
+  Res,
   UseGuards,
 } from "@nestjs/common";
+import type { Response } from "express";
 import {
   ApiBearerAuth,
   ApiExtraModels,
@@ -22,9 +25,11 @@ import { ProblemDetailsDto } from "../../openapi/openapi.dto";
 import {
   AccessTokenGuard,
   AllowRevokedSession,
+  type AuthenticatedRequest,
 } from "../auth/access-token.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { VerifiedAccessToken } from "../auth/token.service";
+import { WebAuthService } from "../auth/web/web-auth.service";
 import { isOperatorOwnerRole } from "../role/role";
 import { SubjectType } from "../../database/prisma.types";
 import {
@@ -46,7 +51,10 @@ const problemContent = {
 @UseGuards(AccessTokenGuard)
 @Controller("auth/sessions")
 export class SessionController {
-  constructor(private readonly sessions: SessionService) {}
+  constructor(
+    private readonly sessions: SessionService,
+    private readonly web: WebAuthService,
+  ) {}
 
   @Get()
   @Header("Cache-Control", "no-store")
@@ -111,13 +119,19 @@ export class SessionController {
   async revoke(
     @Param("sessionId") sessionId: string,
     @CurrentUser() user: VerifiedAccessToken,
+    @Req() req: AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    await this.sessions.revokeOwnedFamily(
+    const { current } = await this.sessions.revokeOwnedFamily(
       subjectTypeFor(user),
       user.sub,
       sessionId,
       user.sid,
     );
+    // Web tự thu hồi chính phiên đang dùng → xoá cookie như logout (API §7.1.1).
+    if (current && req.authCredentialSource === "cookie") {
+      this.web.clearSession(res);
+    }
   }
 }
 

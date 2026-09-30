@@ -51,7 +51,7 @@ describe("Employee account routes — HTTP authorization", () => {
   function account() {
     return {
       id: employeeId,
-      username: "driver-test",
+      username: "nv.driver-test",
       contactEmail: "driver@example.com",
       role: "DRIVER",
       status: "ACTIVE",
@@ -97,7 +97,7 @@ describe("Employee account routes — HTTP authorization", () => {
   }
 
   it.each([
-    ["POST", "", { username: "driver-test", contactEmail: "driver@example.com", role: "DRIVER", reason: "onboarding" }],
+    ["POST", "", { username: "nv.driver-test", contactEmail: "driver@example.com", role: "DRIVER", reason: "onboarding" }],
     ["PATCH", `/${employeeId}`, { status: "LOCKED", reason: "disciplinary lock" }],
     ["POST", `/${employeeId}/password-reset`, { reason: "security reset" }],
   ])("%s %s requires recent re-auth at the real route", async (method, path, body) => {
@@ -118,11 +118,27 @@ describe("Employee account routes — HTTP authorization", () => {
     expect((await request(method, path, ownerToken, body)).status).toBe(method === "PATCH" ? 200 : path ? 200 : 201);
   });
 
+  it.each(["driver-test", "NV.driver", "nv.x", "nv.Tuan"])(
+    "TASK-IAM-006: username nhân viên sai quy tắc `nv.` (%s) → 400, không gọi service",
+    async (username) => {
+      recentReauth = true;
+      create.mockClear();
+      const response = await request("POST", "", await token("OPERATOR_OWNER"), {
+        username,
+        contactEmail: "driver@example.com",
+        role: "DRIVER",
+        reason: "onboarding",
+      });
+      expect(response.status).toBe(400);
+      expect(create).not.toHaveBeenCalled();
+    },
+  );
+
   it("rejects an employee role even when recent re-auth exists", async () => {
     recentReauth = true;
     const driverToken = await token("DRIVER");
     const response = await request("POST", "", driverToken, {
-      username: "driver-test",
+      username: "nv.driver-test",
       contactEmail: "driver@example.com",
       role: "DRIVER",
       reason: "onboarding",
