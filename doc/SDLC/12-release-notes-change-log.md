@@ -13,7 +13,7 @@
 | Người viết    | Nguyễn Hồng Khanh, AI Agent      |
 | Người duyệt   | Nguyễn Hồng Khanh                |
 | Ngày tạo      | 01/06/2026                       |
-| Ngày cập nhật | 01/06/2026                       |
+| Ngày cập nhật | 09/09/2026                       |
 | Loại (15289)  | Release information / Change log |
 
 ### 1.2. Lịch sử thay đổi
@@ -21,6 +21,7 @@
 | Phiên bản | Ngày       | Người cập nhật | Nội dung thay đổi                                                                                                                                                                                                                           |
 | --------- | ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | v0.1      | 01/06/2026 | AI Agent       | Tạo **skeleton** Release Notes & Change Log theo ISO/IEC/IEEE 15289 + quy ước Keep a Changelog. Định nghĩa SemVer, quy trình release, phân loại thay đổi, template release log (chưa có release — pre-code). Chưa có nội dung release thật. |
+| v0.2      | 09/09/2026 | AI Agent       | **TASK-DOC-008 — kích hoạt khi vào code v1.** §9 bổ sung **ADR-028** vào phạm vi release `1.0.0` (mapping cũ dừng ở ADR-027) + tách dòng riêng cho Mobile. §7 ghi nhận **kênh phát hành Mobile v1 = phân phối trực tiếp, KHÔNG qua store** (ADR-028) nên `Rollback` của Mobile khác Web. §10 đóng **REL-OQ-04** (kênh phát hành Mobile). Bối cảnh: nền tảng xong (TASK-FND-001..008 Done, thêm **TASK-FND-009** setup Flutter), IAM-001 gần đóng → tài liệu này bắt đầu có việc thật. |
 
 ---
 
@@ -77,7 +78,7 @@ Dùng **Semantic Versioning** `MAJOR.MINOR.PATCH` cho release code (v1.0.0+).
 | PATCH      | Sửa lỗi/bảo mật tương thích ngược                                    | `1.0.0 → 1.0.1` |
 
 - API URL version (`/v1`, `/v2`) đổi theo MAJOR breaking (ADR-012).
-- Mobile (Expo): EAS Update OTA = PATCH/MINOR không qua store; EAS Build mới = thay đổi native/MAJOR (ADR-014).
+- Mobile (Flutter): v1 **không phát hành store** (ADR-028) → mọi thay đổi = build lại + phân phối trực tiếp (APK / cài qua Xcode), không có store review và cũng không cần OTA. Khi nào lên store thì áp lại quy tắc PATCH/MINOR/MAJOR + cân nhắc Shorebird.
 - Pre-release: hậu tố `-alpha.N` / `-beta.N` / `-rc.N` khi cần (vd `1.0.0-beta.1`).
 
 ---
@@ -90,9 +91,9 @@ Dùng **Semantic Versioning** `MAJOR.MINOR.PATCH` cho release code (v1.0.0+).
 | 2    | GitHub Actions pass (lint + typecheck + Vitest + build + gen-client)     | ADR-026             |
 | 3    | Tag version SemVer + viết entry release log (§7) + change log (§6)       | Tài liệu này        |
 | 4    | Backup production (Postgres PITR + Mongo) trước deploy                   | 09 Deploy §5 REL-06 |
-| 5    | Merge `main` → Render auto-deploy (API + worker cùng image) + EAS mobile | ADR-023/024/026     |
+| 5    | Merge `main` → Render auto-deploy (API + worker cùng image); Mobile build riêng (`flutter build apk`, Android local — ADR-028) | ADR-023/024/026/028 |
 | 6    | Smoke test + theo dõi Sentry (không error spike)                         | 09 Deploy §5 REL-07 |
-| 7    | Nếu lỗi → rollback (Render previous deploy / EAS Update OTA)             | 09 Deploy §10       |
+| 7    | Nếu lỗi → rollback (Render previous deploy; Mobile = phân phối lại bản build trước — v1 không qua store nên không phải chờ review) | 09 Deploy §10       |
 
 > Người duyệt release (promote trạng thái) = **Khanh** (AI không tự duyệt).
 
@@ -116,6 +117,8 @@ Mỗi release liệt kê thay đổi theo nhóm (Keep a Changelog):
 ## 7. Release log
 
 > **Chưa có release.** Bảng dưới là **template**; điền khi cắt release v1.0.0 đầu tiên (code v1 lên production).
+
+> ⚠️ **Mobile phát hành khác Web (ADR-028)**: v1 phục vụ môn học, **không lên App Store / Play Store** → không có store review, cũng không có OTA. Mỗi bản Mobile = build lại + phân phối trực tiếp (APK, hoặc cài qua Xcode nếu có máy macOS). Vì vậy cột `Rollback` của Mobile là "phát hành lại bản trước", không phải "rollback deploy" như Web/API. Lên store về sau ⇒ áp lại quy trình store + cân nhắc Shorebird cho OTA.
 
 | Version            | Ngày | Loại  | Tóm tắt                                            | Migration | Link |
 | ------------------ | ---- | ----- | -------------------------------------------------- | --------- | ---- |
@@ -154,9 +157,10 @@ Template entry cho mỗi release (copy khi release thật):
 
 Release v1.0.0 sẽ là hiện thực hóa toàn bộ **19-layer stack** đã chốt (ADR-002 + ADR-009..027). Bảng này ghi nhận release nào đưa quyết định ADR nào vào production (điền khi release).
 
-| Release           | ADR hiện thực hóa                        | Ghi chú             |
-| ----------------- | ---------------------------------------- | ------------------- |
-| `1.0.0` (dự kiến) | ADR-002, ADR-009..027 (toàn bộ stack v1) | TBD khi cắt release |
+| Release           | ADR hiện thực hóa                                      | Ghi chú                                       |
+| ----------------- | ------------------------------------------------------ | --------------------------------------------- |
+| `1.0.0` (dự kiến) | ADR-002, ADR-009..028 (toàn bộ stack v1)               | TBD khi cắt release                           |
+| ↳ phần Mobile     | **ADR-028** (Flutter thay Expo/RN, supersedes ADR-014) | Phát hành **ngoài store** ở v1 — xem §7 và §8 |
 
 ---
 
@@ -167,6 +171,7 @@ Release v1.0.0 sẽ là hiện thực hóa toàn bộ **19-layer stack** đã ch
 | REL-OQ-01 | Release đầu tiên gắn version `1.0.0` hay `0.x` beta trước?                             | Versioning   | Mở (quyết khi gần code production) |
 | REL-OQ-02 | Cadence release v1.x (theo Sprint 1 tuần per CLAUDE.md §6.1) cố định hay theo nhu cầu? | Release plan | Mở                                 |
 | REL-OQ-03 | Release notes có công khai cho Operator (customer-facing) hay chỉ nội bộ?              | Audience     | Mở                                 |
+| REL-OQ-04 | Kênh phát hành Mobile v1 là gì?                                                        | Release plan | **Đóng 09/09/2026 theo ADR-028**: phân phối trực tiếp (APK / cài qua Xcode), KHÔNG qua store; mở lại nếu thương mại hoá |
 
 ---
 

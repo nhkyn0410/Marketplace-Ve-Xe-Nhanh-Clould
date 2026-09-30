@@ -1,7 +1,7 @@
 # TASK-TRN-001 — Todo: Vehicle + SeatMap/Seat
 
 > **Nguồn task:** `doc/SDLC/11-project-task-breakdown.md` §7.3 — Vehicle (biển số, `VehicleType`, tiện ích, trạng thái vận hành) + SeatMap/Seat (layout `JSONB`): `/operator/vehicles`, `/operator/seat-maps`; unique `(operator_id, plate_number)` + RLS. Nguồn chi tiết: SRS `FR-OPS-01..03`, `UC-12` (A1–A5), §9 quan hệ "một `Vehicle` có một `SeatMap`; `SeatMap` gồm nhiều `Seat`", `BR-14/20/39` (phần dùng sau), `AC-18`; DB §5.2 nhóm Transport + §7; API §7.3; Security §6–7 (`Vehicle/SeatMap`: Operator quản lý trong tenant, Employee xem nếu được phân công, Admin giám sát); UI §5 "Vehicle list, vehicle form, seat map editor", `UX-OQ-03`; DOMAIN-MAP `vehicle/`.
-> **Dependency:** TASK-CAT-001 (catalog `vehicle_types`, `amenities`) — code đã commit `54dd0d9` trên nhánh `TASK-CAT-001`; nhánh `TASK-TRN-001` tạo từ đó.
+> **Dependency:** TASK-CAT-001 (catalog `vehicle_types`, `amenities`) — đã merge `develop` (PR #13). Nhánh `TASK-TRN-001` hiện tại tạo từ `develop` ngày 30/09/2026 và port code từ repo bản sao (commit `1b59a9b`); commit `54dd0d9` cũ không có trong repo chính.
 > **Mở khóa:** `TASK-TRN-003` (Trip chọn xe, sinh TripSeat từ Seat).
 > **Cách dùng:** Guide chạy tay `TRN-001-guide.md`. Nghiệm thu `TRN-001-verification-checklist.md`.
 
@@ -9,6 +9,7 @@
 
 - ✅ Đã đối chiếu task row với SRS, HLD/LLD, DB, API, Security, UI, DOMAIN-MAP, GLOSSARY và code IAM-003/005 + CAT-001.
 - ✅ Khanh chốt Q1–Q4 ngày 25/09/2026: Q2–Q4 theo khuyến nghị; Q1 = **"mẫu và có thể tùy chỉnh"** (xem cách hiện thực ở bảng dưới).
+- ✅ 30/09/2026: port sang repo chính (M1 đầu tiên theo kế hoạch M0–M5), migration đổi tên `20260930020000_add_vehicle`; test, smoke 28/28 và contract đo lại — chi tiết ở checklist. ⏳ Chờ Khanh review diff (chưa commit) → CI → Done.
 
 ---
 

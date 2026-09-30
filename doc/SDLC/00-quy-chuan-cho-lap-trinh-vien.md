@@ -9,7 +9,7 @@
 | Tên tài liệu | Quy chuẩn SDLC cho lập trình viên - Hệ thống đặt vé xe khách |
 | Mã tài liệu  | 00a-quy-chuan-cho-lap-trinh-vien                             |
 | Dự án        | Hệ thống đặt vé xe khách                                     |
-| Trạng thái   | Approved                                                        |
+| Trạng thái   | Approved                                                     |
 | Người viết   | AI Agent                                                     |
 | Người duyệt  | Nguyễn Hồng Khanh                                            |
 | Ngày tạo     | 04/05/2026                                                   |
@@ -107,7 +107,7 @@ Metadata mỗi tài liệu BẮT BUỘC có đúng các trường sau, theo th�
 | ------------- | -------- | ------------------------------------------------------------- |
 | Tên tài liệu  | Có       | Đúng tên trong danh mục SDLC ở mục 3.1                        |
 | Mã tài liệu   | Có       | Trùng với tên file không có `.md`                             |
-| Dự án         | Có       | Marketplace-Ve-Xe-Nhanh                                      |
+| Dự án         | Có       | Marketplace-Ve-Xe-Nhanh                                       |
 | Trạng thái    | Có       | Writing / Draft / Review / Approved / Deprecated / Superseded |
 | Người viết    | Có       | Cá nhân, nhóm hoặc công cụ tạo nội dung                       |
 | Người duyệt   | Có       | Người chịu trách nhiệm phê duyệt                              |

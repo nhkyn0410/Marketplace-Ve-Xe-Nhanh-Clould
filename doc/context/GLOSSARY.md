@@ -15,7 +15,7 @@ Rules:
 | User     | Người dùng        | Passenger who has an account on the platform; can buy, manage and review tickets.                                                 |
 | Guest    | Khách vãng lai    | Passenger who has not logged in or has no account; uses guest session for browsing, holding seats, booking, paying and lookup.    |
 | Operator | Nhà xe            | Transport business onboarded onto the platform; owns and runs vehicles, routes, trips, fares and employees within its own tenant. |
-| Employee | Nhân viên nhà xe  | Operator-internal staff with role `TICKET_STAFF`, `DRIVER` or `SUPPORT_STAFF`; logs in via operator-issued credentials.            |
+| Employee | Nhân viên nhà xe  | Operator-internal staff with role `TICKET_STAFF`, `DRIVER` or `SUPPORT_STAFF`; logs in via operator-issued credentials `{operatorSlug}/nv.{…}` only through the Employee app (`/auth/employee/login`, Bearer); never enters Operator OS (ADR-017 amend 28/09/2026). |
 | Admin    | Admin toàn hệ thống | Platform administrator running the marketplace; final arbiter for disputes; manages KYC, policy, commission, payout.            |
 | Platform | Nền tảng          | The marketplace operator itself; not a transport company; provides Marketplace / Operator OS / Platform admin layers.             |
 
@@ -36,7 +36,9 @@ Rules:
 | Seat                   | Ghế / giường               | A seat or berth slot defined within a SeatMap.                                                        |
 | SeatMap                | Sơ đồ ghế                  | Layout describing seats / berths of a Vehicle.                                                        |
 | Route                  | Tuyến đường                | A logical route between two endpoints, composed of ordered RouteStops.                                |
-| StopPoint              | Điểm đón / trả             | A pickup or drop-off location in the platform catalog.                                                |
+| StopPoint              | Điểm đón / trả             | A pickup or drop-off location in the platform catalog, or a private point owned by one Operator.      |
+| StopPointProposal      | Đề xuất điểm đón / trả     | An Operator's request to add a point to the platform catalog; `PENDING` → `APPROVED` / `REJECTED` by Admin. |
+| RouteStop              | Điểm dừng của tuyến        | An ordered stop of a Route (`ORIGIN` / `INTERMEDIATE` / `DESTINATION`) with cached distance/duration from the previous stop. |
 | Trip                   | Chuyến xe                  | A concrete operating instance of a Route on a specific date / time, served by a Vehicle and crew.     |
 | TripStop               | Điểm dừng của chuyến       | An ordered stop within a Trip.                                                                        |
 | TripSeat               | Ghế của chuyến             | A seat allocation for a specific Trip, with its own status lifecycle.                                 |
@@ -52,6 +54,11 @@ Rules:
 | Payout                 | Khoản chi trả cho nhà xe   | A scheduled transfer from Platform escrow to Operator bank account on cycle T+N.                      |
 | Promotion              | Khuyến mãi                 | A discount campaign with rules, validity window, usage limits; can be Platform-level or Operator-level. |
 | PromotionRedemption    | Lượt áp dụng khuyến mãi    | Snapshot record created when a Promotion is applied to a Booking.                                     |
+| UserVoucher            | Voucher trong ví           | A voucher in a User's wallet: either created by redeeming points (fixed VND amount) or a public Promotion the User saved; status `AVAILABLE` / `RESERVED` / `USED` / `EXPIRED`. |
+| LoyaltyAccount         | Tài khoản thành viên       | A User's VXN Plus membership account: available points, membership tier, point history. Guests have none. |
+| MembershipTier         | Hạng thành viên            | `BRONZE` / `SILVER` / `GOLD` / `PLATINUM`, set by points earned in the last 12 months; in v1 it only changes the point-earning multiplier. |
+| PointTransaction       | Giao dịch điểm             | Append-only point ledger entry: `EARN`, `REDEEM`, `EXPIRE`, `ADJUST`, `REVERSAL`; balance = sum of entries. |
+| Article / ArticleCategory | Bài viết / chuyên mục   | News or travel-guide post published by Admin on the Khám phá page; status `DRAFT` / `PUBLISHED` / `ARCHIVED`. |
 | Review                 | Đánh giá                   | A passenger review of a completed trip / Operator; subject to moderation policy.                      |
 | OperatorScorecard      | Điểm chất lượng nhà xe     | Aggregated quality metric for an Operator (rating, cancel rate, complaint rate, on-time, no-show).    |
 | SupportTicket / Complaint | Phiếu hỗ trợ / khiếu nại| A support or complaint case created by User or verified Guest.                                        |
@@ -60,6 +67,7 @@ Rules:
 | NotificationPreference | Cấu hình nhận thông báo    | Per-actor preference for non-mandatory notifications; mandatory ones cannot be fully disabled.        |
 | AuditLog               | Nhật ký kiểm toán          | Append-only log of sensitive actions: actor, time, action, target, before / after, reason.            |
 | KycDocument            | Hồ sơ KYC                  | Legal document submitted by an Operator during onboarding; verified by Admin.                         |
+| OperatorApplication    | Hồ sơ đăng ký nhà xe       | Registration submitted by an operator representative **before any account exists**; accessed only through an expiring secure link sent to the contact email; on Admin approval the system creates the Operator and its first Owner account. |
 | PolicySnapshot         | Bản chụp chính sách        | Snapshot of policy values applied to a Booking at creation time; never overwritten retroactively.     |
 
 ## 4. Cross-cutting and technical terms
@@ -92,3 +100,13 @@ Rules:
 | OQ      | Câu hỏi mở          | Open Question. Either still open or marked as decided.                      |
 | MQ      | Câu hỏi marketplace | Marketplace-strategic decision question; subset of OQ but tracked separately.|
 | ADR     | Bản ghi quyết định kiến trúc | Architecture Decision Record.                                       |
+
+## 6. Auth error codes
+
+| Code | Nghĩa | HTTP |
+| ---- | ----- | ---- |
+| `AUTH_INVALID_CREDENTIALS` | Sai mật khẩu, account không tồn tại hoặc gọi sai cổng Owner/Employee — cùng một response, không lộ account tồn tại. | 401 |
+| `AUTH_TRANSPORT_INVALID` | `X-Auth-Transport` không thuộc `cookie \| bearer`, hoặc gửi `cookie` tới endpoint chỉ cấp phiên Bearer cho Employee. | 400 |
+| `AUTH_TRANSPORT_AMBIGUOUS` | Request đồng thời mang Bearer và access cookie; hệ thống không chọn ngầm. | 400 |
+| `AUTH_CSRF_INVALID` | CSRF token thiếu, sai chữ ký, không khớp cookie/session hoặc đã rotate. | 403 |
+| `AUTH_ORIGIN_FORBIDDEN` | Unsafe cookie request thiếu `Origin` hoặc origin không thuộc allowlist. | 403 |

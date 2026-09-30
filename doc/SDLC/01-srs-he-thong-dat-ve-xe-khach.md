@@ -4,15 +4,16 @@
 
 ### 1.1. Metadata
 
-| Thuộc tính   | Giá trị                                                        |
-| ------------ | -------------------------------------------------------------- |
-| Tên tài liệu | Software Requirements Specification - Hệ thống đặt vé xe khách |
-| Mã tài liệu  | 01-srs-he-thong-dat-ve-xe-khach                                |
-| Dự án        | Hệ thống đặt vé xe khách                                       |
-| Trạng thái   | Approved                                                       |
-| Người viết   | Nguyễn Hồng Khanh, AI Agent                                    |
-| Người duyệt  | Nguyễn Hồng Khanh                                              |
-| Ngày tạo     | 05/05/2026                                                     |
+| Thuộc tính    | Giá trị                                                        |
+| ------------- | -------------------------------------------------------------- |
+| Tên tài liệu  | Software Requirements Specification - Hệ thống đặt vé xe khách |
+| Mã tài liệu   | 01-srs-he-thong-dat-ve-xe-khach                                |
+| Dự án         | Hệ thống đặt vé xe khách                                       |
+| Trạng thái    | Review                                                         |
+| Người viết    | Nguyễn Hồng Khanh, AI Agent                                    |
+| Người duyệt   | Nguyễn Hồng Khanh                                              |
+| Ngày tạo      | 05/05/2026                                                     |
+| Ngày cập nhật | 30/09/2026                                                     |
 
 ### 1.2. Lịch sử thay đổi
 
@@ -39,6 +40,13 @@
 | v1.18     | 12/05/2026 | AI Agent, Nguyễn Hồng Khanh | Viết mới toàn bộ §16 Luồng nghiệp vụ chính: bổ sung danh mục luồng end-to-end, luồng thiết lập nhà xe trước mở bán, đặt vé User / Guest, payment lỗi / đối soát, tra cứu vé Guest, hủy / hoàn tiền, thay đổi chuyến, check-in / vận hành chuyến, support / complaint / dispute, escrow / payout T+3 và luồng notification / audit / job nền.                                                                                                                                                                                                                                              |
 | v1.19     | 12/05/2026 | AI Agent, Nguyễn Hồng Khanh | Viết lại §17..§20 để tiến tới hoàn thiện SRS: chuẩn hóa state model nghiệp vụ, catalog thông báo bắt buộc / không bắt buộc, tiêu chí nghiệm thu có truy vết và risk register theo managed marketplace, Guest checkout, VNPay Sandbox, escrow / payout T+3, dispute, audit và job nền; cập nhật tham chiếu §21 liên quan state model / payout.                                                                                                                                                                                                                                             |
 | v1.20     | 25/05/2026 | AI Agent                    | Rebrand codename dự án sang `Marketplace-Ve-Xe-Nhanh` (tên cũ `Ve_Xe_Nhanh_NestJS_NextJs_ReactNative`); gỡ tham chiếu tới 2 context file đã xóa `PROJECT-STRUCTURE.md` và `TECH-STACK.md` ở §3.4.2 và §4.6. Không thay đổi nội dung normative (FR / NFR / BR / UC / state model).                                                                                                                                                                                                                                                                                                         |
+| v1.21     | 29/09/2026 | AI Agent, Nguyễn Hồng Khanh | **Bổ sung 3 tính năng hành khách do Khanh chốt 29/09/2026 (đóng `UX-OQ-06`, `UX-OQ-08`):** (1) chương trình thành viên **VXN Plus** — §10.11 `FR-LOY-01..12`: tích điểm khi chuyến `COMPLETED`, hạng theo điểm tích 12 tháng (v1 hạng chỉ ảnh hưởng hệ số tích điểm, không giảm giá theo hạng), đổi điểm lấy voucher; giảm giá từ voucher đổi điểm **do Platform chịu**, Operator nhận theo giá trước giảm (ngoại lệ duy nhất của `BR-48`); (2) **ví voucher** — `FR-PROM-08..10` (voucher đổi điểm + mã khuyến mãi công khai đã lưu, chọn khi đặt vé); (3) **bài viết tin tức / cẩm nang** (trang Khám phá) — `FR-MKT-14`, `FR-ADM-18..19`. Cập nhật §3.5, §4.3, §6.1 / §6.3 / §6.4, §7.1, §9.2–§9.4, §12 (`UC-36..38`), §13, §14 (`BR-65..74`, sửa `BR-48`), §15.3 / §15.5, §16 (`BF-11`), §17.15–§17.17, §18.2 (`NTF-23..26`), §19.2 (`AC-36..39`), §20.2 (`RSK-22..25`), §21. Trạng thái Approved → **Review** chờ Khanh duyệt phần bổ sung. |
+| v1.22     | 29/09/2026 | AI Agent, Nguyễn Hồng Khanh | **Tổ chức lại §12 theo yêu cầu của Khanh:** §12.1 danh sách UC nhóm theo 7 gói (P1–P7), thêm cột actor phụ / hệ thống ngoài và luồng §16, thống nhất tên actor theo §7 và không ghi "Hệ thống" là actor; §12.2 một sơ đồ tổng quan actor ↔ gói; §12.3 sơ đồ riêng cho Hành khách, Nhà xe, Nhân viên nhà xe, Admin, vẽ kèm `«include»` / `«extend»`; §12.4 bảng quan hệ `«include»` / `«extend»` làm nguồn chuẩn. Bỏ sơ đồ phạm vi 38 UC và sơ đồ tổng hợp trùng lặp. Tách `UC-36` (phần Admin → **`UC-39`** Cấu hình và giám sát VXN Plus) và `UC-38` (còn phần đọc; phần Admin → **`UC-40`** Quản lý bài viết); `UC-33` truy vết `FR-PROM-01..07`. Cập nhật truy vết §14, §15.3, §17.2, §19, §21. Không đổi số UC cũ. Giữ trạng thái Review. |
+| v1.23     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **Sửa lệch A2 (Khanh duyệt 30/09/2026): đăng ký nhà xe theo closed enrollment (ADR-017).** Người đại diện nhà xe nộp hồ sơ qua form công khai, **chưa có tài khoản**; mở, bổ sung, theo dõi hồ sơ qua **link bảo mật gửi email liên hệ**; khi Admin duyệt, hệ thống tạo Operator, cấp slug và tài khoản Owner đầu tiên (mật khẩu tạm gửi email, đổi ở lần đăng nhập đầu, bật TOTP). Cập nhật §6.2, §9.2–§9.3, `FR-OPR-01`, `FR-OPR-03`, `FR-OPR-05`, thêm `FR-OPR-12`, `FR-ADM-03`, §12.1, `UC-01` bước 5, viết lại `UC-10`, `UC-23`, thêm `BR-75`, sửa `BR-53` và §18.1 (ngoại lệ OTP xác minh, link có hạn dùng, mật khẩu tạm dùng một lần — trước đây mâu thuẫn với `NTF-01` và cơ chế mật khẩu tạm của TASK-IAM-005), §15.3, §15.5, BF-01, §17.2, thêm §17.18, `NTF-15`, `AC-17`. Giữ trạng thái Review. |
+| v1.24     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **Dò lại §13 (Khanh yêu cầu 30/09/2026), sửa nhóm A3–A6, B, C, D:** Employee chỉ dùng app nhân viên, tên đăng nhập `nv.`, sai cổng trả lỗi như sai thông tin (UC-01, 16, 18, 20); bỏ trạng thái "lên lịch bán" không có ở §17.3 (UC-14); role crew đúng 3 role v1 (UC-16); nối voucher / Loyalty vào UC-05 (extension point của UC-37), UC-06, UC-08, UC-21, UC-26, sửa tiền điều kiện UC-36; bổ sung hệ thống ngoài vào dòng Actor phụ cho khớp §12.1; thống nhất ký hiệu `→` ở luồng thay thế, tham chiếu UC có backtick, SMS là kênh có điều kiện (UC-07), sửa câu UC-04. Không đổi phạm vi. Chưa sửa A1 (xác thực hành khách) — chờ Khanh. Giữ trạng thái Review. |
+| v1.25     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **Sửa lệch A1 (Khanh duyệt 30/09/2026): xác thực theo ADR-017 / ADR-020.** Hành khách đăng ký / đăng nhập bằng **email + OTP** hoặc **OAuth Google / Facebook / Apple**, không có mật khẩu (bỏ số điện thoại và quên mật khẩu); liên kết OAuth chỉ khi email khớp và đã xác minh. Owner `{operatorSlug}/{username}`, Employee `{operatorSlug}/nv.{…}` chỉ qua app nhân viên, Admin `platform/{username}`. Thêm `FR-IAM-17` (TOTP bắt buộc cho Owner và Admin) và `FR-IAM-18` (mật khẩu tạm phải đổi ở lần đăng nhập đầu). Cập nhật `FR-IAM-01`, `02a..02c`, `03a`, `03c`, `10`, §7.6 thêm actor Nhà cung cấp OAuth, §12 (bảng + sơ đồ tổng quan + sơ đồ Hành khách), viết lại `UC-01`, `AC-01`. Giữ trạng thái Review. |
+| v1.26     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | §7.6 cập nhật external actor theo ADR đã chốt (Khanh yêu cầu 30/09/2026): cổng thanh toán VNPay + MoMo (ADR-019, bỏ "chỉ VNPay Sandbox"), thông báo Resend + FCM / APNs, SMS chưa bật (ADR-020 / ADR-028), định tuyến Goong thay OSRM (ADR-027), lưu trữ Cloudflare R2 (ADR-018), payout thủ công (ADR-022). Không đổi phạm vi. Giữ trạng thái Review. |
+| v1.27     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | Đồng bộ các chỗ còn ghi stack cũ theo ADR (Khanh yêu cầu 30/09/2026): §4.6 dòng backend (Postgres + Prisma, Mongo audit riêng, BullMQ, Better Auth; bỏ Socket.IO, OSRM), `AS-08`, §8.3 (bỏ "chưa chính thức", `DP-01`, `DP-06`, `DP-07`), §9.5, BF-02 (sơ đồ + bước 7), §18 đoạn mở đầu, §19.1, `AC-09`, §19.3, `RSK-17`, `RSK-20` (viết lại thành rủi ro phụ thuộc provider), §21 ghi re-chốt `OQ-05` (ADR-019), `OQ-14` (ADR-011), `OQ-15` (điều chỉnh ADR-011). Không đổi phạm vi. Giữ trạng thái Review. |
 
 ---
 
@@ -147,6 +155,11 @@ Các tài liệu cụ thể liên quan đến nghiệp vụ và hiện trạng k
 | Commission             | Phí / tỷ lệ nền tảng thu trên giao dịch vé thành công                   |
 | KYC                    | Quy trình xác minh hồ sơ pháp lý của Operator                           |
 | Promotion              | Mã giảm giá hoặc chương trình khuyến mãi theo rule cấu hình             |
+| LoyaltyAccount         | Tài khoản thành viên VXN Plus của User: điểm khả dụng, hạng thành viên và lịch sử giao dịch điểm |
+| PointTransaction       | Giao dịch điểm append-only: tích, đổi, hết hạn, điều chỉnh, thu hồi |
+| MembershipTier         | Hạng thành viên (Bronze / Silver / Gold / Platinum), xác định theo điểm tích trong 12 tháng |
+| UserVoucher            | Voucher trong ví của User: voucher đổi từ điểm hoặc mã khuyến mãi công khai đã lưu |
+| Article                | Bài viết tin tức / cẩm nang do Admin xuất bản ở trang Khám phá |
 | DisputeCase            | Hồ sơ tranh chấp có trạng thái, minh chứng và quyết định xử lý          |
 | OperatorScorecard      | Bộ chỉ số đánh giá chất lượng Operator theo dữ liệu hợp lệ              |
 | NotificationPreference | Cấu hình nhận thông báo theo loại và kênh của actor                     |
@@ -180,7 +193,7 @@ Hành khách (User)        Nhà xe (Operator) + Nhân viên (Employee)
 
 ### 4.3. Mô hình doanh thu
 
-Platform thu **commission % trên mỗi giao dịch vé bán thành công** (xem MQ-04). Tỷ lệ commission cấu hình được per-Operator hoặc theo tier. Có thể bổ sung service fee phụ thu hành khách ở các phiên bản sau. Subsidy cho promotion (Platform bù tiền) chưa hỗ trợ ở v1.
+Platform thu **commission % trên mỗi giao dịch vé bán thành công** (xem MQ-04). Tỷ lệ commission cấu hình được per-Operator hoặc theo tier. Có thể bổ sung service fee phụ thu hành khách ở các phiên bản sau. Subsidy cho promotion (Platform bù tiền) chưa hỗ trợ ở v1, **ngoại trừ voucher đổi điểm của chương trình thành viên VXN Plus**: phần giảm này do Platform chịu, Operator vẫn nhận escrow và bị tính commission theo giá trước giảm (`FR-LOY-09`, `BR-73`).
 
 ### 4.4. Ba lớp dịch vụ Platform cung cấp
 
@@ -202,14 +215,14 @@ Platform **KHÔNG trực tiếp** sở hữu xe, vận hành tuyến, ký hợp 
 
 Hệ thống gồm 3 ứng dụng client và 1 backend:
 
-| Client              | Đối tượng                                                                                                                                                                                                |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Web user portal     | Hành khách (Marketplace layer)                                                                                                                                                                           |
-| Web operator portal | Operator (Operator OS layer)                                                                                                                                                                             |
-| Web admin portal    | Admin Platform (Platform admin layer)                                                                                                                                                                    |
-| Mobile app (Expo)   | Một codebase mobile phục vụ Hành khách và Employee; giao diện, session, quyền và luồng nghiệp vụ phải tách theo actor. Hành khách dùng đặt vé / quản lý vé; Employee dùng check-in / nhật trình / sự cố. |
+| Client               | Đối tượng                                                                                                                                                                                                           |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web user portal      | Hành khách (Marketplace layer)                                                                                                                                                                                      |
+| Web operator portal  | Operator (Operator OS layer)                                                                                                                                                                                        |
+| Web admin portal     | Admin Platform (Platform admin layer)                                                                                                                                                                               |
+| Mobile app (Flutter) | Hai app Flutter tách biệt (`passenger_mobile` + `employee_mobile`); giao diện, session, quyền và luồng nghiệp vụ tách theo actor. Hành khách dùng đặt vé / quản lý vé; Employee dùng check-in / nhật trình / sự cố. |
 
-Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.IO + JWT + Helmet + OSRM. Phiên bản chi tiết và pin version sẽ được đặc tả ở Deployment & Operation Standard (`09-deployment-operation-standard.md`) khi đóng các OQ về hạ tầng.
+Backend: modular monolith NestJS 11 (TypeScript) + PostgreSQL 16 / Prisma cho dữ liệu nghiệp vụ + MongoDB 7 cluster riêng cho audit / log + Redis (Upstash) cho cache và khóa ghế + BullMQ cho job nền + Better Auth (JWT + refresh token), theo ADR-002 và ADR-009..ADR-028. Web dùng Next.js 16 trong monorepo Turborepo. Realtime cho vận hành chưa chốt (HLD-OQ-11), v1 dùng polling. Phiên bản chi tiết ở `09-deployment-operation-standard.md` và `10-architecture-decision-record.md`.
 
 ---
 
@@ -258,18 +271,21 @@ Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.
 - Xem profile nhà xe: thông tin, đánh giá, scorecard, tuyến tiêu biểu.
 - Chọn ghế, giữ ghế tạm thời, đặt vé.
 - Áp dụng mã giảm giá nếu thỏa điều kiện.
+- Lưu mã khuyến mãi công khai vào **ví voucher** và chọn voucher trong ví khi đặt vé (chỉ User có tài khoản).
+- Tham gia chương trình thành viên **VXN Plus**: tích điểm sau mỗi chuyến hoàn thành, xếp hạng thành viên, xem lịch sử điểm, đổi điểm lấy voucher giảm giá (chỉ User có tài khoản).
 - Thanh toán qua cổng thanh toán tích hợp; tiền được giữ ở **escrow account của Platform** đến khi chuyến hoàn thành.
 - Phát hành vé điện tử có mã vé / QR code.
 - Quản lý lịch sử đặt vé, hủy vé, yêu cầu hoàn tiền theo chính sách.
 - Đánh giá chuyến đi / nhà xe sau khi chuyến hoàn thành.
 - Tạo và theo dõi khiếu nại / yêu cầu hỗ trợ.
 - Nhận thông báo (email / SMS / push / in-app) cho các sự kiện quan trọng.
+- Đọc tin tức / cẩm nang du lịch (trang Khám phá) do Platform xuất bản.
 
 ### 6.2. Trong phạm vi — Operator OS layer (cho nhà xe và nhân viên)
 
 **Quản lý hồ sơ và tài chính nhà xe:**
 
-- Đăng ký nhà xe, gửi hồ sơ KYC (giấy phép, hợp đồng, tài khoản nhận tiền) và chờ admin phê duyệt.
+- Đăng ký nhà xe qua form công khai (chưa cần tài khoản), gửi hồ sơ KYC (giấy phép, hợp đồng, tài khoản nhận tiền), theo dõi và bổ sung hồ sơ qua link bảo mật gửi email; tài khoản Owner chỉ được cấp sau khi Admin phê duyệt.
 - Quản lý hồ sơ doanh nghiệp: tên, logo, mô tả, hotline, email, địa chỉ.
 - Xem **escrow balance** (số tiền Platform đang giữ thuộc về Operator), lịch sử payout, lịch sử commission, đối soát giao dịch.
 - Theo dõi payout theo chu kỳ T+3 sau khi chuyến hoàn thành; payout sớm không phải luồng mặc định của v1 nếu chưa được Platform bật và duyệt.
@@ -333,6 +349,8 @@ Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.
 - Quản lý khiếu nại và dispute resolution: phân công, theo dõi, đóng ticket, leo thang.
 - Kiểm duyệt đánh giá, nội dung vi phạm, banner, FAQ, nội dung tĩnh.
 - Quản lý promotion cấp Platform và quyền cho phép Operator tự tạo promotion.
+- Cấu hình chương trình thành viên VXN Plus (tỷ lệ tích điểm, giá trị quy đổi, hạng, hạn điểm, hạn voucher), xem tài khoản thành viên và điều chỉnh điểm thủ công có lý do và audit log.
+- Soạn, xuất bản, gỡ bài viết tin tức / cẩm nang và quản lý chuyên mục bài viết.
 - Cấu hình trạng thái bảo trì hệ thống.
 - Xem trạng thái tích hợp: cổng thanh toán, SMS, email, push notification.
 - Khóa chuyến / nhà xe khi vi phạm nghiêm trọng.
@@ -341,7 +359,9 @@ Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.
 ### 6.4. Ngoài phạm vi phiên bản đầu
 
 - API integration cho Operator lớn đã có hệ thống vận hành riêng (mô hình hybrid C — chưa hỗ trợ ở v1).
-- Subsidy promotion (Platform bù tiền cho khuyến mãi).
+- Subsidy promotion (Platform bù tiền cho khuyến mãi), trừ voucher đổi điểm VXN Plus (`BR-73`).
+- Giảm giá tự động theo hạng thành viên, ưu tiên CSKH theo hạng, đổi điểm lấy quà / dịch vụ ngoài vé xe, chuyển / tặng điểm giữa User, Admin tặng voucher cho User cụ thể.
+- Operator soạn bài viết; bình luận / tương tác người dùng trên bài viết.
 - Tối ưu lộ trình bằng AI theo thời gian thực.
 - Bán vé liên tuyến phức tạp có trung chuyển nhiều chặng giữa nhiều nhà xe.
 - Quản lý bảo dưỡng xe chuyên sâu.
@@ -360,7 +380,7 @@ Backend: NestJS 11 + MongoDB (mongoose) + Redis (ioredis) + Bull queue + Socket.
 
 **Phạm vi trách nhiệm:** Người dùng chịu trách nhiệm cung cấp thông tin đặt vé và thông tin hành khách chính xác, thực hiện thanh toán theo phương thức được hỗ trợ, xuất trình vé hợp lệ khi lên xe và tuân thủ chính sách hủy / hoàn tiền của hệ thống, nhà xe và nền tảng.
 
-**Quyền hạn / chức năng chính:** Người dùng có thể đăng ký, đăng nhập, cập nhật hồ sơ cá nhân, tìm kiếm / lọc / xem chi tiết chuyến xe, chọn ghế, đặt vé, thanh toán, xem vé điện tử và lịch sử đặt vé, hủy vé hoặc yêu cầu hoàn tiền theo chính sách, đánh giá chuyến đi và gửi khiếu nại / yêu cầu hỗ trợ.
+**Quyền hạn / chức năng chính:** Người dùng có thể đăng ký, đăng nhập, cập nhật hồ sơ cá nhân, tìm kiếm / lọc / xem chi tiết chuyến xe, chọn ghế, đặt vé, thanh toán, xem vé điện tử và lịch sử đặt vé, hủy vé hoặc yêu cầu hoàn tiền theo chính sách, đánh giá chuyến đi và gửi khiếu nại / yêu cầu hỗ trợ. Người dùng có tài khoản còn được tích / đổi điểm VXN Plus, dùng ví voucher và đọc bài viết ở trang Khám phá.
 
 **Giới hạn quyền / quan hệ với actor khác:** Người dùng chỉ được truy cập dữ liệu tài khoản, booking, ticket, đánh giá và khiếu nại của chính mình. Người dùng không có quyền quản lý dữ liệu vận hành của nhà xe, dữ liệu nhân viên nhà xe hoặc cấu hình quản trị nền tảng.
 
@@ -422,11 +442,12 @@ Phần này liệt kê các hệ thống bên ngoài tham gia vào use case như
 
 | External actor           | Vai trò trong hệ thống                                                                                                                                                         |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Cổng thanh toán          | Provider thanh toán bên thứ ba (v1 dùng VNPay Sandbox theo `OQ-05`). Tham gia luồng tạo payment, callback / webhook, hoàn tiền và đối soát giao dịch.                          |
-| Dịch vụ thông báo        | Provider email / SMS / push notification. Nhận yêu cầu gửi từ Notification Service và trả trạng thái gửi để hệ thống lưu lịch sử.                                              |
-| Dịch vụ định tuyến       | OSRM hoặc tương đương. Cung cấp khoảng cách, thời gian di chuyển và gợi ý điểm đón / trả trong quá trình cấu hình route, trip và search chuyến.                                |
-| Dịch vụ lưu trữ tệp      | Object storage cho hồ sơ KYC, ảnh sự cố, attachment minh chứng dispute / complaint và file báo cáo bất đồng bộ.                                                                |
-| Dịch vụ ngân hàng payout | Kênh chuyển khoản ngân hàng phục vụ payout cho Operator theo chu kỳ T+3 (`OQ-16`); có thể là chuyển khoản trực tiếp hoặc qua bên thứ ba khi Platform mở rộng phạm vi tích hợp. |
+| Cổng thanh toán          | VNPay (chính) và MoMo (phương thức 2) theo `OQ-05` / ADR-019, chạy sandbox tới khi giải quyết giấy phép trung gian thanh toán (`OQ-22`). Tham gia luồng tạo payment, callback / webhook, hoàn tiền và đối soát giao dịch. |
+| Dịch vụ thông báo        | Email (Resend) và push (FCM cho Android, APNs cho iOS) theo ADR-020 / ADR-028; SMS mới có adapter, chưa bật ở v1. Nhận yêu cầu gửi từ Notification Service (gồm OTP email) và trả trạng thái gửi để hệ thống lưu lịch sử. |
+| Dịch vụ định tuyến       | Goong (Direction, Distance Matrix, Maps, Geocoding) theo ADR-027; bản đồ phải hiển thị đúng Hoàng Sa / Trường Sa. Cung cấp khoảng cách, thời gian di chuyển (tính khi cấu hình route / trip và lưu lại, không gọi ở mỗi lượt search), geocoding địa chỉ và bản đồ điểm đón / trả. |
+| Dịch vụ lưu trữ tệp      | Cloudflare R2 theo ADR-018: bucket công khai cho ảnh (logo, xe, bài viết), bucket riêng tư cho hồ sơ KYC, ảnh sự cố, minh chứng dispute / complaint và file báo cáo bất đồng bộ (presigned URL có hạn). Nơi lưu KYC production chờ `OQ-21`. |
+| Dịch vụ ngân hàng payout | Kênh chuyển khoản ngân hàng phục vụ payout cho Operator theo chu kỳ T+3 (`OQ-16`): v1 Admin tự chuyển khoản rồi nhập mã giao dịch để xác nhận thủ công (ADR-022); chi hộ tự động qua cổng thanh toán hoãn tới v1.x (`OQ-22`). |
+| Nhà cung cấp OAuth       | Google, Facebook, Apple — xác thực hành khách qua OAuth (PKCE) và trả email đã xác minh để hệ thống tạo hoặc liên kết tài khoản User. Không dùng cho Operator, Employee, Admin. |
 
 Các external actor không có quyền truy cập tài khoản nội bộ; mọi giao tiếp phải qua adapter chuẩn của hệ thống và có cơ chế retry, idempotency, audit log phù hợp.
 
@@ -443,7 +464,7 @@ Các external actor không có quyền truy cập tài khoản nội bộ; mọi
 | AS-05 | Hành khách có thể đặt một hoặc nhiều ghế / giường trong cùng một booking; mỗi ghế / giường phát hành một ticket riêng hoặc một ticket item riêng.     | Booking là đơn giao dịch; Ticket là quyền lên xe của từng hành khách / từng ghế.                                                             |
 | AS-06 | Chọn ghế là chức năng bắt buộc trong luồng đặt vé online, tương tự các hệ thống nhà xe lớn.                                                           | Không nên chỉ đặt theo số lượng khách nếu hệ thống muốn tránh tranh chấp vị trí ghế.                                                         |
 | AS-07 | Ghế được giữ tạm thời trước khi thanh toán thành công; v1 dùng thời gian giữ ghế mặc định 10 phút ở cấp Platform và chưa cấu hình riêng per Operator. | Cần Redis lock / TTL để chống bán trùng ghế và tự giải phóng ghế khi khách bỏ dở thanh toán.                                                 |
-| AS-08 | V1 dùng VNPay Sandbox làm cổng thanh toán tích hợp đầu tiên và phải có callback / webhook xác nhận kết quả.                                           | Thiết kế payment vẫn phải đi qua adapter để có thể bổ sung provider khác sau này mà không khóa cứng vào một nhà cung cấp.                    |
+| AS-08 | V1 tích hợp VNPay (chính) và MoMo (phương thức 2) ở môi trường sandbox (`OQ-05`, ADR-019) và phải có callback / webhook xác nhận kết quả.                                           | Thiết kế payment vẫn phải đi qua adapter để có thể bổ sung provider khác sau này mà không khóa cứng vào một nhà cung cấp.                    |
 | AS-09 | Vé điện tử được phát hành sau khi thanh toán thành công hoặc sau khi nhà xe xác nhận nếu có luồng thanh toán sau.                                     | Vé phải có mã vé / QR code, thông tin chuyến, ghế, điểm đón / trả và trạng thái hiện tại.                                                    |
 | AS-10 | Hệ thống cần hỗ trợ khách không đăng nhập tra cứu vé bằng mã vé / số điện thoại / email, nhưng thao tác nhạy cảm vẫn cần xác minh.                    | Phù hợp hành vi thực tế của khách mua vé nhanh nhưng vẫn bảo vệ dữ liệu cá nhân.                                                             |
 | AS-11 | Nhà xe có thể thay đổi giờ chạy, xe, tài xế, điểm đón / trả hoặc hủy chuyến khi có sự cố vận hành.                                                    | Mọi thay đổi sau khi đã bán vé phải có thông báo cho khách và có lịch sử audit.                                                              |
@@ -493,17 +514,17 @@ Các external actor không có quyền truy cập tài khoản nội bộ; mọi
 | CO-26 | Khi notification gửi thất bại, hệ thống phải retry và hiển thị trạng thái gửi cho admin / nhà xe khi cần.                               | Vé vẫn phải tra cứu được trong hệ thống dù email / SMS gửi lỗi.                                              |
 | CO-27 | Các thao tác thủ công của admin hoặc nhà xe làm ảnh hưởng tiền / vé / ghế phải ghi rõ người thực hiện, lý do và thời điểm.              | Cần để audit, xử lý khiếu nại và đối soát nội bộ.                                                            |
 
-### 8.3. Phụ thuộc (chưa chính thức)
+### 8.3. Phụ thuộc
 
 | ID    | Phụ thuộc                                                                                                         | Mức độ ảnh hưởng                                                                              |
 | ----- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| DP-01 | Backend NestJS, MongoDB, Redis, Bull queue, Socket.IO, JWT, Helmet.                                               | Lõi API, lưu dữ liệu, khóa ghế, queue xử lý callback / notification, realtime vận hành.       |
+| DP-01 | Backend NestJS 11, PostgreSQL 16 + Prisma, MongoDB (audit), Redis (Upstash), BullMQ, Better Auth (ADR-009..ADR-017).                                               | Lõi API, lưu dữ liệu, khóa ghế, queue xử lý callback / notification.       |
 | DP-02 | Frontend Next.js, React, Ant Design, Tailwind, React Query, Zustand.                                              | Web hành khách, operator portal, admin portal.                                                |
-| DP-03 | Mobile Expo / React Native.                                                                                       | App hành khách và app / portal nhân viên cho check-in, nhật trình, báo sự cố.                 |
+| DP-03 | Mobile Flutter (Dart).                                                                                            | App hành khách và app / portal nhân viên cho check-in, nhật trình, báo sự cố.                 |
 | DP-04 | Redis hoặc lock service tương đương.                                                                              | Bắt buộc cho seat locking, chống double booking và chống spam thanh toán.                     |
 | DP-05 | Payment gateway.                                                                                                  | Bắt buộc cho thanh toán online, callback, tra soát giao dịch và hoàn tiền.                    |
-| DP-06 | Email / SMS / push notification provider.                                                                         | Bắt buộc để gửi vé điện tử, OTP, nhắc giờ đi, thông báo đổi / hủy chuyến.                     |
-| DP-07 | OSRM hoặc dịch vụ bản đồ / routing.                                                                               | Phục vụ tính khoảng cách, thời gian hành trình, gợi ý điểm đón / trả và tuyến trung chuyển.   |
+| DP-06 | Email (Resend), push (FCM / APNs); SMS mới có adapter, chưa bật ở v1 (ADR-020, ADR-028).                                                                         | Bắt buộc để gửi vé điện tử, OTP, nhắc giờ đi, thông báo đổi / hủy chuyến.                     |
+| DP-07 | Goong Maps, Direction, Distance Matrix, Geocoding (ADR-027).                                                                               | Phục vụ tính khoảng cách, thời gian hành trình, gợi ý điểm đón / trả và tuyến trung chuyển.   |
 | DP-08 | Dữ liệu địa lý chuẩn: tỉnh thành, bến xe, văn phòng, trạm dừng, tọa độ.                                           | Ảnh hưởng trực tiếp đến search, route, stop point và trải nghiệm đặt vé.                      |
 | DP-09 | Quy trình KYC và hợp đồng với nhà xe.                                                                             | Bắt buộc để xác định nhà xe được bán vé, nhận payout và chịu trách nhiệm vận tải.             |
 | DP-10 | Chính sách hủy / đổi / hoàn tiền của Platform và từng Operator.                                                   | Bắt buộc trước khi mở bán vì ảnh hưởng số tiền hoàn, dispute và chăm sóc khách hàng.          |
@@ -541,12 +562,14 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 | Nhóm dữ liệu             | Thực thể khái niệm chính                                                                                        | Mục đích                                                                                                               |
 | ------------------------ | --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
 | Identity & Access        | `User`, `Admin`, `Operator`, `Employee`, `Role`, `Permission`, `Session`                                        | Quản lý danh tính, đăng nhập, phân quyền, trạng thái tài khoản và phạm vi truy cập.                                    |
-| Operator Profile & KYC   | `OperatorProfile`, `KycDocument`, `BankAccount`, `OperatorStatusHistory`                                        | Quản lý hồ sơ pháp lý, thông tin nhận tiền, trạng thái phê duyệt / khóa / yêu cầu bổ sung của nhà xe.                  |
+| Operator Profile & KYC   | `OperatorApplication`, `OperatorProfile`, `KycDocument`, `BankAccount`, `OperatorStatusHistory`                                        | Quản lý hồ sơ đăng ký trước khi có tài khoản, hồ sơ pháp lý, thông tin nhận tiền, trạng thái phê duyệt / khóa / yêu cầu bổ sung của nhà xe.                  |
 | Location & Catalog       | `Province`, `Ward`, `StopPoint`, `VehicleType`, `Amenity`, `ContentPage`                                        | Chuẩn hóa dữ liệu địa lý, điểm đón / trả, loại phương tiện, tiện ích và nội dung công khai.                            |
+| Content                  | `Article`, `ArticleCategory`                                                                                    | Bài viết tin tức / cẩm nang và chuyên mục do Admin xuất bản ở trang Khám phá; tách khỏi `ContentPage` (trang nội dung tĩnh). |
 | Transport Resource       | `Vehicle`, `SeatMap`, `Seat`, `Route`, `RouteStop`                                                              | Quản lý hạ tầng vận tải thuộc Operator: phương tiện, sơ đồ ghế, tuyến và các điểm dừng theo thứ tự.                    |
 | Trip & Inventory         | `Trip`, `TripStop`, `TripSeat`, `SeatHold`, `Fare`, `FareRule`                                                  | Quản lý chuyến cụ thể, ghế theo chuyến, giữ ghế, giá vé và điều kiện mở bán.                                           |
 | Booking & Ticket         | `Booking`, `PassengerInfo`, `Ticket`, `TicketQrToken`, `BookingStatusHistory`                                   | Quản lý đơn đặt vé, thông tin hành khách, vé điện tử, QR check-in và lịch sử trạng thái.                               |
-| Promotion & Campaign     | `Promotion`, `PromotionRule`, `PromotionRedemption`, `PromotionUsageLimit`                                      | Quản lý khuyến mãi cấp Platform / Operator, điều kiện áp dụng, lượt dùng và snapshot áp dụng vào booking.              |
+| Promotion & Campaign     | `Promotion`, `PromotionRule`, `PromotionRedemption`, `PromotionUsageLimit`, `UserVoucher`                       | Quản lý khuyến mãi cấp Platform / Operator, điều kiện áp dụng, lượt dùng, ví voucher của User và snapshot áp dụng vào booking.              |
+| Loyalty (VXN Plus)       | `LoyaltyAccount`, `MembershipTier`, `PointTransaction`                                                          | Quản lý tài khoản thành viên, hạng và giao dịch điểm append-only (tích / đổi / hết hạn / điều chỉnh / thu hồi); tham số chương trình lưu theo `PolicyVersion`. |
 | Payment, Escrow & Payout | `Payment`, `Refund`, `EscrowLedger`, `CommissionRule`, `Payout`, `ReconciliationRecord`                         | Quản lý thanh toán, hoàn tiền, tiền giữ hộ Platform, commission, chuyển tiền cho Operator và đối soát.                 |
 | Operation & Check-in     | `CheckInEvent`, `JourneyLog`, `IncidentReport`, `EmployeeAssignment`                                            | Ghi nhận soát vé, phân công Employee, nhật trình chuyến, sự cố và dữ liệu vận hành thực tế.                            |
 | Support & Trust          | `SupportTicket`, `Complaint`, `Review`, `DisputeCase`, `OperatorScorecard`, `ScorecardMetric`, `Attachment`     | Quản lý hỗ trợ, khiếu nại, đánh giá, tranh chấp, scorecard Operator và minh chứng liên quan.                           |
@@ -555,6 +578,7 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 ### 9.3. Quan hệ dữ liệu chính
 
 - Một `Operator` là tenant nghiệp vụ của nhiều `Vehicle`, `Employee`, `Route`, `Trip`, `Booking`, `Ticket`, báo cáo vận hành và dữ liệu tài chính liên quan.
+- Một `OperatorApplication` là hồ sơ đăng ký của nhà xe trước khi có tenant, truy cập qua link bảo mật gửi email liên hệ; khi Admin duyệt, hệ thống tạo đúng một `Operator` cùng tài khoản Owner đầu tiên và chuyển giấy tờ KYC, tài khoản nhận tiền sang tenant đó.
 - Một `Employee` thuộc đúng một `Operator`; role của Employee thuộc tập đã chốt ở §7.4 gồm `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`.
 - Một `Vehicle` có một `SeatMap`; `SeatMap` gồm nhiều `Seat`. Trạng thái ghế bán vé phải được quản lý theo `TripSeat` hoặc cấu trúc tương đương trên từng chuyến.
 - Một `Route` gồm nhiều `RouteStop`; mỗi `RouteStop` tham chiếu một `StopPoint` chuẩn hoặc điểm được Platform duyệt.
@@ -564,6 +588,9 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 - Một `Ticket` gắn với một hành khách, một ghế / giường, một `Trip`, điểm đón, điểm trả và QR token dùng để check-in.
 - Một `SeatHold` gắn với ghế trên chuyến, có TTL và phải hết hiệu lực nếu booking hết hạn hoặc thanh toán không thành công.
 - Một `Promotion` có thể thuộc Platform hoặc một `Operator`, có rule áp dụng, giới hạn lượt dùng và phải tạo `PromotionRedemption` khi áp vào booking hợp lệ.
+- Một `User` có đúng một `LoyaltyAccount`; số dư điểm bằng tổng các `PointTransaction` của tài khoản. Giao dịch tích / thu hồi điểm tham chiếu `Booking` / `Ticket` nguồn; giao dịch đổi điểm tham chiếu `UserVoucher` được tạo.
+- Một `UserVoucher` thuộc đúng một `User`, có nguồn là đổi điểm (giá trị cố định VND) hoặc một `Promotion` công khai User đã lưu; khi áp vào booking hợp lệ vẫn tạo `PromotionRedemption` và snapshot như promotion, kèm bên chịu phần giảm.
+- Một `Article` thuộc một `ArticleCategory` và do Admin tạo; chỉ bài đã xuất bản được đọc công khai.
 - Một `Payment` gắn với một `Booking`; khi thanh toán thành công, hệ thống phát hành ticket và ghi nhận dòng tiền vào `EscrowLedger`.
 - Một `Refund` gắn với `Booking`, `Ticket` hoặc `Payment` liên quan; hoàn tiền phải cập nhật ledger, trạng thái đối soát và audit log.
 - Một `Payout` gom các khoản tiền đủ điều kiện chuyển cho `Operator` sau khi trừ commission, refund, adjustment và các khoản giữ lại nếu có.
@@ -577,11 +604,12 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 
 | Ngữ cảnh            | Snapshot cần lưu                                                                                       | Lý do                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Booking             | Thông tin chuyến, nhà xe, tuyến, giờ đi / đến, điểm đón / trả, giá vé, phí, khuyến mãi, chính sách hủy | Tránh thay đổi sau này làm sai quyền lợi của hành khách hoặc doanh thu của Operator. |
+| Booking             | Thông tin chuyến, nhà xe, tuyến, giờ đi / đến, điểm đón / trả, giá vé, phí, khuyến mãi / voucher đã dùng và bên chịu phần giảm, chính sách hủy | Tránh thay đổi sau này làm sai quyền lợi của hành khách hoặc doanh thu của Operator. |
 | Ticket              | Mã vé, QR token, ghế, hành khách, điểm đón / trả, trạng thái vé, thời điểm phát hành                   | Đảm bảo vé có thể kiểm tra độc lập, chống vé giả và phục vụ check-in.                |
 | Payment / Refund    | Provider, mã giao dịch, số tiền, trạng thái, thời điểm callback, dữ liệu đối soát                      | Xử lý callback trễ / trùng, tra soát thanh toán và kiểm toán tài chính.              |
-| Escrow / Payout     | Số tiền gốc, commission, số tiền giữ lại, số tiền hoàn, số tiền payout, kỳ payout                      | Minh bạch tài chính giữa Platform và Operator.                                       |
+| Escrow / Payout     | Số tiền gốc, commission, số tiền giữ lại, số tiền hoàn, số tiền payout, kỳ payout, phần giảm do Platform chịu | Minh bạch tài chính giữa Platform và Operator.                                       |
 | Policy / Commission | Phiên bản chính sách, thời gian hiệu lực, người cấu hình, phạm vi áp dụng                              | Không áp dụng ngược chính sách mới lên giao dịch cũ.                                 |
+| Loyalty             | Số tiền căn cứ, tỷ lệ tích điểm, hệ số hạng, phiên bản policy của mỗi giao dịch điểm; giá trị quy đổi khi đổi điểm | Không tính lại điểm / giá trị voucher đã ghi khi Admin đổi tham số chương trình. |
 | Audit               | Actor, quyền tại thời điểm thao tác, dữ liệu trước / sau, lý do, IP / thiết bị nếu có                  | Truy vết thao tác nhạy cảm, xử lý tranh chấp và đáp ứng yêu cầu kiểm toán.           |
 
 ### 9.5. Ghi chú cho Database Design
@@ -590,7 +618,7 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 - `04-database-design.md` BẮT BUỘC xác định cơ chế chống bán trùng ghế: transaction, atomic update, distributed lock, unique constraint hoặc kết hợp các cơ chế này.
 - `04-database-design.md` BẮT BUỘC làm rõ mô hình ledger cho escrow, commission, refund và payout trước khi triển khai giao dịch tiền thật.
 - `04-database-design.md` BẮT BUỘC định nghĩa rõ dữ liệu nào là dữ liệu chuẩn Platform quản lý và dữ liệu nào là dữ liệu riêng của từng Operator.
-- Cổng thanh toán v1 đã chốt VNPay Sandbox ở mức yêu cầu; provider SMS / email / push và object storage cụ thể vẫn chưa chốt ở SRS, vì mục 9 chỉ xác định nhu cầu dữ liệu và ràng buộc thiết kế.
+- Provider bên ngoài đã chốt qua ADR (xem §7.6): VNPay + MoMo, Resend + FCM / APNs, Goong, Cloudflare R2. Mục 9 chỉ xác định nhu cầu dữ liệu và ràng buộc thiết kế; chi tiết lưu trữ ở `04-database-design.md`.
 
 ---
 
@@ -602,26 +630,28 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 
 | ID         | Yêu cầu chức năng                                                                                                                                                                                                                                                           | Actor chính                          |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
-| FR-IAM-01  | Hệ thống phải cho phép hành khách đăng ký tài khoản bằng số điện thoại hoặc email.                                                                                                                                                                                          | Người dùng                           |
-| FR-IAM-02a | User phải đăng nhập bằng số điện thoại hoặc email theo cơ chế xác thực dành cho hành khách.                                                                                                                                                                                 | Người dùng                           |
-| FR-IAM-02b | Admin phải đăng nhập bằng tài khoản Admin được tạo sẵn trong database; hệ thống không cho Admin tự đăng ký qua luồng public.                                                                                                                                                | Admin                                |
-| FR-IAM-02c | Operator và Employee phải đăng nhập bằng username và mật khẩu được cấp; hệ thống không cho Operator / Employee đăng nhập bằng luồng số điện thoại / email dành cho User.                                                                                                    | Nhà xe, Employee                     |
-| FR-IAM-03a | User được tự thực hiện quên mật khẩu / đặt lại mật khẩu bằng cơ chế xác minh dành cho hành khách.                                                                                                                                                                           | Người dùng                           |
+| FR-IAM-01  | Hệ thống phải cho phép hành khách tự đăng ký tài khoản bằng email xác minh qua OTP, hoặc bằng OAuth Google / Facebook / Apple; hành khách không dùng mật khẩu. | Người dùng |
+| FR-IAM-02a | User phải đăng nhập bằng email + OTP gửi qua email hoặc bằng OAuth Google / Facebook / Apple; tài khoản OAuth chỉ được liên kết vào tài khoản sẵn có khi email khớp và đã xác minh. | Người dùng |
+| FR-IAM-02b | Admin phải đăng nhập bằng tài khoản `platform/{username}` và mật khẩu do Platform cấp nội bộ; hệ thống không cho Admin tự đăng ký qua luồng public. | Admin |
+| FR-IAM-02c | Owner nhà xe phải đăng nhập Operator OS bằng `{operatorSlug}/{username}` và mật khẩu được cấp; Employee phải đăng nhập app nhân viên bằng `{operatorSlug}/nv.{…}` và mật khẩu được cấp; hai cổng tách biệt, sai cổng bị từ chối như sai thông tin đăng nhập; Operator / Employee không được đăng nhập bằng luồng email OTP / OAuth dành cho User. | Nhà xe, Employee |
+| FR-IAM-03a | User không có mật khẩu nên không có luồng quên / đặt lại mật khẩu; User truy cập lại tài khoản bằng OTP gửi tới email đã xác minh, đổi email phải xác minh OTP. | Người dùng |
 | FR-IAM-03b | Admin không được tự đặt lại mật khẩu qua luồng public; mật khẩu Admin chỉ được cấp lại bởi Admin có thẩm quyền hoặc quy trình vận hành được duyệt và phải có audit log.                                                                                                     | Admin                                |
-| FR-IAM-03c | Operator và Employee không được tự đặt lại mật khẩu qua số điện thoại / email; phải yêu cầu người có thẩm quyền cấp lại mật khẩu theo phạm vi quản lý và phải có audit log.                                                                                                 | Nhà xe, Employee                     |
+| FR-IAM-03c | Operator và Employee không được tự đặt lại mật khẩu qua luồng public; phải yêu cầu người có thẩm quyền cấp lại mật khẩu tạm theo phạm vi quản lý và phải có audit log.                                                                                                 | Nhà xe, Employee                     |
 | FR-IAM-04  | Hệ thống phải quản lý actor chính gồm `User`, `Operator`, `Employee`, `Admin`.                                                                                                                                                                                              | Admin                                |
 | FR-IAM-05  | Hệ thống phải hỗ trợ role Employee đã chốt gồm `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`.                                                                                                                                                                                   | Nhà xe, Employee                     |
 | FR-IAM-06  | Hệ thống phải kiểm tra RBAC và tenant boundary theo `Operator` cho mọi thao tác của Operator và Employee.                                                                                                                                                                   | Hệ thống                             |
 | FR-IAM-07  | Hệ thống phải cho phép Admin cấu hình hoặc gán quyền nội bộ cho tài khoản Admin theo phạm vi trách nhiệm.                                                                                                                                                                   | Admin                                |
 | FR-IAM-08  | Hệ thống phải cho phép khóa, mở khóa hoặc vô hiệu hóa tài khoản theo quyền hạn và ghi lý do thao tác.                                                                                                                                                                       | Admin, Nhà xe                        |
 | FR-IAM-09  | Hệ thống phải ghi nhận lịch sử đăng nhập, thiết bị, thời điểm và trạng thái đăng nhập cho các actor đã xác thực.                                                                                                                                                            | Hệ thống                             |
-| FR-IAM-10  | Hệ thống phải yêu cầu xác nhận lại danh tính trước thao tác nhạy cảm: User / Guest xác minh bằng OTP / email / số điện thoại theo cấu hình; Admin, Operator và Employee nhập lại mật khẩu phiên hiện tại hoặc MFA nếu đã bật. Thao tác thất bại phải bị từ chối và ghi log. | User, Guest, Admin, Nhà xe, Employee |
+| FR-IAM-10  | Hệ thống phải yêu cầu xác nhận lại danh tính trước thao tác nhạy cảm: User / Guest xác minh bằng OTP gửi qua email (`OQ-09`); Admin, Operator và Employee nhập lại mật khẩu hoặc TOTP. Thao tác thất bại phải bị từ chối và ghi log. | User, Guest, Admin, Nhà xe, Employee |
 | FR-IAM-11  | Hệ thống phải cho phép User xem và cập nhật thông tin cá nhân / hồ sơ tài khoản của chính mình trong phạm vi được phép.                                                                                                                                                     | Người dùng                           |
 | FR-IAM-12  | Hệ thống phải từ chối truy cập dữ liệu không thuộc quyền sở hữu hoặc phạm vi phân quyền của actor.                                                                                                                                                                          | Hệ thống                             |
 | FR-IAM-13  | Hệ thống phải tạo session / token khi đăng nhập thành công, có thời hạn hiệu lực và refresh policy theo từng nhóm actor.                                                                                                                                                    | Hệ thống                             |
 | FR-IAM-14  | Hệ thống phải áp dụng timeout phiên đăng nhập theo cấu hình; phiên hết hạn phải yêu cầu đăng nhập lại hoặc refresh hợp lệ.                                                                                                                                                  | Hệ thống                             |
 | FR-IAM-15  | Hệ thống phải hỗ trợ quản lý đa thiết bị theo policy: giới hạn số phiên hoạt động, xem danh sách phiên và thu hồi phiên khi cần.                                                                                                                                            | User, Admin, Nhà xe, Employee        |
 | FR-IAM-16  | Hệ thống phải force logout / revoke session khi tài khoản bị khóa, mật khẩu bị cấp lại, quyền bị thu hồi hoặc phát hiện rủi ro bảo mật.                                                                                                                                     | Hệ thống                             |
+| FR-IAM-17  | Owner nhà xe và Admin phải xác thực TOTP bắt buộc sau mật khẩu, kèm 10 backup code dùng một lần; Employee được bật TOTP tùy chọn. | Nhà xe, Admin, Employee |
+| FR-IAM-18  | Tài khoản Owner và Employee được cấp mật khẩu tạm có hạn dùng; lần đăng nhập đầu phải đổi mật khẩu rồi đăng nhập lại trước khi dùng hệ thống. | Nhà xe, Employee |
 
 ### 10.2. Marketplace Layer - Tìm kiếm, đặt vé và quản lý vé
 
@@ -640,6 +670,7 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | FR-MKT-11 | Hệ thống phải cho phép hành khách xem lịch sử booking, ticket, trạng thái thanh toán, trạng thái hoàn tiền và thông báo liên quan.             | Người dùng        |
 | FR-MKT-12 | Hệ thống phải cho phép Guest tra cứu vé bằng thông tin được phép, đồng thời yêu cầu xác minh cho thao tác nhạy cảm.                            | Guest             |
 | FR-MKT-13 | Hệ thống phải cho phép hành khách lưu thông tin hành khách thường dùng để đặt vé nhanh hơn.                                                    | Người dùng        |
+| FR-MKT-14 | Hệ thống phải cho phép hành khách xem danh sách bài viết tin tức / cẩm nang đã xuất bản, lọc theo chuyên mục, tìm theo từ khóa, xem bài nổi bật và xem chi tiết bài viết. | Người dùng, Guest |
 
 ### 10.3. Booking, Ticket, Payment & Escrow
 
@@ -668,17 +699,18 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 
 | ID        | Yêu cầu chức năng                                                                                                           | Actor chính |
 | --------- | --------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| FR-OPR-01 | Hệ thống phải cho phép Operator đăng ký hồ sơ nhà xe và gửi yêu cầu tham gia nền tảng.                                      | Nhà xe      |
+| FR-OPR-01 | Hệ thống phải cho phép người đại diện nhà xe đăng ký tham gia nền tảng qua form công khai, không cần tài khoản; email liên hệ được xác minh bằng link bảo mật trước khi hồ sơ được gửi duyệt.                                      | Nhà xe      |
 | FR-OPR-02 | Hệ thống phải cho phép Operator khai báo thông tin doanh nghiệp, logo, mô tả, hotline, email, địa chỉ và thông tin liên hệ. | Nhà xe      |
-| FR-OPR-03 | Hệ thống phải cho phép Operator tải lên hồ sơ KYC và tài liệu pháp lý theo danh mục Admin cấu hình.                         | Nhà xe      |
+| FR-OPR-03 | Hệ thống phải cho phép Operator tải lên hồ sơ KYC và tài liệu pháp lý theo danh mục Admin cấu hình: qua link bảo mật khi đang đăng ký, trong Operator OS khi đã được duyệt.                         | Nhà xe      |
 | FR-OPR-04 | Hệ thống phải cho phép Operator khai báo và cập nhật tài khoản nhận tiền theo quy trình xác minh bổ sung.                   | Nhà xe      |
-| FR-OPR-05 | Hệ thống phải cho phép Operator theo dõi trạng thái KYC: chờ duyệt, được duyệt, bị từ chối, cần bổ sung, bị khóa.           | Nhà xe      |
+| FR-OPR-05 | Hệ thống phải cho phép nhà xe theo dõi trạng thái hồ sơ đăng ký (nháp, chờ duyệt, cần bổ sung, được duyệt, bị từ chối) qua email và link bảo mật khi chưa có tài khoản, và trạng thái hoạt động (đang hoạt động, bị khóa) trong Operator OS sau khi được duyệt.           | Nhà xe      |
 | FR-OPR-06 | Hệ thống phải chỉ cho phép Operator đã được phê duyệt mở bán công khai.                                                     | Hệ thống    |
 | FR-OPR-07 | Hệ thống phải cho phép Operator xem escrow balance, giao dịch đang giữ, giao dịch đã hoàn và giao dịch đủ điều kiện payout. | Nhà xe      |
 | FR-OPR-08 | Hệ thống phải cho phép Operator xem lịch sử commission, payout, adjustment và đối soát giao dịch thuộc nhà xe.              | Nhà xe      |
 | FR-OPR-09 | Hệ thống phải cho phép Operator gửi yêu cầu payout sớm nếu policy nền tảng cho phép.                                        | Nhà xe      |
 | FR-OPR-10 | Hệ thống phải cho phép Operator phản hồi đánh giá, khiếu nại và dispute liên quan đến chuyến / booking thuộc nhà xe.        | Nhà xe      |
 | FR-OPR-11 | Hệ thống phải bảo đảm Operator không xem hoặc thao tác dữ liệu thuộc Operator khác.                                         | Hệ thống    |
+| FR-OPR-12 | Hệ thống phải gửi link bảo mật có hạn dùng tới email liên hệ của hồ sơ đăng ký; link chỉ mở đúng hồ sơ đó, được cấp lại theo yêu cầu (link cũ hết hiệu lực) và hết hiệu lực khi hồ sơ được duyệt hoặc bị từ chối. | Hệ thống    |
 
 ### 10.5. Operator OS - Resource, Route, Trip & Inventory
 
@@ -711,6 +743,9 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | FR-PROM-05 | Hệ thống phải kiểm tra điều kiện promotion trước khi áp dụng cho booking: trạng thái, thời gian hiệu lực, phạm vi Operator / tuyến / chuyến, số lượt dùng và điều kiện người dùng nếu có. | Hệ thống      |
 | FR-PROM-06 | Hệ thống phải lưu snapshot promotion và bản ghi redemption vào booking để chống dùng sai, dùng trùng hoặc thay đổi rule ngược về giao dịch cũ.                                            | Hệ thống      |
 | FR-PROM-07 | Admin và Operator phải xem được hiệu quả promotion theo phạm vi dữ liệu được cấp quyền, gồm lượt áp dụng, doanh thu chịu ảnh hưởng và tổng giá trị giảm.                                  | Admin, Nhà xe |
+| FR-PROM-08 | User phải lưu được mã khuyến mãi công khai đang hiệu lực (Platform / Operator) vào ví voucher của mình; mỗi mã chỉ lưu một lần và việc lưu không giữ chỗ lượt dùng của promotion. | Người dùng |
+| FR-PROM-09 | Hệ thống phải hiển thị ví voucher của User gồm voucher đổi từ điểm và mã đã lưu, với giá trị giảm, điều kiện áp dụng, hạn dùng và trạng thái `AVAILABLE` / `RESERVED` / `USED` / `EXPIRED`. | Người dùng |
+| FR-PROM-10 | Khi tạo booking, User phải chọn được tối đa một voucher hợp lệ trong ví hoặc nhập một mã; hệ thống giữ voucher cho booking, đánh dấu đã dùng khi thanh toán thành công và trả voucher về ví theo `BR-72`. | Người dùng, Hệ thống |
 
 ### 10.7. Employee App / Portal & Operations
 
@@ -736,7 +771,7 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | FR-ADM-01 | Admin phải xem được dashboard tổng quan toàn hệ thống theo quyền được cấp.                                                                                                                         | Admin       |
 | FR-ADM-02 | Admin phải quản lý tài khoản người dùng, Operator, Employee ở mức giám sát và tài khoản Admin nội bộ.                                                                                              | Admin       |
-| FR-ADM-03 | Admin phải phê duyệt, từ chối, yêu cầu bổ sung, khóa hoặc mở khóa Operator dựa trên KYC và chính sách nền tảng.                                                                                    | Admin       |
+| FR-ADM-03 | Admin phải phê duyệt, từ chối, yêu cầu bổ sung, khóa hoặc mở khóa Operator dựa trên KYC và chính sách nền tảng; khi phê duyệt hồ sơ đăng ký, Admin đặt slug Operator và tên đăng nhập Owner, hệ thống tạo Operator cùng tài khoản Owner đầu tiên và gửi mật khẩu tạm tới email liên hệ đã xác minh.                                                                                    | Admin       |
 | FR-ADM-04 | Admin phải quản lý danh mục chuẩn gồm tỉnh / thành, phường / xã, điểm đón / trả, loại phương tiện và tiện ích.                                                                                     | Admin       |
 | FR-ADM-05 | Admin phải duyệt hoặc từ chối đề xuất StopPoint từ Operator.                                                                                                                                       | Admin       |
 | FR-ADM-06 | Admin phải cấu hình policy hủy / đổi / hoàn tiền, thời gian giữ ghế, thời gian ngừng bán online và policy dữ liệu.                                                                                 | Admin       |
@@ -751,6 +786,8 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | FR-ADM-15 | Admin phải xem trạng thái tích hợp payment, notification, routing và các service phụ trợ ở mức vận hành.                                                                                           | Admin       |
 | FR-ADM-16 | Admin phải truy xuất audit log cho thao tác nhạy cảm theo actor, thời gian, module, đối tượng tác động và kết quả.                                                                                 | Admin       |
 | FR-ADM-17 | Admin phải xuất báo cáo theo quyền được cấp, bao gồm báo cáo doanh thu, booking, refund, payout, khiếu nại và audit.                                                                               | Admin       |
+| FR-ADM-18 | Admin phải tạo, sửa, xuất bản, gỡ và lưu trữ bài viết tin tức / cẩm nang gồm tiêu đề, slug, chuyên mục, ảnh bìa, tóm tắt, nội dung, cờ bài nổi bật và thời điểm xuất bản. | Admin |
+| FR-ADM-19 | Admin phải quản lý chuyên mục bài viết gồm tên, slug, thứ tự hiển thị và trạng thái. | Admin |
 
 ### 10.9. Notification, Support, Review & Reporting
 
@@ -784,6 +821,25 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | FR-DSP-06 | Admin phải ra quyết định xử lý gồm refund, không refund, đổi vé hoặc phương án khác theo policy, kèm lý do và audit log.                                                                   | Admin               |
 | FR-DSP-07 | Hệ thống phải gửi thông báo cho các bên liên quan khi DisputeCase đổi trạng thái hoặc có quyết định cuối cùng.                                                                             | Hệ thống            |
 | FR-DSP-08 | Mỗi chuyển trạng thái DisputeCase phải lưu actor, thời điểm, trạng thái trước / sau, lý do và tham chiếu minh chứng nếu có.                                                                | Hệ thống            |
+
+### 10.11. Loyalty — Chương trình thành viên VXN Plus
+
+Chương trình thành viên cấp Platform, chỉ dành cho User có tài khoản; không thuộc tenant Operator nào. Điểm không phải tiền; chỉ phần giảm giá khi dùng voucher đổi điểm là dòng tiền và do Platform chịu (`BR-73`).
+
+| ID        | Yêu cầu chức năng                                                                                                                                                                                                              | Actor chính |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| FR-LOY-01 | Hệ thống phải tạo tài khoản thành viên (`LoyaltyAccount`) hạng khởi điểm cho mỗi User khi đăng ký; Guest không tham gia chương trình.                                                                                          | Hệ thống    |
+| FR-LOY-02 | Hệ thống phải cộng điểm cho User một lần cho mỗi booking khi chuyến chuyển `COMPLETED`, tính trên số tiền User thực trả của các ticket hợp lệ theo tỷ lệ tích điểm và hệ số hạng tại thời điểm cộng (`BR-66`).                  | Hệ thống    |
+| FR-LOY-03 | Hệ thống phải xếp hạng thành viên theo tổng điểm tích trong 12 tháng gần nhất và cập nhật hạng khi điểm thay đổi hoặc theo job định kỳ; ở v1 hạng chỉ ảnh hưởng hệ số tích điểm (`BR-68`).                                       | Hệ thống    |
+| FR-LOY-04 | User phải xem được hạng hiện tại, điểm khả dụng, giá trị quy đổi ước tính, số điểm cần để lên hạng kế tiếp, bảng hạng và hệ số tích điểm của từng hạng.                                                                         | Người dùng  |
+| FR-LOY-05 | User phải xem được lịch sử giao dịch điểm (tích, đổi, hết hạn, điều chỉnh, thu hồi) mới nhất trước, lọc theo loại và thời gian, kèm tổng điểm đã tích / đã đổi / đã hết hạn.                                                     | Người dùng  |
+| FR-LOY-06 | User phải đổi được điểm lấy voucher giảm giá theo giá trị quy đổi và số điểm tối thiểu Admin cấu hình; voucher có giá trị cố định VND, hạn dùng theo policy, áp dụng cho mọi tuyến / Operator và được đưa vào ví voucher.     | Người dùng  |
+| FR-LOY-07 | Hệ thống phải xử lý đổi điểm idempotent trong một giao dịch: trừ điểm và tạo voucher cùng thành công hoặc cùng thất bại; không cho số dư âm; điểm đã đổi không hoàn lại.                                                         | Hệ thống    |
+| FR-LOY-08 | Hệ thống phải hết hạn điểm theo policy bằng job nền idempotent, ghi giao dịch hết hạn và nhắc User trước khi điểm hết hạn nếu User bật thông báo.                                                                              | Hệ thống    |
+| FR-LOY-09 | Phần giảm giá từ voucher đổi điểm do Platform chịu: escrow của Operator và commission tính trên giá trước phần giảm này; hệ thống ghi phần Platform chịu thành dòng riêng trong ledger để đối soát.                              | Hệ thống    |
+| FR-LOY-10 | Admin phải cấu hình tham số chương trình (đơn vị tích điểm, giá trị quy đổi, số điểm đổi tối thiểu, hạn dùng voucher, hạn điểm, mốc và hệ số hạng) theo phiên bản có ngày hiệu lực; thay đổi không áp ngược giao dịch đã ghi. | Admin       |
+| FR-LOY-11 | Admin phải xem tài khoản thành viên của User và điều chỉnh điểm thủ công bằng giao dịch mới kèm lý do và audit log.                                                                                                             | Admin       |
+| FR-LOY-12 | Admin phải xem báo cáo chương trình theo kỳ: điểm phát hành, điểm đổi, điểm hết hạn, voucher đã dùng và tổng giá trị giảm Platform chịu.                                                                                        | Admin       |
 
 ---
 
@@ -873,7 +929,7 @@ Các yêu cầu phi chức năng dưới đây áp dụng cho toàn bộ hệ th
 | ID          | Yêu cầu phi chức năng                                                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------- |
 | NFR-COMP-01 | Website phải tương thích với các trình duyệt phổ biến phiên bản hiện đại.                                                             |
-| NFR-COMP-02 | Mobile app phải hỗ trợ Android / iOS theo phạm vi Expo SDK đang dùng trong dự án.                                                     |
+| NFR-COMP-02 | Mobile app phải hỗ trợ Android / iOS theo phạm vi Flutter SDK đang dùng trong dự án.                                                  |
 | NFR-COMP-03 | Email / SMS / push notification phải hiển thị thông tin cốt lõi đủ rõ khi provider hỗ trợ.                                            |
 | NFR-COMP-04 | QR code trên vé phải quét được bằng app / portal Employee trong điều kiện ánh sáng và chất lượng màn hình phổ biến.                   |
 | NFR-COMP-05 | Payment gateway, notification provider, routing service và object storage cụ thể không được hard-code vào SRS khi chưa chốt provider. |
@@ -904,152 +960,406 @@ Các yêu cầu phi chức năng dưới đây áp dụng cho toàn bộ hệ th
 
 ## 12. Use Case tổng quan
 
-### 12.1. Sơ đồ Use Case
+Mục này gồm bảng danh sách use case nhóm theo 7 gói (§12.1), một sơ đồ tổng quan actor ↔ gói (§12.2), sơ đồ riêng cho từng vai trò (§12.3) và bảng quan hệ `«include»` / `«extend»` (§12.4). Mô tả chi tiết từng use case ở §13, xếp theo số UC. Số UC là định danh cố định, không phản ánh thứ tự gói.
+
+Quy ước ký hiệu dùng chung cho mọi sơ đồ:
+
+- **Actor** là hình chữ nhật. Actor trừu tượng (`Hành khách`, `Nhân viên nhà xe`, `Hệ thống bên ngoài`) viền nét đứt, chữ nghiêng; chỉ dùng để gom hành vi chung, không phải actor nghiệp vụ mới.
+- **Use case** là hình bo tròn `UC-xx`. Use case thuộc vai trò khác, chỉ xuất hiện vì có quan hệ `«include»` / `«extend»`, viền nét đứt.
+- `---` là association: actor tham gia use case. Quyền thực thi cuối cùng vẫn theo §15, tenant boundary, ownership, role và phân công.
+- `-->|«generalization»|` đi từ actor chuyên biệt đến actor tổng quát. Mermaid flowchart không có mũi tên tam giác rỗng của UML nên nhãn là ký hiệu chính thức. Generalization của Employee không có nghĩa mọi role có toàn bộ quyền của nhau (§15.4).
+- `-.->|«include»|` và `-.->|«extend»|` là nét đứt; chiều mũi tên, điều kiện và extension point theo bảng §12.4.
+- `Hệ thống` không được vẽ như actor của chính nó: use case tự động nằm trong system boundary và được kích hoạt bởi sự kiện nghiệp vụ, lịch chạy, Admin hoặc hệ thống bên ngoài. Trong §13, "Hệ thống" ở dòng actor chỉ vai trò xử lý tự động của chính hệ thống.
+
+### 12.1. Danh sách Use Case
+
+| ID    | Use case                                          | Actor chính                                            | Actor phụ / hệ thống ngoài                                                          | FR liên quan                                       | Luồng (§16)         | Ưu tiên    |
+| ----- | ------------------------------------------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------- | ---------- |
+| **P1 · Tài khoản & truy cập** |                           |                                                        |                                                                                     |                                                    |                     |            |
+| UC-01 | Xác thực theo actor và quản lý thông tin          | Người dùng, Nhà xe, Nhân viên nhà xe, Admin            | Khách vãng lai (chỉ xác minh thao tác nhạy cảm); Dịch vụ thông báo (OTP), Nhà cung cấp OAuth                                     | `FR-IAM-*`                                         | —                   | Cao        |
+| UC-34 | Cấu hình notification preference                  | Người dùng, Nhà xe, Nhân viên nhà xe                   | —                                                                                   | `FR-NSR-14`                                        | BF-10               | Trung bình |
+| **P2 · Marketplace: tìm, đặt, quản lý vé** |              |                                                        |                                                                                     |                                                    |                     |            |
+| UC-02 | Tìm kiếm và so sánh chuyến                        | Người dùng, Khách vãng lai                             | Dịch vụ định tuyến                                                                  | `FR-MKT-01..04`                                    | BF-02               | Cao        |
+| UC-03 | Xem chi tiết chuyến và profile Operator           | Người dùng, Khách vãng lai                             | —                                                                                   | `FR-MKT-05..06`                                    | BF-02               | Cao        |
+| UC-04 | Chọn ghế và giữ ghế                               | Người dùng, Khách vãng lai                             | —                                                                                   | `FR-MKT-07`, `FR-BTP-01..04`                       | BF-02, BF-03        | Cao        |
+| UC-05 | Tạo booking                                       | Người dùng, Khách vãng lai                             | —                                                                                   | `FR-MKT-08..10`, `FR-BTP-05..06`, `FR-PROM-05..06` | BF-02, BF-03, BF-11 | Cao        |
+| UC-06 | Thanh toán booking                                | Người dùng, Khách vãng lai                             | Admin; Cổng thanh toán                                                              | `FR-BTP-07..09`                                    | BF-02, BF-03, BF-11 | Cao        |
+| UC-07 | Nhận và xem vé điện tử                            | Người dùng, Khách vãng lai                             | Nhân viên nhà xe                                                                    | `FR-BTP-10..11`                                    | BF-02, BF-04        | Cao        |
+| UC-08 | Hủy vé / yêu cầu hoàn tiền                        | Người dùng, Khách vãng lai, Admin                      | Nhà xe; Cổng thanh toán                                                             | `FR-BTP-12..14`, `FR-MKT-12`, `FR-IAM-10`          | BF-04, BF-05        | Cao        |
+| UC-09 | Đánh giá, hỗ trợ và khiếu nại                     | Người dùng; Khách vãng lai (hỗ trợ / khiếu nại)        | Nhà xe, Admin                                                                       | `FR-NSR-06`, `FR-NSR-09..11`, `FR-MKT-12`          | BF-04, BF-08        | Trung bình |
+| UC-35 | Tra cứu vé khách vãng lai                         | Khách vãng lai                                         | —                                                                                   | `FR-MKT-12`, `FR-IAM-10`                           | BF-04               | Trung bình |
+| **P3 · Thành viên, ưu đãi & nội dung** |                  |                                                        |                                                                                     |                                                    |                     |            |
+| UC-33 | Quản lý promotion cấp Platform / Operator         | Admin, Nhà xe                                          | —                                                                                   | `FR-PROM-01..07`, `FR-ADM-12`                      | —                   | Trung bình |
+| UC-36 | Tích điểm và theo dõi hạng thành viên VXN Plus    | Người dùng                                             | —                                                                                   | `FR-LOY-01..05`, `FR-LOY-08`                       | BF-11               | Trung bình |
+| UC-37 | Đổi điểm và sử dụng ví voucher                    | Người dùng                                             | —                                                                                   | `FR-LOY-06..07`, `FR-LOY-09`, `FR-PROM-08..10`     | BF-11               | Trung bình |
+| UC-38 | Đọc bài viết tin tức / cẩm nang                   | Người dùng, Khách vãng lai                             | —                                                                                   | `FR-MKT-14`                                        | —                   | Thấp       |
+| UC-39 | Cấu hình và giám sát chương trình VXN Plus        | Admin                                                  | Người dùng (được điều chỉnh điểm)                                                   | `FR-LOY-10..12`                                    | —                   | Trung bình |
+| UC-40 | Quản lý bài viết tin tức / cẩm nang               | Admin                                                  | Dịch vụ lưu trữ tệp                                                                 | `FR-ADM-18..19`                                    | —                   | Thấp       |
+| **P4 · Operator OS** |                                    |                                                        |                                                                                     |                                                    |                     |            |
+| UC-10 | Đăng ký Operator và gửi hồ sơ KYC                 | Nhà xe (người đại diện, chưa có tài khoản)                                                 | Admin; Dịch vụ lưu trữ tệp                                                          | `FR-OPR-01..05`, `FR-OPR-12`                                    | BF-01               | Cao        |
+| UC-11 | Quản lý hồ sơ và tài chính Operator               | Nhà xe                                                 | Admin                                                                               | `FR-OPR-02..09`                                    | BF-01, BF-09        | Cao        |
+| UC-12 | Quản lý Vehicle, VehicleType và SeatMap           | Nhà xe                                                 | Admin                                                                               | `FR-OPS-01..03`                                    | BF-01               | Cao        |
+| UC-13 | Quản lý route, stop point và đề xuất điểm mới     | Nhà xe, Admin                                          | Dịch vụ định tuyến                                                                  | `FR-OPS-04..05`, `FR-ADM-04..05`                   | BF-01               | Cao        |
+| UC-14 | Quản lý trip, fare, mở bán và inventory           | Nhà xe                                                 | Admin; Dịch vụ định tuyến                                                           | `FR-OPS-06..13`                                    | BF-01, BF-06        | Cao        |
+| UC-15 | Quản lý booking / ticket thuộc Operator           | Nhà xe                                                 | —                                                                                   | `FR-OPS-14..15`, `FR-OPR-11`                       | —                   | Cao        |
+| UC-16 | Quản lý Employee và phân công nhiệm vụ            | Nhà xe                                                 | Nhân viên nhà xe                                                                    | `FR-IAM-05..06`, `FR-OPS-15`, `FR-EMP-*`           | BF-01               | Cao        |
+| UC-17 | Xem báo cáo Operator                              | Nhà xe                                                 | Dịch vụ lưu trữ tệp                                                                 | `FR-NSR-12`                                        | —                   | Trung bình |
+| **P5 · App nhân viên** |                                  |                                                        |                                                                                     |                                                    |                     |            |
+| UC-18 | Xem nhiệm vụ được phân công                       | Nhân viên nhà xe                                       | —                                                                                   | `FR-EMP-01..04`                                    | BF-07               | Cao        |
+| UC-19 | Xem danh sách hành khách                          | Nhân viên nhà xe (`TICKET_STAFF`, `DRIVER`)            | —                                                                                   | `FR-EMP-05..06`                                    | BF-07               | Cao        |
+| UC-20 | Check-in ticket bằng QR / mã vé                   | Nhân viên nhà xe (`TICKET_STAFF`, `DRIVER`)            | Người dùng                                                                          | `FR-EMP-07..08`, `FR-BTP-11`                       | BF-07               | Cao        |
+| UC-21 | Cập nhật trạng thái chuyến                        | Nhân viên nhà xe (`DRIVER`)                            | Nhà xe                                                                              | `FR-EMP-09`                                        | BF-06, BF-07        | Cao        |
+| UC-22 | Ghi nhật trình và báo cáo sự cố                   | Nhân viên nhà xe (`DRIVER`, `SUPPORT_STAFF`)           | Nhà xe, Admin; Dịch vụ lưu trữ tệp                                                  | `FR-EMP-10..13`                                    | BF-06, BF-07        | Cao        |
+| **P6 · Platform admin** |                                 |                                                        |                                                                                     |                                                    |                     |            |
+| UC-23 | Duyệt KYC và quản lý Operator                     | Admin                                                  | Nhà xe                                                                              | `FR-ADM-02..03`, `FR-OPR-06`                       | BF-01               | Cao        |
+| UC-24 | Quản lý catalog chuẩn                             | Admin                                                  | Nhà xe                                                                              | `FR-ADM-04..05`                                    | BF-01               | Cao        |
+| UC-25 | Cấu hình policy, commission và payout             | Admin                                                  | Nhà xe                                                                              | `FR-ADM-06..09`                                    | BF-01, BF-09        | Cao        |
+| UC-26 | Giám sát payment, refund, escrow, payout          | Admin                                                  | Nhà xe; Cổng thanh toán, Dịch vụ ngân hàng payout                                   | `FR-BTP-15..17`, `FR-ADM-10`                       | BF-03, BF-05, BF-09 | Cao        |
+| UC-27 | Xử lý dispute case và refund thủ công             | Admin                                                  | Người dùng, Khách vãng lai, Nhà xe; Cổng thanh toán, Dịch vụ lưu trữ tệp            | `FR-DSP-*`, `FR-BTP-14`, `FR-ADM-11`               | BF-05, BF-06, BF-08 | Cao        |
+| UC-28 | Kiểm duyệt nội dung, review và nội dung công khai | Admin                                                  | Người dùng, Nhà xe                                                                  | `FR-ADM-13`, `FR-NSR-10..11`, `FR-NSR-15`          | —                   | Trung bình |
+| UC-29 | Xem báo cáo toàn hệ thống                         | Admin                                                  | Dịch vụ lưu trữ tệp                                                                 | `FR-ADM-17`, `FR-NSR-13`                           | —                   | Trung bình |
+| UC-30 | Truy xuất audit log                               | Admin                                                  | —                                                                                   | `FR-ADM-16`, `NFR-AUDIT-*`                         | BF-10               | Cao        |
+| **P7 · Tác vụ hệ thống** |                                |                                                        |                                                                                     |                                                    |                     |            |
+| UC-31 | Gửi notification theo sự kiện nghiệp vụ           | — (kích hoạt bởi sự kiện; được include bởi UC-06, UC-07, UC-08, UC-27) | Người nhận: Người dùng, Khách vãng lai, Nhà xe, Nhân viên nhà xe, Admin; Dịch vụ thông báo | `FR-NSR-01..05`                     | BF-02, BF-06, BF-10 | Cao        |
+| UC-32 | Đối soát và chạy lại job nền                      | Admin (chạy lại); tự động theo lịch                    | Nhà xe; Cổng thanh toán, Dịch vụ thông báo, Dịch vụ ngân hàng payout                | `FR-BTP-17`, `NFR-AVAIL-03`, `NFR-MAINT-06`        | BF-03, BF-09, BF-10 | Cao        |
+
+Cột **Luồng (§16)** lấy từ danh mục BF ở §16.1; `—` nghĩa là use case không nằm trong luồng end-to-end nào ở §16.
+
+### 12.2. Sơ đồ Use Case tổng quan
 
 ```mermaid
 flowchart LR
-    User[Người dùng]
-    Guest[Khách vãng lai]
-    Operator[Nhà xe]
-    Admin[Admin toàn hệ thống]
-    Employee[Nhân viên nhà xe]
-    System[Hệ thống]
+    User["Người dùng<br/>(User)"]
+    Guest["Khách vãng lai<br/>(Guest)"]
+    Passenger["«abstract actor»<br/>Hành khách"]
+    Operator["Nhà xe<br/>(Operator)"]
+    Employee["Nhân viên nhà xe<br/>(Employee)"]
+    Admin["Admin toàn hệ thống<br/>(Admin)"]
+    External["«abstract actor»<br/>Hệ thống bên ngoài<br/>thanh toán · thông báo · định tuyến<br/>lưu trữ tệp · ngân hàng payout · OAuth"]
 
-    UC01((Đăng nhập / xác thực))
-    UC02((Tìm kiếm và so sánh chuyến))
-    UC03((Xem chi tiết chuyến / Operator))
-    UC04((Chọn ghế và giữ ghế))
-    UC05((Tạo booking))
-    UC06((Thanh toán))
-    UC07((Nhận vé điện tử))
-    UC08((Hủy vé / yêu cầu hoàn tiền))
-    UC09((Đánh giá / hỗ trợ / khiếu nại))
+    User -->|«generalization»| Passenger
+    Guest -->|«generalization»| Passenger
 
-    UC10((Đăng ký Operator / KYC))
-    UC11((Quản lý hồ sơ và tài chính Operator))
-    UC12((Quản lý Vehicle / SeatMap))
-    UC13((Quản lý route / stop point))
-    UC14((Quản lý trip / fare / inventory))
-    UC15((Quản lý booking / ticket))
-    UC16((Quản lý Employee / phân công))
-    UC17((Xem báo cáo Operator))
+    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
+        direction TB
+        P1["P1 · Tài khoản & truy cập<br/>UC-01, UC-34"]
+        P2["P2 · Marketplace: tìm, đặt, quản lý vé<br/>UC-02..09, UC-35"]
+        P3["P3 · Thành viên, ưu đãi & nội dung<br/>UC-33, UC-36..40"]
+        P4["P4 · Operator OS<br/>UC-10..17"]
+        P5["P5 · App nhân viên<br/>UC-18..22"]
+        P6["P6 · Platform admin<br/>UC-23..30"]
+        P7["P7 · Tác vụ hệ thống<br/>UC-31, UC-32"]
+    end
 
-    UC18((Xem nhiệm vụ được phân công))
-    UC19((Xem danh sách hành khách))
-    UC20((Check-in ticket))
-    UC21((Cập nhật trạng thái chuyến))
-    UC22((Ghi nhật trình / báo cáo sự cố))
+    User --- P1
+    Passenger --- P2
+    Passenger ---|UC-38| P3
+    User ---|UC-36, UC-37| P3
+    Operator --- P1
+    Operator ---|UC-33| P3
+    Operator --- P4
+    Employee --- P1
+    Employee --- P5
+    Admin ---|UC-01| P1
+    Admin ---|UC-08| P2
+    Admin ---|UC-33, UC-39, UC-40| P3
+    Admin ---|UC-13| P4
+    Admin --- P6
+    Admin ---|UC-32| P7
 
-    UC23((Duyệt KYC / quản lý Operator))
-    UC24((Quản lý catalog chuẩn))
-    UC25((Cấu hình policy / commission / payout))
-    UC26((Giám sát payment / refund / escrow / payout))
-    UC27((Xử lý dispute case / refund thủ công))
-    UC28((Kiểm duyệt nội dung / review))
-    UC29((Báo cáo toàn hệ thống))
-    UC30((Truy xuất audit log))
+    P2 -.->|«include» UC-06, UC-07, UC-08 → UC-31| P7
+    P6 -.->|«include» UC-27 → UC-31| P7
+    P3 -.->|«extend» UC-37 → UC-05| P2
+    P6 -.->|«extend» UC-27 → UC-08, UC-09| P2
+    P7 -.->|«extend» UC-32 → UC-06, UC-08| P2
 
-    UC31((Gửi notification))
-    UC32((Đối soát và retry job))
-    UC33((Quản lý promotion))
-    UC34((Cấu hình notification preference))
-    UC35((Tra cứu vé khách vãng lai))
+    P1 --- External
+    P2 --- External
+    P3 --- External
+    P4 --- External
+    P5 --- External
+    P6 --- External
+    P7 --- External
 
-    User --> UC01
-    User --> UC02
-    User --> UC03
-    User --> UC04
-    User --> UC05
-    User --> UC06
-    User --> UC07
-    User --> UC08
-    User --> UC09
-    User --> UC34
-
-    Guest --> UC02
-    Guest --> UC03
-    Guest --> UC04
-    Guest --> UC05
-    Guest --> UC06
-    Guest --> UC07
-    Guest --> UC08
-    Guest --> UC09
-    Guest --> UC35
-
-    Operator --> UC01
-    Operator --> UC10
-    Operator --> UC11
-    Operator --> UC12
-    Operator --> UC13
-    Operator --> UC14
-    Operator --> UC15
-    Operator --> UC16
-    Operator --> UC17
-    Operator --> UC33
-    Operator --> UC34
-
-    Employee --> UC01
-    Employee --> UC18
-    Employee --> UC19
-    Employee --> UC20
-    Employee --> UC21
-    Employee --> UC22
-    Employee --> UC34
-
-    Admin --> UC01
-    Admin --> UC23
-    Admin --> UC24
-    Admin --> UC25
-    Admin --> UC26
-    Admin --> UC27
-    Admin --> UC28
-    Admin --> UC29
-    Admin --> UC30
-    Admin --> UC33
-
-    System --> UC31
-    System --> UC32
+    classDef abstractActor stroke-dasharray: 5 3,font-style:italic
+    class Passenger,External abstractActor
 ```
 
-### 12.2. Danh sách Use Case
+- Association actor ↔ gói nghĩa là actor tham gia **một hoặc nhiều** use case trong gói; nhãn liệt kê use case khi actor chỉ tham gia một phần của gói. Danh sách chính xác xem §12.1 và §12.3.
+- Mũi tên nét đứt giữa hai gói tóm tắt quan hệ `«include»` / `«extend»` giữa use case của hai gói đó. Ba quan hệ `«extend»` vào `UC-35` nằm trong cùng gói P2 nên không vẽ ở đây (xem §12.3.1 và §12.4).
+- `Hệ thống bên ngoài` gom 6 external system actor ở §7.6; use case cụ thể của từng hệ thống xem cột "Actor phụ / hệ thống ngoài" ở §12.1.
 
-| ID    | Use Case                                          | Actor chính                 | FR liên quan                                       | Mức ưu tiên |
-| ----- | ------------------------------------------------- | --------------------------- | -------------------------------------------------- | ----------- |
-| UC-01 | Xác thực theo actor / Quản lý thông tin           | Actor đã xác thực           | `FR-IAM-*`                                         | Cao         |
-| UC-02 | Tìm kiếm và so sánh chuyến                        | Người dùng, Guest           | `FR-MKT-01..04`                                    | Cao         |
-| UC-03 | Xem chi tiết chuyến và profile Operator           | Người dùng, Guest           | `FR-MKT-05..06`                                    | Cao         |
-| UC-04 | Chọn ghế và giữ ghế                               | Người dùng, Guest, Hệ thống | `FR-MKT-07`, `FR-BTP-01..04`                       | Cao         |
-| UC-05 | Tạo booking                                       | Người dùng, Guest, Hệ thống | `FR-MKT-08..10`, `FR-BTP-05..06`, `FR-PROM-05..06` | Cao         |
-| UC-06 | Thanh toán booking                                | Người dùng, Guest, Hệ thống | `FR-BTP-07..09`                                    | Cao         |
-| UC-07 | Nhận và xem vé điện tử                            | Người dùng, Guest, Hệ thống | `FR-BTP-10..11`                                    | Cao         |
-| UC-08 | Hủy vé / yêu cầu hoàn tiền                        | Người dùng, Guest, Admin    | `FR-BTP-12..14`, `FR-MKT-12`, `FR-IAM-10`          | Cao         |
-| UC-09 | Đánh giá, hỗ trợ và khiếu nại                     | Người dùng, Guest           | `FR-NSR-06`, `FR-NSR-09..11`, `FR-MKT-12`          | Trung bình  |
-| UC-10 | Đăng ký Operator và gửi hồ sơ KYC                 | Nhà xe                      | `FR-OPR-01..05`                                    | Cao         |
-| UC-11 | Quản lý hồ sơ và tài chính Operator               | Nhà xe                      | `FR-OPR-02..09`                                    | Cao         |
-| UC-12 | Quản lý Vehicle, VehicleType và SeatMap           | Nhà xe                      | `FR-OPS-01..03`                                    | Cao         |
-| UC-13 | Quản lý route, stop point và đề xuất điểm mới     | Nhà xe, Admin               | `FR-OPS-04..05`, `FR-ADM-04..05`                   | Cao         |
-| UC-14 | Quản lý trip, fare, mở bán và inventory           | Nhà xe                      | `FR-OPS-06..13`                                    | Cao         |
-| UC-15 | Quản lý booking / ticket thuộc Operator           | Nhà xe                      | `FR-OPS-14..15`, `FR-OPR-11`                       | Cao         |
-| UC-16 | Quản lý Employee và phân công nhiệm vụ            | Nhà xe                      | `FR-IAM-05..06`, `FR-OPS-15`, `FR-EMP-*`           | Cao         |
-| UC-17 | Xem báo cáo Operator                              | Nhà xe                      | `FR-NSR-12`                                        | Trung bình  |
-| UC-18 | Xem nhiệm vụ được phân công                       | Employee                    | `FR-EMP-01..04`                                    | Cao         |
-| UC-19 | Xem danh sách hành khách                          | Employee                    | `FR-EMP-05..06`                                    | Cao         |
-| UC-20 | Check-in ticket bằng QR / mã vé                   | Employee                    | `FR-EMP-07..08`, `FR-BTP-11`                       | Cao         |
-| UC-21 | Cập nhật trạng thái chuyến                        | Employee                    | `FR-EMP-09`                                        | Cao         |
-| UC-22 | Ghi nhật trình và báo cáo sự cố                   | Employee                    | `FR-EMP-10..13`                                    | Cao         |
-| UC-23 | Duyệt KYC và quản lý Operator                     | Admin                       | `FR-ADM-02..03`, `FR-OPR-06`                       | Cao         |
-| UC-24 | Quản lý catalog chuẩn                             | Admin                       | `FR-ADM-04..05`                                    | Cao         |
-| UC-25 | Cấu hình policy, commission và payout             | Admin                       | `FR-ADM-06..09`                                    | Cao         |
-| UC-26 | Giám sát payment, refund, escrow, payout          | Admin                       | `FR-BTP-15..17`, `FR-ADM-10`                       | Cao         |
-| UC-27 | Xử lý dispute case và refund thủ công             | Admin                       | `FR-DSP-*`, `FR-BTP-14`, `FR-ADM-11`               | Cao         |
-| UC-28 | Kiểm duyệt nội dung, review và nội dung công khai | Admin                       | `FR-ADM-13`, `FR-NSR-10..11`, `FR-NSR-15`          | Trung bình  |
-| UC-29 | Xem báo cáo toàn hệ thống                         | Admin                       | `FR-ADM-17`, `FR-NSR-13`                           | Trung bình  |
-| UC-30 | Truy xuất audit log                               | Admin                       | `FR-ADM-16`, `NFR-AUDIT-*`                         | Cao         |
-| UC-31 | Gửi notification theo sự kiện nghiệp vụ           | Hệ thống                    | `FR-NSR-01..05`                                    | Cao         |
-| UC-32 | Đối soát và chạy lại job nền                      | Hệ thống, Admin             | `FR-BTP-17`, `NFR-AVAIL-03`, `NFR-MAINT-06`        | Cao         |
-| UC-33 | Quản lý promotion cấp Platform / Operator         | Admin, Nhà xe               | `FR-PROM-*`, `FR-ADM-12`                           | Trung bình  |
-| UC-34 | Cấu hình notification preference                  | User, Nhà xe, Employee      | `FR-NSR-14`                                        | Trung bình  |
-| UC-35 | Tra cứu vé khách vãng lai                         | Guest                       | `FR-MKT-12`, `FR-IAM-10`                           | Trung bình  |
+### 12.3. Sơ đồ Use Case theo vai trò
+
+#### 12.3.1. Hành khách (Người dùng, Khách vãng lai)
+
+```mermaid
+flowchart LR
+    User["Người dùng<br/>(User)"]
+    Guest["Khách vãng lai<br/>(Guest)"]
+    Passenger["«abstract actor»<br/>Hành khách"]
+
+    User -->|«generalization»| Passenger
+    Guest -->|«generalization»| Passenger
+
+    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
+        direction TB
+        UC01(["UC-01<br/>Xác thực / quản lý thông tin"])
+        UC34(["UC-34<br/>Notification preference"])
+        UC02(["UC-02<br/>Tìm kiếm và so sánh chuyến"])
+        UC03(["UC-03<br/>Xem chi tiết chuyến / Operator"])
+        UC04(["UC-04<br/>Chọn ghế và giữ ghế"])
+        UC05(["UC-05<br/>Tạo booking"])
+        UC06(["UC-06<br/>Thanh toán booking"])
+        UC07(["UC-07<br/>Nhận và xem vé điện tử"])
+        UC08(["UC-08<br/>Hủy vé / yêu cầu hoàn tiền"])
+        UC09(["UC-09<br/>Đánh giá / hỗ trợ / khiếu nại"])
+        UC35(["UC-35<br/>Tra cứu vé Guest"])
+        UC36(["UC-36<br/>Tích điểm / hạng VXN Plus"])
+        UC37(["UC-37<br/>Đổi điểm / ví voucher"])
+        UC38(["UC-38<br/>Đọc bài viết"])
+        UC31(["UC-31<br/>Gửi notification<br/>(tác vụ hệ thống)"])
+        UC27(["UC-27<br/>Dispute / refund thủ công<br/>(Admin)"])
+        UC32(["UC-32<br/>Đối soát / chạy lại job<br/>(tác vụ hệ thống, Admin)"])
+    end
+
+    PaymentGateway["Cổng thanh toán"]
+    RoutingProvider["Dịch vụ định tuyến"]
+    NotificationProvider["Dịch vụ thông báo"]
+    OAuthProvider["Nhà cung cấp OAuth<br/>(Google, Facebook, Apple)"]
+
+    Passenger --- UC02
+    Passenger --- UC03
+    Passenger --- UC04
+    Passenger --- UC05
+    Passenger --- UC06
+    Passenger --- UC07
+    Passenger --- UC08
+    Passenger --- UC38
+    User --- UC01
+    User --- UC09
+    User --- UC34
+    User --- UC36
+    User --- UC37
+    Guest ---|hỗ trợ / khiếu nại| UC09
+    Guest --- UC35
+
+    UC06 -.->|«include»| UC31
+    UC07 -.->|«include»| UC31
+    UC08 -.->|«include»| UC31
+    UC07 -.->|«extend»| UC35
+    UC08 -.->|«extend»| UC35
+    UC09 -.->|«extend»| UC35
+    UC37 -.->|«extend»| UC05
+    UC27 -.->|«extend»| UC08
+    UC27 -.->|«extend»| UC09
+    UC32 -.->|«extend»| UC06
+    UC32 -.->|«extend»| UC08
+
+    UC02 --- RoutingProvider
+    UC06 --- PaymentGateway
+    UC08 --- PaymentGateway
+    UC31 --- NotificationProvider
+    UC01 --- NotificationProvider
+    UC01 --- OAuthProvider
+
+    classDef abstractActor stroke-dasharray: 5 3,font-style:italic
+    classDef otherRole stroke-dasharray: 3 3
+    class Passenger abstractActor
+    class UC31,UC27,UC32 otherRole
+```
+
+Association của `Hành khách` được kế thừa bởi cả `User` và `Guest`. Guest không đăng nhập, không có tài khoản thành viên, ví voucher hay notification preference; Guest chỉ xem / hủy vé / gửi hỗ trợ lại sau khi xác minh qua `UC-35`.
+
+#### 12.3.2. Nhà xe (Operator)
+
+```mermaid
+flowchart LR
+    Operator["Nhà xe<br/>(Operator)"]
+
+    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
+        direction TB
+        UC01(["UC-01<br/>Xác thực / quản lý thông tin"])
+        UC34(["UC-34<br/>Notification preference"])
+        UC10(["UC-10<br/>Đăng ký Operator / KYC"])
+        UC11(["UC-11<br/>Hồ sơ và tài chính Operator"])
+        UC12(["UC-12<br/>Vehicle / VehicleType / SeatMap"])
+        UC13(["UC-13<br/>Route / stop point"])
+        UC14(["UC-14<br/>Trip / fare / inventory"])
+        UC15(["UC-15<br/>Booking / ticket Operator"])
+        UC16(["UC-16<br/>Employee / phân công"])
+        UC17(["UC-17<br/>Báo cáo Operator"])
+        UC33(["UC-33<br/>Quản lý promotion"])
+    end
+
+    StorageProvider["Dịch vụ lưu trữ tệp"]
+    RoutingProvider["Dịch vụ định tuyến"]
+
+    Operator --- UC01
+    Operator --- UC34
+    Operator --- UC10
+    Operator --- UC11
+    Operator --- UC12
+    Operator --- UC13
+    Operator --- UC14
+    Operator --- UC15
+    Operator --- UC16
+    Operator --- UC17
+    Operator --- UC33
+
+    UC10 --- StorageProvider
+    UC17 --- StorageProvider
+    UC13 --- RoutingProvider
+    UC14 --- RoutingProvider
+```
+
+Không có quan hệ `«include»` / `«extend»` giữa các use case của Nhà xe. `UC-13` và `UC-33` dùng chung với Admin (§12.3.4). Nhà xe còn là actor phụ của `UC-08`, `UC-09`, `UC-27` và các use case khác ghi ở §12.1.
+
+#### 12.3.3. Nhân viên nhà xe (Employee)
+
+```mermaid
+flowchart LR
+    Employee["«abstract actor»<br/>Nhân viên nhà xe"]
+    TicketStaff["Nhân viên vé<br/>(TICKET_STAFF)"]
+    Driver["Tài xế<br/>(DRIVER)"]
+    SupportStaff["Nhân viên hỗ trợ<br/>(SUPPORT_STAFF)"]
+
+    TicketStaff -->|«generalization»| Employee
+    Driver -->|«generalization»| Employee
+    SupportStaff -->|«generalization»| Employee
+
+    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
+        direction TB
+        UC01(["UC-01<br/>Xác thực / quản lý thông tin"])
+        UC34(["UC-34<br/>Notification preference"])
+        UC18(["UC-18<br/>Nhiệm vụ được phân công"])
+        UC19(["UC-19<br/>Danh sách hành khách"])
+        UC20(["UC-20<br/>Check-in ticket"])
+        UC21(["UC-21<br/>Cập nhật trạng thái chuyến"])
+        UC22(["UC-22<br/>Nhật trình / báo cáo sự cố"])
+    end
+
+    StorageProvider["Dịch vụ lưu trữ tệp"]
+
+    Employee --- UC01
+    Employee --- UC34
+    Employee --- UC18
+    TicketStaff --- UC19
+    TicketStaff --- UC20
+    Driver --- UC19
+    Driver --- UC20
+    Driver --- UC21
+    Driver --- UC22
+    SupportStaff ---|báo cáo sự cố| UC22
+
+    UC22 --- StorageProvider
+
+    classDef abstractActor stroke-dasharray: 5 3,font-style:italic
+    class Employee abstractActor
+```
+
+Association theo role vẽ theo cột "Role áp dụng" của `FR-EMP-*` (§10.7); các ô "Theo phân quyền" ở §15.4 không vẽ. Không có quan hệ `«include»` / `«extend»` giữa các use case của Nhân viên nhà xe.
+
+#### 12.3.4. Admin toàn hệ thống
+
+```mermaid
+flowchart LR
+    Admin["Admin toàn hệ thống<br/>(Admin)"]
+
+    subgraph SystemBoundary["System boundary: Marketplace-Ve-Xe-Nhanh"]
+        direction TB
+        UC01(["UC-01<br/>Xác thực / quản lý thông tin"])
+        UC08(["UC-08<br/>Hủy vé / hoàn tiền"])
+        UC13(["UC-13<br/>Route / stop point"])
+        UC23(["UC-23<br/>Duyệt KYC / quản lý Operator"])
+        UC24(["UC-24<br/>Catalog chuẩn"])
+        UC25(["UC-25<br/>Policy / commission / payout"])
+        UC26(["UC-26<br/>Giám sát chuỗi tài chính"])
+        UC27(["UC-27<br/>Dispute / refund thủ công"])
+        UC28(["UC-28<br/>Kiểm duyệt nội dung / review"])
+        UC29(["UC-29<br/>Báo cáo toàn hệ thống"])
+        UC30(["UC-30<br/>Truy xuất audit log"])
+        UC32(["UC-32<br/>Đối soát / chạy lại job"])
+        UC33(["UC-33<br/>Quản lý promotion"])
+        UC39(["UC-39<br/>Cấu hình / giám sát VXN Plus"])
+        UC40(["UC-40<br/>Quản lý bài viết"])
+        UC31(["UC-31<br/>Gửi notification<br/>(tác vụ hệ thống)"])
+        UC06(["UC-06<br/>Thanh toán booking<br/>(Hành khách)"])
+        UC09(["UC-09<br/>Đánh giá / hỗ trợ / khiếu nại<br/>(Hành khách)"])
+    end
+
+    PaymentGateway["Cổng thanh toán"]
+    PayoutBank["Dịch vụ ngân hàng payout"]
+    NotificationProvider["Dịch vụ thông báo"]
+    StorageProvider["Dịch vụ lưu trữ tệp"]
+
+    Admin --- UC01
+    Admin --- UC08
+    Admin --- UC13
+    Admin --- UC23
+    Admin --- UC24
+    Admin --- UC25
+    Admin --- UC26
+    Admin --- UC27
+    Admin --- UC28
+    Admin --- UC29
+    Admin --- UC30
+    Admin --- UC32
+    Admin --- UC33
+    Admin --- UC39
+    Admin --- UC40
+
+    UC08 -.->|«include»| UC31
+    UC27 -.->|«include»| UC31
+    UC27 -.->|«extend»| UC08
+    UC27 -.->|«extend»| UC09
+    UC32 -.->|«extend»| UC06
+    UC32 -.->|«extend»| UC08
+
+    UC08 --- PaymentGateway
+    UC26 --- PaymentGateway
+    UC27 --- PaymentGateway
+    UC32 --- PaymentGateway
+    UC26 --- PayoutBank
+    UC32 --- PayoutBank
+    UC31 --- NotificationProvider
+    UC32 --- NotificationProvider
+    UC27 --- StorageProvider
+    UC29 --- StorageProvider
+    UC40 --- StorageProvider
+
+    classDef otherRole stroke-dasharray: 3 3
+    class UC31,UC06,UC09 otherRole
+```
+
+`UC-32` vừa chạy tự động theo lịch vừa cho Admin kích hoạt chạy lại. `UC-31` không có actor người khởi tạo; nó chỉ xuất hiện trong sơ đồ Hành khách và Admin qua quan hệ `«include»`.
+
+### 12.4. Quan hệ `«include»` và `«extend»`
+
+Bảng dưới là nguồn chuẩn cho mọi quan hệ `«include»` / `«extend»`; các sơ đồ §12.2 và §12.3 vẽ lại từ bảng này.
+
+| Use case nguồn                          | Quan hệ     | Use case đích                           | Điều kiện / extension point                                        |
+| --------------------------------------- | ----------- | --------------------------------------- | ------------------------------------------------------------------ |
+| UC-06 Thanh toán booking                | `«include»` | UC-31 Gửi notification                  | Thanh toán thành công hoặc thất bại / hết hạn (`NTF-05`, `NTF-06`) |
+| UC-07 Nhận và xem vé điện tử            | `«include»` | UC-31 Gửi notification                  | Phát hành vé (`NTF-05`)                                            |
+| UC-08 Hủy vé / yêu cầu hoàn tiền        | `«include»` | UC-31 Gửi notification                  | Ghi nhận hủy vé / đổi trạng thái refund (`NTF-08`, `NTF-09`)       |
+| UC-27 Dispute / refund thủ công         | `«include»` | UC-31 Gửi notification                  | Dispute đổi trạng thái / có quyết định (`NTF-18`)                  |
+| UC-27 Dispute / refund thủ công         | `«extend»`  | UC-09 Đánh giá / hỗ trợ / khiếu nại     | Khi khiếu nại cần Admin phân xử                                    |
+| UC-27 Dispute / refund thủ công         | `«extend»`  | UC-08 Hủy vé / yêu cầu hoàn tiền        | Refund thủ công hoặc tranh chấp về hoàn tiền                       |
+| UC-32 Đối soát / chạy lại job           | `«extend»`  | UC-06 Thanh toán booking                | Callback payment bất thường                                        |
+| UC-32 Đối soát / chạy lại job           | `«extend»`  | UC-08 Hủy vé / yêu cầu hoàn tiền        | Refund cần đối soát                                                |
+| UC-07 Nhận và xem vé điện tử            | `«extend»`  | UC-35 Tra cứu vé Guest                  | Guest đã xác minh chọn xem vé                                      |
+| UC-08 Hủy vé / yêu cầu hoàn tiền        | `«extend»`  | UC-35 Tra cứu vé Guest                  | Guest đã xác minh chọn hủy / hoàn tiền                             |
+| UC-09 Đánh giá / hỗ trợ / khiếu nại     | `«extend»`  | UC-35 Tra cứu vé Guest                  | Guest đã xác minh chọn hỗ trợ / khiếu nại                          |
+| UC-37 Đổi điểm và sử dụng ví voucher    | `«extend»`  | UC-05 Tạo booking                       | User đã đăng nhập chọn voucher hợp lệ trong ví                     |
+
+Quy ước áp dụng:
+
+- `A «include» B`: mỗi lần thực hiện nhánh thành công liên quan của A phải phát / enqueue hành vi B; mũi tên đi từ A đến B. Với `UC-31`, việc gửi qua provider chạy bất đồng bộ; lỗi delivery không rollback nghiệp vụ chính.
+- `A «extend» B`: A chỉ chèn thêm hành vi tại điều kiện ghi trong bảng; B vẫn hoàn chỉnh khi extension không xảy ra; mũi tên đi từ A đến B. Các extension vào `UC-35` chỉ áp dụng cho Guest đã xác minh, không thay luồng trực tiếp của User.
+- Chuỗi `UC-02 → UC-03 → UC-04 → UC-05 → UC-06 → UC-07` là workflow / tiền điều kiện trong §16, không phải chuỗi `«include»`. Đặc biệt, `UC-05` không include `UC-04` vì SeatHold hợp lệ là tiền điều kiện của `UC-05`.
+- `UC-31` không include `UC-34`: `UC-34` là use case quản lý cấu hình, còn `UC-31` chỉ đọc và áp dụng preference. `UC-33` cũng không extend `UC-05` vì quản lý promotion khác với hành vi áp dụng promotion trong checkout.
+- `UC-37 «extend» UC-05` chỉ chèn bước chọn voucher; nhập mã khuyến mãi thủ công vẫn thuộc `UC-05` / `FR-MKT-10`. `UC-36`, `UC-39` và `UC-40` không có quan hệ `«include»` / `«extend»`: cộng điểm được kích hoạt bởi sự kiện chuyến `COMPLETED`, không phải bước của use case khác.
 
 ---
 
@@ -1059,54 +1369,58 @@ Mỗi Use Case dưới đây trình bày: actor, mục tiêu, tiền điều ki�
 
 ### UC-01: Xác thực theo actor và quản lý thông tin
 
-| Thuộc tính     | Nội dung                                                                                                                                                                                                                                                                      |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Actor chính    | Người dùng (User), Nhà xe (Operator), Nhân viên nhà xe (Employee), Admin toàn hệ thống (Admin)                                                                                                                                                                                |
-| Actor phụ      | Hệ thống; Guest chỉ tham gia xác minh thao tác nhạy cảm nếu có luồng tra cứu vé / guest flow                                                                                                                                                                                  |
-| Mục tiêu       | Cung cấp luồng xác thực và quản lý thông tin phù hợp cho từng actor, bao gồm đăng ký / đăng nhập User, đăng nhập Operator / Employee / Admin theo đúng cổng, đặt lại mật khẩu theo policy, quản lý hồ sơ User, quản lý session / token và xác thực lại cho thao tác nhạy cảm. |
-| Tiền điều kiện | User có thể chưa có tài khoản khi đăng ký; các actor nội bộ đã có tài khoản hợp lệ theo cơ chế tương ứng; tài khoản chưa bị khóa, chưa bị thu hồi quyền và chưa hết hiệu lực.                                                                                                 |
-| Kích hoạt      | Actor mở luồng đăng ký, đăng nhập, quên mật khẩu / đặt lại mật khẩu, cập nhật hồ sơ, làm mới phiên, hoặc hệ thống yêu cầu xác thực lại trước thao tác nhạy cảm.                                                                                                               |
-| Hậu điều kiện  | Actor có session / token hợp lệ hoặc yêu cầu được xử lý đúng policy; hồ sơ User được cập nhật nếu hợp lệ; lịch sử đăng nhập, thay đổi và revoke session được ghi nhận.                                                                                                        |
-| Ưu tiên        | Cao                                                                                                                                                                                                                                                                           |
+| Thuộc tính     | Nội dung                                                                                                                                                                                                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Actor chính    | Người dùng (User), Nhà xe (Operator), Nhân viên nhà xe (Employee), Admin toàn hệ thống (Admin)                                                                                                                                                                                                   |
+| Actor phụ      | Hệ thống, Dịch vụ thông báo (gửi OTP), Nhà cung cấp OAuth; Guest chỉ tham gia xác minh thao tác nhạy cảm nếu có luồng tra cứu vé / guest flow                                                                                                                                                   |
+| Mục tiêu       | Cung cấp luồng xác thực và quản lý thông tin phù hợp cho từng actor: User đăng ký / đăng nhập bằng email OTP hoặc OAuth, Owner / Employee / Admin đăng nhập đúng cổng và namespace, đổi mật khẩu tạm và TOTP cho tài khoản được cấp, quản lý hồ sơ User, quản lý session / token và xác thực lại cho thao tác nhạy cảm. |
+| Tiền điều kiện | User có thể chưa có tài khoản khi đăng ký; tài khoản Operator, Employee, Admin đã được cấp theo closed enrollment (không tự đăng ký); tài khoản chưa bị khóa, chưa bị thu hồi quyền và chưa hết hiệu lực.                                                                                          |
+| Kích hoạt      | Actor mở luồng đăng ký, đăng nhập, đổi mật khẩu tạm, đăng ký TOTP, cập nhật hồ sơ, làm mới phiên, hoặc hệ thống yêu cầu xác thực lại trước thao tác nhạy cảm.                                                                                                                                    |
+| Hậu điều kiện  | Actor có session / token hợp lệ hoặc yêu cầu được xử lý đúng policy; hồ sơ User được cập nhật nếu hợp lệ; lịch sử đăng nhập, thay đổi và revoke session được ghi nhận.                                                                                                                           |
+| Ưu tiên        | Cao                                                                                                                                                                                                                                                                                              |
 
 Luồng chính:
 
-1. User có thể đăng ký tài khoản bằng số điện thoại hoặc email theo cơ chế dành cho hành khách.
-2. User đăng nhập bằng số điện thoại hoặc email theo cơ chế xác thực dành cho Marketplace layer.
-3. User có thể dùng luồng quên mật khẩu / đặt lại mật khẩu bằng cơ chế xác minh dành cho hành khách.
-4. Admin đăng nhập bằng tài khoản Admin nội bộ đã được tạo sẵn; hệ thống không cung cấp luồng tự đăng ký public hoặc public reset password cho Admin.
-5. Operator đăng nhập vào Operator OS portal bằng username/password của tài khoản nhà xe đã được cấp hoặc đã được tạo qua quy trình onboarding.
-6. Employee đăng nhập vào app/portal nhân viên bằng username/password do Operator cấp; Employee không dùng chung giao diện nghiệp vụ với Operator.
-7. Hệ thống xác thực loại actor, trạng thái tài khoản, quyền, role và tenant boundary.
-8. Hệ thống tạo session/token, áp dụng refresh policy, timeout phiên, giới hạn phiên hoặc quản lý đa thiết bị nếu policy được bật.
-9. Hệ thống chuyển actor vào đúng giao diện:
+1. User đăng ký bằng email: hệ thống gửi OTP tới email và chỉ tạo tài khoản sau khi OTP được xác minh.
+2. User đăng nhập bằng email + OTP gửi qua email, hoặc bằng OAuth Google / Facebook / Apple; hành khách không có mật khẩu.
+3. Khi OAuth trả về email trùng một tài khoản đã xác minh, hệ thống liên kết vào cùng tài khoản thay vì tạo tài khoản mới.
+4. Admin đăng nhập Platform admin portal bằng tài khoản `platform/{username}` và mật khẩu đã được cấp nội bộ; hệ thống không cung cấp luồng tự đăng ký public hoặc public reset password cho Admin.
+5. Operator (Owner) đăng nhập vào Operator OS portal bằng tài khoản `{operatorSlug}/{username}` do Platform cấp khi hồ sơ đăng ký được duyệt (`UC-23`).
+6. Employee đăng nhập vào app nhân viên (`employee_mobile`) bằng tài khoản `{operatorSlug}/nv.{…}` do Operator cấp; Employee không đăng nhập Operator OS.
+7. Với tài khoản được cấp mật khẩu tạm (Owner, Employee), lần đăng nhập đầu hệ thống yêu cầu đổi mật khẩu rồi đăng nhập lại; mật khẩu tạm có hạn dùng.
+8. Owner và Admin bắt buộc xác thực TOTP sau mật khẩu; lần đầu đăng ký TOTP và nhận 10 backup code dùng một lần. Employee có thể bật TOTP tùy chọn.
+9. Hệ thống xác thực loại actor, trạng thái tài khoản, quyền, role và tenant boundary.
+10. Hệ thống tạo session/token, áp dụng refresh policy, timeout phiên, giới hạn phiên hoặc quản lý đa thiết bị nếu policy được bật.
+11. Hệ thống chuyển actor vào đúng giao diện:
    - User vào Marketplace layer.
    - Operator vào Operator OS portal.
-   - Employee vào Employee app/portal.
+   - Employee vào app nhân viên.
    - Admin vào Platform admin portal.
-10. User có thể xem và cập nhật hồ sơ cá nhân của chính mình trong phạm vi được phép.
-11. Với thao tác nhạy cảm, hệ thống yêu cầu xác thực lại theo `FR-IAM-10`.
-12. Khi tài khoản bị khóa, mật khẩu bị cấp lại, quyền bị thu hồi hoặc phát hiện rủi ro bảo mật, hệ thống revoke session/token liên quan.
+12. User có thể xem và cập nhật hồ sơ cá nhân của chính mình trong phạm vi được phép; đổi email phải xác minh OTP.
+13. Với thao tác nhạy cảm, hệ thống yêu cầu xác thực lại theo `FR-IAM-10`.
+14. Khi tài khoản bị khóa, mật khẩu bị cấp lại, quyền bị thu hồi hoặc phát hiện rủi ro bảo mật, hệ thống revoke session/token liên quan.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: User đăng ký bằng email hoặc số điện thoại đã tồn tại → hệ thống từ chối đăng ký và hướng dẫn đăng nhập hoặc đặt lại mật khẩu.
-- A2: User đăng nhập sai thông tin hoặc vượt số lần thử → hệ thống từ chối, ghi nhận lần thất bại và áp dụng giới hạn / khóa tạm thời theo policy.
-- A3: User đặt lại mật khẩu nhưng OTP / email token không hợp lệ, hết hạn hoặc xác minh thất bại → hệ thống từ chối đặt lại mật khẩu.
+- A1: User đăng ký bằng email đã có tài khoản → hệ thống không tạo tài khoản trùng và hướng dẫn đăng nhập bằng OTP.
+- A2: Actor nhập sai OTP / mật khẩu / TOTP hoặc vượt số lần thử → hệ thống từ chối, ghi nhận lần thất bại và áp dụng giới hạn gửi lại / khóa tạm thời theo policy.
+- A3: User hủy OAuth, provider lỗi hoặc callback không hợp lệ → hệ thống không đăng nhập và cho chọn lại phương thức; provider không trả email đã xác minh → hệ thống không tự liên kết với tài khoản sẵn có.
 - A4: Admin cố dùng luồng public registration hoặc public reset password → hệ thống từ chối và yêu cầu thực hiện theo quy trình nội bộ có thẩm quyền.
-- A5: Operator hoặc Employee cố đăng nhập bằng luồng User số điện thoại / email → hệ thống từ chối và không tiết lộ thông tin tài khoản.
-- A6: Actor dùng sai portal, ví dụ Employee vào Operator OS hoặc Operator vào Employee app → hệ thống từ chối hoặc chuyển hướng sang cổng phù hợp nếu policy cho phép.
+- A5: Operator hoặc Employee cố đăng nhập bằng luồng email OTP / OAuth dành cho User → hệ thống từ chối và không tiết lộ thông tin tài khoản.
+- A6: Actor dùng sai cổng đăng nhập, ví dụ Employee đăng nhập Operator OS hoặc Owner đăng nhập app nhân viên → hệ thống từ chối như sai thông tin đăng nhập, không tiết lộ tài khoản tồn tại; Operator OS hướng dẫn tài khoản có tiền tố `nv.` dùng app nhân viên.
 - A7: Tài khoản bị khóa, bị thu hồi quyền, mật khẩu bị cấp lại hoặc phát hiện rủi ro bảo mật → hệ thống revoke session/token hiện có và yêu cầu xử lý theo quy trình.
 - A8: Refresh token hết hạn, không hợp lệ hoặc không khớp phiên đã lưu → hệ thống yêu cầu đăng nhập lại.
 - A9: Xác thực lại cho thao tác nhạy cảm thất bại → hệ thống từ chối thao tác, ghi log và giữ nguyên dữ liệu trước đó.
 - A10: User cập nhật hồ sơ thiếu dữ liệu hợp lệ hoặc vượt phạm vi được phép → hệ thống từ chối cập nhật và hiển thị lỗi phù hợp.
+- A11: Mật khẩu tạm hết hạn trước khi đổi → hệ thống từ chối đăng nhập; người có thẩm quyền phải cấp lại mật khẩu tạm.
+- A12: Owner hoặc Admin mất thiết bị TOTP → dùng backup code; hết backup code thì yêu cầu người có thẩm quyền đặt lại TOTP theo quy trình nội bộ có audit log.
 
 ### UC-02: Tìm kiếm và so sánh chuyến
 
 | Thuộc tính     | Nội dung                                                                                                     |
 | -------------- | ------------------------------------------------------------------------------------------------------------ |
 | Actor chính    | Người dùng (User), Khách vãng lai (Guest)                                                                    |
-| Actor phụ      | Hệ thống                                                                                                     |
+| Actor phụ      | Hệ thống, Dịch vụ định tuyến                                                                                                     |
 | Mục tiêu       | Giúp hành khách tìm và so sánh các chuyến đang mở bán từ nhiều Operator trên Marketplace layer.              |
 | Tiền điều kiện | Hệ thống có dữ liệu tuyến, điểm dừng, chuyến, giá vé, trạng thái ghế và Operator đã được phép bán công khai. |
 | Kích hoạt      | User hoặc Guest nhập điểm đi, điểm đến, ngày đi và số lượng khách.                                           |
@@ -1152,7 +1466,7 @@ Luồng chính:
 4. Hệ thống hiển thị sơ đồ ghế / giường và trạng thái khả dụng ở mức phục vụ quyết định đặt vé.
 5. Hệ thống hiển thị giá vé, phí nếu có, chính sách hủy / hoàn tiền, thời gian ngừng bán online và các điều kiện quan trọng trước khi đặt.
 6. Hệ thống hiển thị profile Operator gồm thông tin công khai, logo, mô tả, hotline, email, scorecard, review hợp lệ, tuyến tiêu biểu và điều khoản dịch vụ.
-7. User hoặc Guest chọn tiếp tục sang UC-04 để chọn ghế và giữ ghế nếu chuyến còn đủ điều kiện bán. Với Guest, hệ thống sử dụng phiên guest/session tạm để theo dõi quá trình chọn ghế và sẽ yêu cầu cung cấp hoặc xác minh thông tin liên hệ ở bước tạo booking / thao tác nhạy cảm nếu cần.
+7. User hoặc Guest chọn tiếp tục sang `UC-04` để chọn ghế và giữ ghế nếu chuyến còn đủ điều kiện bán. Với Guest, hệ thống sử dụng phiên guest/session tạm để theo dõi quá trình chọn ghế và sẽ yêu cầu cung cấp hoặc xác minh thông tin liên hệ ở bước tạo booking / thao tác nhạy cảm nếu cần.
 
 Luồng thay thế / ngoại lệ:
 
@@ -1170,7 +1484,7 @@ Luồng thay thế / ngoại lệ:
 | Mục tiêu       | Cho phép User/Guest chọn một hoặc nhiều ghế / giường khả dụng và giữ tạm thời bằng SeatHold có TTL để chống bán trùng ghế.         |
 | Tiền điều kiện | Người dùng hoặc Khách vãng lai đang ở chi tiết chuyến hợp lệ; chuyến còn mở bán, còn ghế phù hợp và chưa hết thời gian bán online. |
 | Kích hoạt      | User/Guest chọn ghế / giường trên seat map.                                                                                        |
-| Hậu điều kiện  | Ghế được giữ tạm thời cho phiên đặt vé của User hoặc Guest được giải phóng khi giữ ghế thất bại / hết hạn.                         |
+| Hậu điều kiện  | Ghế được giữ tạm thời cho phiên đặt vé của User hoặc Guest, hoặc được giải phóng khi giữ ghế thất bại / hết hạn.                         |
 | Ưu tiên        | Cao                                                                                                                                |
 
 Luồng chính:
@@ -1199,7 +1513,7 @@ Luồng thay thế / ngoại lệ:
 | Actor phụ      | Không có                                                                                                                                                                                        |
 | Mục tiêu       | Tạo booking hợp lệ cho User hoặc Guest từ ghế đang được giữ, thông tin hành khách, điểm đón / trả, fare, policy và promotion snapshot.                                                          |
 | Tiền điều kiện | User hoặc Guest có SeatHold còn hiệu lực cho các ghế đã chọn; chuyến vẫn đủ điều kiện bán.                                                                                                      |
-| Kích hoạt      | User hoặc Guest nhập thông tin hành khách / liên hệ, chọn điểm đón / trả, áp dụng promotion nếu có và xác nhận tạo booking.                                                                     |
+| Kích hoạt      | User hoặc Guest nhập thông tin hành khách / liên hệ, chọn điểm đón / trả, áp dụng promotion hoặc voucher nếu có và xác nhận tạo booking.                                                                     |
 | Hậu điều kiện  | Booking được tạo ở trạng thái `PENDING_PAYMENT` trong luồng checkout mặc định v1; dữ liệu snapshot bắt buộc được lưu; booking của Guest gắn với guest session và thông tin liên hệ đã cung cấp. |
 | Ưu tiên        | Cao                                                                                                                                                                                             |
 
@@ -1207,20 +1521,20 @@ Luồng chính:
 
 1. User hoặc Guest nhập thông tin hành khách, thông tin liên hệ và ghi chú hợp lệ cho booking.
 2. User hoặc Guest chọn điểm đón và điểm trả trong danh sách được cấu hình cho chuyến.
-3. User hoặc Guest nhập mã giảm giá hoặc chọn chương trình khuyến mãi nếu có; hệ thống chỉ áp dụng promotion nếu chương trình cho phép actor / kênh đặt vé tương ứng.
+3. User hoặc Guest nhập mã giảm giá hoặc chọn chương trình khuyến mãi nếu có; User đã đăng nhập có thể chọn voucher trong ví thay cho mã (extension point của `UC-37`). Mỗi booking áp dụng tối đa một mã hoặc voucher (`BR-72`); hệ thống chỉ áp dụng promotion nếu chương trình cho phép actor / kênh đặt vé tương ứng.
 4. Hệ thống kiểm tra SeatHold còn hiệu lực, thuộc đúng User / guest session / phiên đặt vé và bao phủ đúng danh sách ghế được đặt.
 5. Hệ thống validate điểm đón / trả hợp lệ theo chuyến, số lượng hành khách khớp số ghế và thông tin hành khách đáp ứng yêu cầu tối thiểu.
 6. Hệ thống kiểm tra điều kiện promotion, giới hạn lượt dùng, phạm vi Operator / tuyến / chuyến và thời gian hiệu lực.
 7. Hệ thống tính tổng tiền gồm giá vé, phí, giảm giá, phí hủy dự kiến nếu có và số tiền hành khách phải trả.
-8. Hệ thống lưu snapshot bắt buộc: chuyến, Operator, route, điểm đón / trả, fare, policy hủy / hoàn tiền, promotion và số tiền đã tính.
-9. Hệ thống tạo booking với mã duy nhất ở trạng thái `PENDING_PAYMENT`; trạng thái chờ xác nhận thủ công chỉ dùng khi một luồng thanh toán sau / vận hành ngoại lệ được bật rõ ràng.
+8. Hệ thống lưu snapshot bắt buộc: chuyến, Operator, route, điểm đón / trả, fare, policy hủy / hoàn tiền, promotion / voucher kèm bên chịu phần giảm và số tiền đã tính.
+9. Hệ thống tạo booking với mã duy nhất ở trạng thái `PENDING_PAYMENT`; trạng thái chờ xác nhận thủ công chỉ dùng khi một luồng thanh toán sau / vận hành ngoại lệ được bật rõ ràng. Voucher được chọn chuyển sang `RESERVED` cho booking này.
 10. Hệ thống ghi lịch sử trạng thái booking và chuyển User hoặc Guest sang bước thanh toán hoặc chờ xác nhận.
 
 Luồng thay thế / ngoại lệ:
 
 - A1: SeatHold không tồn tại, hết hạn, không thuộc User / guest session hoặc không khớp ghế đang đặt → hệ thống không tạo booking và yêu cầu chọn ghế lại.
 - A2: Điểm đón / trả không hợp lệ hoặc không còn áp dụng cho chuyến → hệ thống từ chối booking và yêu cầu chọn lại.
-- A3: Promotion không hợp lệ, hết lượt, sai phạm vi, hết hạn hoặc không áp dụng cho Guest → hệ thống hiển thị lý do và cho phép tiếp tục không áp dụng promotion.
+- A3: Promotion hoặc voucher không hợp lệ, hết lượt, sai phạm vi, hết hạn, không áp dụng cho Guest, hoặc actor gửi cùng lúc cả mã và voucher → hệ thống hiển thị lý do và cho phép tiếp tục với tối đa một ưu đãi hợp lệ hoặc không áp dụng ưu đãi.
 - A4: Fare, policy hoặc thông tin chuyến thay đổi trước khi xác nhận → hệ thống tính lại, hiển thị snapshot mới và yêu cầu User hoặc Guest xác nhận lại.
 - A5: Ghế không còn khả dụng khi kiểm tra cuối → hệ thống không tạo booking, giải phóng hold liên quan nếu cần và yêu cầu chọn ghế khác.
 - A6: Guest không cung cấp thông tin liên hệ hợp lệ → hệ thống không tạo booking và yêu cầu nhập lại thông tin liên hệ có thể dùng để nhận vé / xác minh tra cứu.
@@ -1246,13 +1560,13 @@ Luồng chính:
 5. User hoặc Guest hoàn tất thanh toán trên kênh được chọn.
 6. Payment gateway gửi callback / webhook về hệ thống.
 7. Hệ thống xác minh chữ ký, mã giao dịch, số tiền, trạng thái và xử lý callback theo cơ chế chống xử lý trùng (idempotent).
-8. Khi thanh toán thành công, hệ thống cập nhật payment, booking và trạng thái ghế; ghi dòng tiền vào escrow ledger của Platform, tính dữ liệu commission và chuẩn bị phát hành ticket.
-9. Hệ thống gửi thông báo kết quả thanh toán cho User hoặc Guest; với Guest, thông báo phải gửi qua thông tin liên hệ đã lưu trong booking và phục vụ tra cứu vé theo UC-35.
+8. Khi thanh toán thành công, hệ thống cập nhật payment, booking và trạng thái ghế; ghi dòng tiền vào escrow ledger của Platform, tính dữ liệu commission và chuẩn bị phát hành ticket. Nếu booking dùng voucher, voucher chuyển `USED`; phần giảm của voucher đổi điểm do Platform chịu được ghi dòng riêng trong ledger (`BR-72`, `BR-73`).
+9. Hệ thống gửi thông báo kết quả thanh toán cho User hoặc Guest (`UC-31`); với Guest, thông báo phải gửi qua thông tin liên hệ đã lưu trong booking và phục vụ tra cứu vé theo `UC-35`.
 
 Luồng thay thế / ngoại lệ:
 
 - A1: Booking đã hết hạn, đã hủy hoặc đã thanh toán thành công → hệ thống không tạo payment mới và hiển thị trạng thái hiện tại.
-- A2: Thanh toán thất bại hoặc User / Guest bỏ dở ở cổng thanh toán → hệ thống giữ booking trong thời hạn còn lại hoặc chuyển hết hạn theo policy.
+- A2: Thanh toán thất bại hoặc User / Guest bỏ dở ở cổng thanh toán → hệ thống giữ booking trong thời hạn còn lại hoặc chuyển hết hạn theo policy; voucher đang giữ được trả về ví khi booking chuyển hết hạn (`BR-72`).
 - A3: Callback / webhook trùng lặp → hệ thống nhận diện idempotency key / mã provider transaction và không ghi nhận trùng tiền hoặc trùng trạng thái.
 - A4: Callback trễ, thiếu dữ liệu, lệch số tiền hoặc lệch trạng thái booking → hệ thống đưa giao dịch vào trạng thái cần đối soát và không phát hành ticket nếu chưa đủ căn cứ.
 - A5: Thanh toán thành công nhưng booking đã hết hạn hoặc ghế không còn hợp lệ do sự cố đối soát → hệ thống chuyển sang xử lý ngoại lệ, ưu tiên bảo toàn dữ liệu tài chính và có thể tạo refund / dispute theo policy.
@@ -1263,7 +1577,7 @@ Luồng thay thế / ngoại lệ:
 | Thuộc tính     | Nội dung                                                                                                                         |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Người dùng (User), Khách vãng lai (Guest), Hệ thống                                                                              |
-| Actor phụ      | Dịch vụ thông báo, Nhân viên nhà xe (Employee)                                                                                   |
+| Actor phụ      | Nhân viên nhà xe (Employee), Hệ thống (gửi thông báo qua `UC-31`)                                                                                   |
 | Mục tiêu       | Phát hành và hiển thị ticket điện tử hợp lệ để User / Guest sử dụng khi lên xe và Employee có thể xác thực server-side.          |
 | Tiền điều kiện | Booking đã thanh toán thành công hoặc đã được xác nhận hợp lệ theo luồng thanh toán sau.                                         |
 | Kích hoạt      | Hệ thống phát hành ticket sau sự kiện đủ điều kiện, User mở mục vé / lịch sử booking hoặc Guest tra cứu vé hợp lệ.               |
@@ -1277,15 +1591,15 @@ Luồng chính:
 3. Hệ thống phát hành ticket cho từng hành khách / ghế với mã vé duy nhất.
 4. Hệ thống tạo QR token không đoán được và chỉ có giá trị khi xác thực server-side.
 5. Hệ thống lưu thông tin ticket gồm chuyến, Operator, route, ghế, điểm đón / trả, hành khách, trạng thái ticket và thời điểm phát hành.
-6. User xem ticket trong tài khoản, lịch sử vé hoặc màn hình chi tiết booking; Guest xem ticket bằng mã vé / mã booking và thông tin liên hệ đã xác minh theo UC-35.
-7. Hệ thống gửi thông báo vé điện tử qua kênh đã cấu hình như email, SMS, push hoặc in-app và lưu trạng thái gửi; với Guest, hệ thống chỉ dùng kênh liên hệ đã lưu trong booking.
+6. User xem ticket trong tài khoản, lịch sử vé hoặc màn hình chi tiết booking; Guest xem ticket bằng mã vé / mã booking và thông tin liên hệ đã xác minh theo `UC-35`.
+7. Hệ thống gửi thông báo vé điện tử qua kênh đã cấu hình như email, push, in-app hoặc SMS nếu provider được bật và lưu trạng thái gửi; với Guest, hệ thống chỉ dùng kênh liên hệ đã lưu trong booking.
 8. Khi User hoặc Guest xuất trình vé, Employee có thể quét QR / nhập mã vé ở luồng check-in được phân quyền.
 
 Luồng thay thế / ngoại lệ:
 
 - A1: Notification gửi thất bại hoặc provider tạm lỗi → hệ thống ghi trạng thái lỗi / retry, nhưng ticket vẫn phải xem được trong hệ thống.
 - A2: Sự kiện phát hành ticket bị gọi lại nhiều lần → hệ thống xử lý idempotent và không tạo trùng ticket cho cùng booking item.
-- A3: User hoặc Guest mất kết nối hoặc không nhận được email / SMS → User vẫn có thể đăng nhập và xem lại ticket trong lịch sử vé; Guest có thể tra cứu lại bằng mã vé / mã booking và thông tin liên hệ hợp lệ.
+- A3: User hoặc Guest mất kết nối hoặc không nhận được thông báo → User vẫn có thể đăng nhập và xem lại ticket trong lịch sử vé; Guest có thể tra cứu lại bằng mã vé / mã booking và thông tin liên hệ hợp lệ.
 - A4: QR token bị nghi ngờ lộ hoặc không hợp lệ → hệ thống có thể vô hiệu hóa / cấp lại token theo policy và ghi log.
 - A5: Booking hoặc payment bị đưa vào đối soát sau khi phát hành → hệ thống cập nhật trạng thái ticket theo quyết định xử lý và thông báo User hoặc Guest nếu cần.
 
@@ -1308,22 +1622,22 @@ Luồng chính:
 3. User hoặc Guest chọn hủy vé / yêu cầu hoàn tiền và xem lại thông tin chuyến, ghế, hành khách, payment và điều kiện hủy.
 4. Hệ thống tải policy snapshot đã áp dụng tại thời điểm tạo booking; không áp dụng policy mới ngược về booking cũ.
 5. Hệ thống kiểm tra trạng thái ticket, booking, payment, thời điểm khởi hành, trạng thái check-in và trạng thái chuyến.
-6. Hệ thống tính số tiền dự kiến được hoàn, phí hủy, phần tiền không hoàn nếu có và lý do đủ / không đủ điều kiện.
+6. Hệ thống tính số tiền dự kiến được hoàn, phí hủy, phần tiền không hoàn nếu có và lý do đủ / không đủ điều kiện. Số tiền hoàn tính trên số tiền khách thực trả; phần giảm do Platform chịu được đảo theo cùng tỷ lệ (`BR-73`).
 7. User hoặc Guest xác nhận thao tác sau khi xem điều kiện hủy / hoàn tiền; hệ thống yêu cầu xác thực lại nếu thao tác thuộc nhóm nhạy cảm.
-8. Hệ thống cập nhật trạng thái ticket / booking, giải phóng ghế nếu nghiệp vụ còn cho phép bán lại và tạo refund request khi có số tiền cần hoàn.
+8. Hệ thống cập nhật trạng thái ticket / booking, giải phóng ghế nếu nghiệp vụ còn cho phép bán lại và tạo refund request khi có số tiền cần hoàn. Voucher đã dùng không được trả lại khi hành khách tự hủy (`BR-72`).
 9. Nếu refund có thể xử lý tự động, hệ thống gửi yêu cầu hoàn tiền tới cổng thanh toán và theo dõi kết quả; nếu cần xử lý thủ công, hồ sơ được chuyển cho Admin.
 10. Admin kiểm tra booking, payment, policy snapshot, bằng chứng và lịch sử liên quan trước khi phê duyệt, từ chối hoặc refund đơn phương theo quyền.
 11. Hệ thống cập nhật trạng thái refund / payment liên quan, ghi audit log, thông báo cho User hoặc Guest qua kênh liên hệ hợp lệ và thông báo Operator khi có ảnh hưởng đến doanh thu / vận hành.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Guest nhập sai mã vé / mã booking, sai thông tin liên hệ hoặc không vượt qua xác minh bổ sung -> hệ thống từ chối hiển thị dữ liệu nhạy cảm và không cho hủy / yêu cầu hoàn tiền.
-- A2: Vé đã check-in, chuyến đã hoàn thành hoặc đã quá hạn hủy thông thường -> hệ thống từ chối hủy tự động và có thể hướng hành khách sang hỗ trợ / khiếu nại.
-- A3: Booking nhiều vé nhưng chỉ hủy một phần -> hệ thống chỉ cập nhật các ticket được chọn, tính lại số tiền hoàn và giữ nguyên các ticket còn hiệu lực.
-- A4: Booking thuộc policy không hoàn tiền hoặc số tiền hoàn bằng 0 -> hệ thống vẫn có thể hủy vé nếu policy cho phép nhưng không tạo giao dịch refund thanh toán.
-- A5: Payment gateway từ chối hoàn tiền, callback refund trễ hoặc lệch trạng thái -> hệ thống chuyển refund sang trạng thái cần đối soát / xử lý thủ công.
-- A6: Admin refund thủ công hoặc refund đơn phương với vai trò arbiter -> hệ thống yêu cầu lý do, xác thực lại nếu cần, audit log bắt buộc và thông báo Operator.
-- A7: User / Guest và Operator không đồng thuận về điều kiện hoàn tiền -> hệ thống có thể tạo hoặc liên kết DisputeCase để xử lý theo workflow tranh chấp.
+- A1: Guest nhập sai mã vé / mã booking, sai thông tin liên hệ hoặc không vượt qua xác minh bổ sung → hệ thống từ chối hiển thị dữ liệu nhạy cảm và không cho hủy / yêu cầu hoàn tiền.
+- A2: Vé đã check-in, chuyến đã hoàn thành hoặc đã quá hạn hủy thông thường → hệ thống từ chối hủy tự động và có thể hướng hành khách sang hỗ trợ / khiếu nại.
+- A3: Booking nhiều vé nhưng chỉ hủy một phần → hệ thống chỉ cập nhật các ticket được chọn, tính lại số tiền hoàn và giữ nguyên các ticket còn hiệu lực.
+- A4: Booking thuộc policy không hoàn tiền hoặc số tiền hoàn bằng 0 → hệ thống vẫn có thể hủy vé nếu policy cho phép nhưng không tạo giao dịch refund thanh toán.
+- A5: Payment gateway từ chối hoàn tiền, callback refund trễ hoặc lệch trạng thái → hệ thống chuyển refund sang trạng thái cần đối soát / xử lý thủ công.
+- A6: Admin refund thủ công hoặc refund đơn phương với vai trò arbiter → hệ thống yêu cầu lý do, xác thực lại nếu cần, audit log bắt buộc và thông báo Operator.
+- A7: User / Guest và Operator không đồng thuận về điều kiện hoàn tiền → hệ thống có thể tạo hoặc liên kết DisputeCase để xử lý theo workflow tranh chấp (`UC-27`).
 
 ### UC-09: Đánh giá, hỗ trợ và khiếu nại
 
@@ -1361,35 +1675,36 @@ Luồng thay thế / ngoại lệ:
 
 ### UC-10: Đăng ký Operator và gửi hồ sơ KYC
 
-| Thuộc tính     | Nội dung                                                                                                                                  |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Actor chính    | Nhà xe (Operator)                                                                                                                         |
-| Actor phụ      | Hệ thống, Admin toàn hệ thống (Admin)                                                                                                     |
-| Mục tiêu       | Onboard nhà xe vào marketplace bằng hồ sơ doanh nghiệp, giấy tờ KYC và thông tin nhận tiền để Platform kiểm soát quyền tham gia nền tảng. |
-| Tiền điều kiện | Operator chưa có hồ sơ được duyệt hoặc cần bổ sung hồ sơ theo yêu cầu của Platform.                                                       |
-| Kích hoạt      | Operator mở luồng đăng ký nhà xe / onboarding KYC.                                                                                        |
-| Hậu điều kiện  | Hồ sơ Operator được tạo hoặc cập nhật ở trạng thái chờ duyệt, cần bổ sung, được duyệt, bị từ chối hoặc bị khóa.                           |
-| Ưu tiên        | Cao                                                                                                                                       |
+| Thuộc tính     | Nội dung                                                                                                                                                              |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actor chính    | Nhà xe (Operator) — người đại diện nộp hồ sơ, chưa có tài khoản                                                                                                       |
+| Actor phụ      | Hệ thống, Admin toàn hệ thống (Admin), Dịch vụ lưu trữ tệp                                                                                                            |
+| Mục tiêu       | Cho nhà xe nộp hồ sơ tham gia marketplace (thông tin doanh nghiệp, giấy tờ KYC, tài khoản nhận tiền) mà chưa cần tài khoản, để Platform thẩm định trước khi cấp tài khoản Owner. |
+| Tiền điều kiện | Nhà xe chưa có Operator trên nền tảng hoặc có hồ sơ đăng ký đang cần bổ sung; người đại diện dùng được email liên hệ để nhận link.                                    |
+| Kích hoạt      | Người đại diện mở trang đăng ký nhà xe công khai, hoặc mở link bảo mật trong email để tiếp tục / bổ sung hồ sơ.                                                       |
+| Hậu điều kiện  | Hồ sơ đăng ký ở trạng thái `SUBMITTED` (chờ duyệt), hoặc `DRAFT` / `NEEDS_INFO` chờ người đại diện hoàn tất; chưa có tài khoản đăng nhập nào được tạo.               |
+| Ưu tiên        | Cao                                                                                                                                                                   |
 
 Luồng chính:
 
-1. Operator mở luồng đăng ký tham gia nền tảng.
-2. Operator nhập thông tin doanh nghiệp, người liên hệ, hotline, email, địa chỉ và thông tin công khai ban đầu.
-3. Operator thiết lập thông tin tài khoản đăng nhập theo cơ chế username / password do hệ thống hoặc quy trình vận hành cấp.
-4. Operator tải lên giấy tờ KYC, giấy phép, tài liệu pháp lý và thông tin tài khoản nhận tiền theo danh mục Platform yêu cầu.
-5. Hệ thống kiểm tra định dạng, trường bắt buộc, trùng lặp thông tin định danh và tính đầy đủ của hồ sơ.
-6. Hệ thống tạo hồ sơ Operator ở trạng thái chờ duyệt và ghi lịch sử trạng thái.
-7. Hệ thống thông báo Admin có hồ sơ cần duyệt và cho Operator theo dõi trạng thái KYC.
-8. Nếu Admin yêu cầu bổ sung, Operator nhận phản hồi, cập nhật hồ sơ và gửi lại để duyệt.
-9. Chỉ khi Operator được duyệt, hệ thống mới cho phép Operator mở bán chuyến công khai trên Marketplace layer.
+1. Người đại diện mở trang đăng ký nhà xe công khai, nhập tên nhà xe, người liên hệ và email liên hệ.
+2. Hệ thống tạo hồ sơ đăng ký ở trạng thái `DRAFT` với mã hồ sơ duy nhất và gửi link bảo mật có hạn dùng tới email liên hệ; phản hồi trên màn hình không tiết lộ email đó đã có hồ sơ khác hay chưa.
+3. Người đại diện mở link; hệ thống kiểm tra link còn hiệu lực và chỉ cho truy cập đúng hồ sơ gắn với link. Việc mở link đồng thời xác minh email liên hệ.
+4. Người đại diện nhập thông tin doanh nghiệp, mã số thuế, hotline, địa chỉ và thông tin công khai ban đầu.
+5. Người đại diện tải lên giấy tờ KYC theo danh mục Platform yêu cầu (`OQ-19`) và khai báo tài khoản nhận tiền.
+6. Hệ thống kiểm tra định dạng, trường bắt buộc, trùng lặp thông tin định danh và tính đầy đủ của hồ sơ.
+7. Người đại diện gửi duyệt; hệ thống chuyển hồ sơ sang `SUBMITTED`, ghi lịch sử trạng thái và thông báo Admin có hồ sơ cần duyệt.
+8. Người đại diện theo dõi trạng thái hồ sơ qua email và qua link bảo mật; có thể yêu cầu gửi lại link bằng email liên hệ và mã hồ sơ.
+9. Khi Admin duyệt (`UC-23`), người đại diện nhận email gồm tên đăng nhập Owner `{operatorSlug}/{username}` và mật khẩu tạm; từ đây nhà xe làm việc trong Operator OS và link bảo mật hết hiệu lực.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Hồ sơ thiếu giấy tờ bắt buộc, sai định dạng hoặc thông tin liên hệ không hợp lệ → hệ thống không cho gửi duyệt và yêu cầu bổ sung.
-- A2: Thông tin doanh nghiệp, giấy phép, mã số thuế hoặc tài khoản nhận tiền bị trùng / nghi ngờ rủi ro → hệ thống đưa vào trạng thái cần kiểm tra hoặc từ chối theo policy.
-- A3: Admin từ chối hồ sơ → hệ thống lưu lý do, thông báo Operator và không cho mở bán công khai.
-- A4: Admin yêu cầu bổ sung → hệ thống chuyển trạng thái cần bổ sung, lưu nội dung yêu cầu và cho Operator nộp lại.
-- A5: Operator bị khóa sau khi đã đăng ký → hệ thống revoke quyền mở bán, chặn truy cập nghiệp vụ cần thiết và ghi audit log.
+- A1: Hồ sơ thiếu giấy tờ bắt buộc, sai định dạng hoặc thông tin liên hệ không hợp lệ → hệ thống không cho gửi duyệt và chỉ rõ phần cần bổ sung.
+- A2: Thông tin doanh nghiệp, giấy phép, mã số thuế hoặc tài khoản nhận tiền trùng với Operator hay hồ sơ khác, hoặc nghi ngờ rủi ro → hệ thống vẫn nhận hồ sơ nhưng đánh dấu để Admin kiểm tra.
+- A3: Link hết hạn hoặc đã bị thay bằng link mới → hệ thống từ chối truy cập và hướng dẫn yêu cầu gửi lại link.
+- A4: Admin yêu cầu bổ sung → hồ sơ chuyển `NEEDS_INFO`; người đại diện nhận email kèm nội dung cần bổ sung và link mới, sửa hồ sơ rồi gửi duyệt lại.
+- A5: Admin từ chối → hồ sơ chuyển `REJECTED`; người đại diện nhận email kèm lý do, link hết hiệu lực; muốn tham gia lại phải nộp hồ sơ mới.
+- A6: Tạo hồ sơ hoặc yêu cầu gửi lại link quá nhiều lần → hệ thống áp dụng rate limit theo policy bảo mật.
 
 ### UC-11: Quản lý hồ sơ và tài chính Operator
 
@@ -1457,7 +1772,7 @@ Luồng thay thế / ngoại lệ:
 | Thuộc tính     | Nội dung                                                                                                                                       |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Nhà xe (Operator), Admin toàn hệ thống (Admin)                                                                                                 |
-| Actor phụ      | Hệ thống                                                                                                                                       |
+| Actor phụ      | Hệ thống, Dịch vụ định tuyến                                                                                                                                       |
 | Mục tiêu       | Tạo và duy trì tuyến hoạt động thực tế, cấu hình các điểm đón / trả hợp lệ cho từng tuyến và đề xuất điểm mới khi danh mục chuẩn chưa đáp ứng. |
 | Tiền điều kiện | Operator đã được phê duyệt; danh mục tỉnh / thành, phường / xã và stop point chuẩn khả dụng ở mức tối thiểu.                                   |
 | Kích hoạt      | Operator mở quản lý tuyến hoặc cần thêm điểm đón / trả mới.                                                                                    |
@@ -1478,18 +1793,18 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Stop point đã ngừng hoạt động, bị ẩn hoặc không thuộc phạm vi được phép dùng, hệ thống từ chối lưu.
-- A2: Route bị trùng hoàn toàn với route đã có của cùng Operator, hệ thống cảnh báo để tránh tạo dữ liệu dư thừa.
-- A3: Tọa độ, tỉnh / thành hoặc phường / xã của stop point mới không hợp lệ, hệ thống yêu cầu bổ sung trước khi gửi đề xuất.
-- A4: Admin từ chối stop point đề xuất, hệ thống lưu lý do để Operator sửa và gửi lại.
-- A5: Route đang được dùng bởi trip tương lai, hệ thống cho cập nhật có kiểm soát và phải đánh giá ảnh hưởng đến các chuyến đã mở bán.
+- A1: Stop point đã ngừng hoạt động, bị ẩn hoặc không thuộc phạm vi được phép dùng → hệ thống từ chối lưu.
+- A2: Route bị trùng hoàn toàn với route đã có của cùng Operator → hệ thống cảnh báo để tránh tạo dữ liệu dư thừa.
+- A3: Tọa độ, tỉnh / thành hoặc phường / xã của stop point mới không hợp lệ → hệ thống yêu cầu bổ sung trước khi gửi đề xuất.
+- A4: Admin từ chối stop point đề xuất → hệ thống lưu lý do để Operator sửa và gửi lại.
+- A5: Route đang được dùng bởi trip tương lai → hệ thống cho cập nhật có kiểm soát và phải đánh giá ảnh hưởng đến các chuyến đã mở bán.
 
 ### UC-14: Quản lý trip, fare, mở bán và inventory
 
 | Thuộc tính     | Nội dung                                                                                                                                             |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Nhà xe (Operator)                                                                                                                                    |
-| Actor phụ      | Hệ thống, Admin toàn hệ thống (Admin)                                                                                                                |
+| Actor phụ      | Hệ thống, Admin toàn hệ thống (Admin), Dịch vụ định tuyến                                                                                                                |
 | Mục tiêu       | Tạo chuyến bán vé cụ thể từ route, gắn xe, cấu hình giá vé, mở bán và kiểm soát inventory ghế để hỗ trợ luồng bán vé giống website xe khách thực tế. |
 | Tiền điều kiện | Operator đã có route hợp lệ; xe và seat map khả dụng; tài khoản Operator chưa bị khóa bán.                                                           |
 | Kích hoạt      | Operator tạo trip mới, cập nhật trip hiện có hoặc thay đổi trạng thái mở bán / tồn ghế.                                                              |
@@ -1505,7 +1820,7 @@ Luồng chính:
 5. Hệ thống tính giá cuối cùng và cảnh báo nếu giá vượt khung kiểm tra của Platform; ở v1 chỉ cảnh báo theo quyết định tại `OQ-17`.
 6. Operator cấu hình điểm đón / trả thực tế của chuyến, cửa sổ thời gian đón khách, thời gian ngừng bán online, ghi chú như trung chuyển, đón dọc đường, hành lý hoặc phụ thu.
 7. Nếu khai thác tuyến lặp lại, Operator có thể tạo lịch chuyến lặp theo rule ngày chạy, giờ chạy và thời gian áp dụng.
-8. Operator chọn trạng thái lưu nháp, lên lịch bán hoặc mở bán ngay.
+8. Operator lưu nháp (`DRAFT`) hoặc chọn mở bán ngay (`OPEN_FOR_SALE`).
 9. Hệ thống kiểm tra trip có đủ route, xe, seat map, fare và dữ liệu tối thiểu trước khi cho phép chuyển sang trạng thái mở bán.
 10. Khi mở bán, hệ thống công bố trip cho Marketplace layer để search có thể hiển thị lịch trình, loại xe, thời gian hành trình, giá vé, điểm đón / trả và số ghế khả dụng.
 11. Trong quá trình bán, hệ thống cập nhật inventory dựa trên ghế đã bán, ghế đang hold, ghế bị khóa thủ công và ghế bán ngoài nền tảng nếu Operator đồng bộ đa kênh.
@@ -1513,13 +1828,13 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Xe đã được gắn cho trip khác trùng thời gian, hệ thống từ chối tạo hoặc gắn xe.
-- A2: Xe chưa có seat map hợp lệ, hệ thống không cho mở bán.
-- A3: Trip chưa có fare hoặc thiếu dữ liệu pickup / dropoff bắt buộc, hệ thống chỉ cho lưu nháp.
-- A4: Trip đã có vé bán, các thay đổi quan trọng như đổi xe, đổi giờ, đổi điểm đón / trả phải ghi lý do và kích hoạt thông báo cho hành khách.
-- A5: Operator bỏ gắn xe khỏi trip đã có booking, hệ thống từ chối thao tác.
-- A6: Operator khóa ghế để xử lý bán đa kênh hoặc ghế kỹ thuật, inventory phải cập nhật ngay và không cho khách online chọn các ghế đó.
-- A7: Đã qua thời gian ngừng bán online, hệ thống không còn hiển thị trip cho luồng đặt vé web / app dù chuyến chưa khởi hành.
+- A1: Xe đã được gắn cho trip khác trùng thời gian → hệ thống từ chối tạo hoặc gắn xe.
+- A2: Xe chưa có seat map hợp lệ → hệ thống không cho mở bán.
+- A3: Trip chưa có fare hoặc thiếu dữ liệu pickup / dropoff bắt buộc → hệ thống chỉ cho lưu nháp.
+- A4: Trip đã có vé bán mà Operator đổi xe, giờ hoặc điểm đón / trả → hệ thống yêu cầu ghi lý do và kích hoạt thông báo cho hành khách.
+- A5: Operator bỏ gắn xe khỏi trip đã có booking → hệ thống từ chối thao tác.
+- A6: Operator khóa ghế để xử lý bán đa kênh hoặc ghế kỹ thuật → hệ thống cập nhật inventory ngay và không cho khách online chọn các ghế đó.
+- A7: Đã qua thời gian ngừng bán online → hệ thống không còn hiển thị trip cho luồng đặt vé web / app dù chuyến chưa khởi hành.
 
 ### UC-15: Quản lý booking / ticket thuộc Operator
 
@@ -1546,10 +1861,10 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Operator cố truy cập booking của nhà xe khác, hệ thống từ chối.
-- A2: Booking đã hủy, hoàn tiền hoặc chuyến đã kết thúc, hệ thống hạn chế các thao tác chỉnh sửa nhưng vẫn cho tra cứu lịch sử.
-- A3: Dữ liệu manifest quá lớn, hệ thống cho xuất file hoặc phân trang thay vì tải toàn bộ một lần.
-- A4: Số điện thoại hoặc dữ liệu cá nhân nằm trong nhóm phải mask, hệ thống chỉ hiển thị theo policy bảo mật áp dụng.
+- A1: Operator cố truy cập booking của nhà xe khác → hệ thống từ chối.
+- A2: Booking đã hủy, hoàn tiền hoặc chuyến đã kết thúc → hệ thống hạn chế các thao tác chỉnh sửa nhưng vẫn cho tra cứu lịch sử.
+- A3: Dữ liệu manifest quá lớn → hệ thống cho xuất file hoặc phân trang thay vì tải toàn bộ một lần.
+- A4: Số điện thoại hoặc dữ liệu cá nhân nằm trong nhóm phải mask → hệ thống chỉ hiển thị theo policy bảo mật áp dụng.
 
 ### UC-16: Quản lý Employee và phân công nhiệm vụ
 
@@ -1560,32 +1875,32 @@ Luồng thay thế / ngoại lệ:
 | Mục tiêu       | Tạo tài khoản nhân viên, quản lý trạng thái làm việc và phân công đúng người cho đúng chuyến / nhiệm vụ vận hành.                      |
 | Tiền điều kiện | Operator đã được duyệt; có nhu cầu tổ chức nhân sự vận hành; trip hoặc công việc đã tồn tại.                                           |
 | Kích hoạt      | Operator mở màn hình quản lý nhân viên hoặc phân công crew cho trip.                                                                   |
-| Hậu điều kiện  | Employee được tạo / cập nhật / ngừng hoạt động đúng phạm vi nhà xe; phân công nhiệm vụ được lưu và đồng bộ tới app / portal nhân viên. |
+| Hậu điều kiện  | Employee được tạo / cập nhật / ngừng hoạt động đúng phạm vi nhà xe; phân công nhiệm vụ được lưu và đồng bộ tới app nhân viên. |
 | Ưu tiên        | Cao                                                                                                                                    |
 
 Luồng chính:
 
 1. Operator tạo hồ sơ Employee với thông tin nhận diện, liên hệ, role, trạng thái kích hoạt và dữ liệu nội bộ cần thiết.
-2. Hệ thống sinh mã nhân viên duy nhất theo prefix của Operator và lưu Employee thuộc đúng tenant.
+2. Operator đặt tên đăng nhập dạng `{operatorSlug}/nv.{…}` (duy nhất trong Operator); hệ thống tạo tài khoản Employee thuộc đúng tenant với mật khẩu tạm gửi qua email, Employee phải đổi mật khẩu ở lần đăng nhập đầu.
 3. Operator cập nhật role, số điện thoại, trạng thái hoạt động hoặc đánh dấu nghỉ việc khi cần.
-4. Operator mở chi tiết trip và chọn crew thực hiện chuyến, ví dụ tài xế, nhân viên điều hành, nhân viên soát vé hoặc hỗ trợ.
+4. Operator mở chi tiết trip và chọn crew thực hiện chuyến theo role: tài xế (`DRIVER`), nhân viên vé (`TICKET_STAFF`), nhân viên hỗ trợ (`SUPPORT_STAFF`).
 5. Hệ thống kiểm tra Employee thuộc đúng Operator, còn hiệu lực và phù hợp với loại nhiệm vụ được giao.
 6. Operator xác nhận phân công; hệ thống lưu crew cho trip và đồng bộ lịch nhiệm vụ cho Employee.
 7. Hệ thống gửi thông báo đến Employee về lịch chạy, tuyến, xe, giờ đón khách và ghi chú vận hành.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Employee không thuộc nhà xe hiện tại, hệ thống từ chối phân công.
-- A2: Employee đã bị ngừng hoạt động hoặc nghỉ việc, hệ thống không cho gán nhiệm vụ mới.
-- A3: Employee bị trùng lịch hoặc trùng chuyến, hệ thống cảnh báo; tùy policy có thể chặn hoặc cho xác nhận có kiểm soát.
-- A4: Trip đã quá gần giờ khởi hành hoặc đang vận hành, việc thay đổi crew phải ghi lý do và lưu audit.
+- A1: Employee không thuộc nhà xe hiện tại → hệ thống từ chối phân công.
+- A2: Employee đã bị ngừng hoạt động hoặc nghỉ việc → hệ thống không cho gán nhiệm vụ mới.
+- A3: Employee bị trùng lịch hoặc trùng chuyến → hệ thống cảnh báo; tùy policy có thể chặn hoặc cho xác nhận có kiểm soát.
+- A4: Trip đã quá gần giờ khởi hành hoặc đang vận hành → việc thay đổi crew phải ghi lý do và lưu audit.
 
 ### UC-17: Xem báo cáo Operator
 
 | Thuộc tính     | Nội dung                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Nhà xe (Operator)                                                                                             |
-| Actor phụ      | Hệ thống                                                                                                      |
+| Actor phụ      | Hệ thống, Dịch vụ lưu trữ tệp                                                                                                      |
 | Mục tiêu       | Theo dõi hiệu quả bán vé, vận hành chuyến và dữ liệu tài chính thuộc phạm vi nhà xe để điều chỉnh kinh doanh. |
 | Tiền điều kiện | Nhà xe đã có dữ liệu trip, booking, ticket hoặc giao dịch tài chính.                                          |
 | Kích hoạt      | Operator mở dashboard hoặc màn hình báo cáo.                                                                  |
@@ -1601,9 +1916,9 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Dải thời gian quá lớn, hệ thống chuyển sang xuất báo cáo bất đồng bộ.
-- A2: Không có dữ liệu phù hợp bộ lọc, hệ thống hiển thị trạng thái rỗng thay vì lỗi.
-- A3: Chỉ số tài chính nhạy cảm có thể bị giới hạn theo vai trò nội bộ của Operator nếu sau này bật phân quyền chi tiết hơn.
+- A1: Dải thời gian quá lớn → hệ thống chuyển sang xuất báo cáo bất đồng bộ.
+- A2: Không có dữ liệu phù hợp bộ lọc → hệ thống hiển thị trạng thái rỗng thay vì lỗi.
+- A3: Sau này bật phân quyền chi tiết hơn trong Operator → chỉ số tài chính nhạy cảm có thể bị giới hạn theo vai trò nội bộ.
 
 ### UC-18: Xem nhiệm vụ được phân công
 
@@ -1613,22 +1928,22 @@ Luồng thay thế / ngoại lệ:
 | Actor phụ      | Hệ thống                                                                                                 |
 | Mục tiêu       | Cho Employee biết lịch chuyến, nhiệm vụ và thông tin vận hành cần thực hiện trong ngày.                  |
 | Tiền điều kiện | Employee có tài khoản hợp lệ và đã được phân công ít nhất một nhiệm vụ.                                  |
-| Kích hoạt      | Employee đăng nhập app / portal nhân viên và mở màn hình lịch công việc.                                 |
+| Kích hoạt      | Employee đăng nhập app nhân viên và mở màn hình lịch công việc.                                 |
 | Hậu điều kiện  | Employee xem được danh sách nhiệm vụ thuộc phạm vi được phân công, kèm chi tiết cần thiết để tác nghiệp. |
 | Ưu tiên        | Cao                                                                                                      |
 
 Luồng chính:
 
 1. Employee đăng nhập bằng tài khoản do Operator cấp.
-2. Hệ thống xác thực actor là `EMPLOYEE`, nạp đúng tenant và chỉ trả dữ liệu theo role, chuyến và công việc được giao.
+2. Hệ thống xác thực tài khoản Employee và role (`TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`), nạp đúng tenant và chỉ trả dữ liệu theo role, chuyến và công việc được giao.
 3. Employee xem danh sách nhiệm vụ theo ngày, gồm tuyến, giờ chạy, xe, biển số, điểm đón / trả và ghi chú vận hành.
 4. Employee mở chi tiết một nhiệm vụ để xem dữ liệu cần tác nghiệp như danh sách khách, hướng dẫn check-in hoặc trạng thái chuyến.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Employee chưa được phân công nhiệm vụ nào, hệ thống hiển thị trạng thái chưa có lịch.
-- A2: Nhiệm vụ vừa bị đổi hoặc hủy, hệ thống hiển thị trạng thái mới nhất và ghi nhận thay đổi.
-- A3: Employee cố truy cập nhiệm vụ ngoài phạm vi phân công, hệ thống từ chối.
+- A1: Employee chưa được phân công nhiệm vụ nào → hệ thống hiển thị trạng thái chưa có lịch.
+- A2: Nhiệm vụ vừa bị đổi hoặc hủy → hệ thống hiển thị trạng thái mới nhất và ghi nhận thay đổi.
+- A3: Employee cố truy cập nhiệm vụ ngoài phạm vi phân công → hệ thống từ chối.
 
 ### UC-19: Xem danh sách hành khách
 
@@ -1651,9 +1966,9 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Employee không có quyền hoặc không được phân công chuyến đó, hệ thống từ chối truy cập.
-- A2: Dữ liệu đồng bộ chậm, hệ thống cho phép tải lại manifest và hiển thị thời điểm cập nhật cuối.
-- A3: Thông tin cá nhân nhạy cảm phải mask, hệ thống chỉ lộ phần tối thiểu cần cho tác nghiệp.
+- A1: Employee không có quyền hoặc không được phân công chuyến đó → hệ thống từ chối truy cập.
+- A2: Dữ liệu đồng bộ chậm → hệ thống cho phép tải lại manifest và hiển thị thời điểm cập nhật cuối.
+- A3: Thông tin cá nhân nhạy cảm phải mask → hệ thống chỉ lộ phần tối thiểu cần cho tác nghiệp.
 
 ### UC-20: Check-in ticket bằng QR / mã vé
 
@@ -1670,7 +1985,7 @@ Luồng thay thế / ngoại lệ:
 Luồng chính:
 
 1. Hành khách xuất trình QR ticket hoặc mã vé.
-2. Employee quét QR hoặc nhập mã vé trên app / portal.
+2. Employee quét QR hoặc nhập mã vé trên app nhân viên.
 3. Hệ thống xác thực mã vé, ticket status, trip liên quan, quyền của Employee và tính hợp lệ của QR token trên server.
 4. Hệ thống hiển thị thông tin đối chiếu như tên khách, ghế, điểm đón / trả và trạng thái hiện tại.
 5. Employee xác nhận cho hành khách lên xe.
@@ -1678,10 +1993,10 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Vé không tồn tại, QR sai chữ ký hoặc token hết hiệu lực, hệ thống từ chối check-in.
-- A2: Vé thuộc chuyến khác, hệ thống cảnh báo sai chuyến.
-- A3: Vé đã hủy, đã hoàn tiền hoặc đã check-in trước đó, hệ thống không cho check-in lần nữa.
-- A4: Thiết bị tạm mất mạng, ứng dụng có thể hỗ trợ ghi nhớ cục bộ nếu sau này bật offline mode; khi chưa có cơ chế đó, thao tác phải chờ có mạng.
+- A1: Vé không tồn tại, QR sai chữ ký hoặc token hết hiệu lực → hệ thống từ chối check-in.
+- A2: Vé thuộc chuyến khác → hệ thống cảnh báo sai chuyến.
+- A3: Vé đã hủy, đã hoàn tiền hoặc đã check-in trước đó → hệ thống không cho check-in lần nữa.
+- A4: Thiết bị tạm mất mạng → ứng dụng chỉ ghi nhớ cục bộ nếu sau này bật offline mode (`UX-OQ-04`); khi chưa có cơ chế đó, thao tác phải chờ có mạng.
 
 ### UC-21: Cập nhật trạng thái chuyến
 
@@ -1692,29 +2007,29 @@ Luồng thay thế / ngoại lệ:
 | Mục tiêu       | Phản ánh tiến độ vận hành thực tế của chuyến để nhà xe và hệ thống theo dõi được trạng thái hiện tại. |
 | Tiền điều kiện | Employee được phân công cho chuyến; role của Employee cho phép thao tác trạng thái chuyến.            |
 | Kích hoạt      | Employee chọn hành động cập nhật trạng thái trên chi tiết chuyến.                                     |
-| Hậu điều kiện  | Trạng thái chuyến được cập nhật đúng thứ tự chuyển trạng thái và lưu lịch sử thao tác.                |
+| Hậu điều kiện  | Trạng thái chuyến được cập nhật đúng thứ tự chuyển trạng thái và lưu lịch sử thao tác; khi chuyến chuyển `COMPLETED`, hệ thống kích hoạt cộng điểm thành viên (`UC-36`) và tính mốc payout T+3 (`BR-32`).                |
 | Ưu tiên        | Cao                                                                                                   |
 
 Luồng chính:
 
 1. Employee mở chi tiết chuyến mình phụ trách.
 2. Hệ thống hiển thị trạng thái hiện tại và các trạng thái kế tiếp hợp lệ theo workflow vận hành.
-3. Employee chọn trạng thái mới như bắt đầu đón khách, đã khởi hành, đang chạy hoặc hoàn thành.
+3. Employee chọn trạng thái mới như bắt đầu đón khách (`BOARDING`), đã khởi hành (`DEPARTED`), đang chạy (`IN_PROGRESS`) hoặc hoàn thành (`COMPLETED`).
 4. Hệ thống kiểm tra quyền, thứ tự chuyển trạng thái và thời điểm cập nhật.
 5. Hệ thống lưu trạng thái mới, lịch sử cập nhật và đồng bộ cho Operator để theo dõi vận hành.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Chuyển trạng thái không đúng thứ tự hoặc không phù hợp với trạng thái hiện tại, hệ thống từ chối.
-- A2: Chuyến đã hủy hoặc đã hoàn thành, hệ thống không cho cập nhật theo luồng vận hành thông thường.
-- A3: Thay đổi trạng thái quan trọng sau giờ dự kiến có thể kéo theo cảnh báo nội bộ hoặc thông báo cho bộ phận liên quan.
+- A1: Chuyển trạng thái không đúng thứ tự hoặc không phù hợp với trạng thái hiện tại → hệ thống từ chối.
+- A2: Chuyến đã hủy hoặc đã hoàn thành → hệ thống không cho cập nhật theo luồng vận hành thông thường.
+- A3: Thay đổi trạng thái quan trọng diễn ra sau giờ dự kiến → hệ thống có thể phát cảnh báo nội bộ hoặc thông báo cho bộ phận liên quan.
 
 ### UC-22: Ghi nhật trình và báo cáo sự cố
 
 | Thuộc tính     | Nội dung                                                                                                        |
 | -------------- | --------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Nhân viên nhà xe (Employee)                                                                                     |
-| Actor phụ      | Nhà xe (Operator), Admin toàn hệ thống (Admin), Hệ thống                                                        |
+| Actor phụ      | Nhà xe (Operator), Admin toàn hệ thống (Admin), Hệ thống, Dịch vụ lưu trữ tệp                                                        |
 | Mục tiêu       | Ghi nhận diễn biến thực tế của chuyến và các sự cố phát sinh để phục vụ điều hành, hậu kiểm và xử lý khiếu nại. |
 | Tiền điều kiện | Employee có chuyến hoặc nhiệm vụ đang hoạt động; quyền ghi nhật trình / báo cáo sự cố đã được cấp.              |
 | Kích hoạt      | Employee cập nhật nhật trình theo chặng hoặc tạo báo cáo sự cố khi có vấn đề phát sinh.                         |
@@ -1731,36 +2046,40 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Attachment không hợp lệ hoặc quá dung lượng, hệ thống yêu cầu bổ sung lại.
-- A2: Employee cố gửi báo cáo cho chuyến ngoài phạm vi phụ trách, hệ thống từ chối.
-- A3: Mạng gián đoạn, hệ thống cần retry đồng bộ hoặc lưu nháp cục bộ nếu có hỗ trợ.
+- A1: Attachment không hợp lệ hoặc quá dung lượng → hệ thống yêu cầu bổ sung lại.
+- A2: Employee cố gửi báo cáo cho chuyến ngoài phạm vi phụ trách → hệ thống từ chối.
+- A3: Mạng gián đoạn → hệ thống cần retry đồng bộ hoặc lưu nháp cục bộ nếu có hỗ trợ.
 
 ### UC-23: Duyệt KYC và quản lý Operator
 
-| Thuộc tính     | Nội dung                                                                                                                                      |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Actor chính    | Admin toàn hệ thống (Admin)                                                                                                                   |
-| Actor phụ      | Nhà xe (Operator), Hệ thống                                                                                                                   |
-| Mục tiêu       | Kiểm soát việc tham gia marketplace của nhà xe thông qua quy trình KYC, phê duyệt, từ chối, tạm ngưng và mở lại hoạt động.                    |
-| Tiền điều kiện | Có hồ sơ Operator đã đăng ký hoặc Operator đang hoạt động cần được quản trị.                                                                  |
-| Kích hoạt      | Admin mở hàng đợi KYC hoặc danh sách Operator toàn hệ thống.                                                                                  |
-| Hậu điều kiện  | Operator được cập nhật trạng thái phù hợp như chờ duyệt, được duyệt, bị từ chối hoặc bị tạm ngưng; quyền mở bán công khai thay đổi tương ứng. |
-| Ưu tiên        | Cao                                                                                                                                           |
+| Thuộc tính     | Nội dung                                                                                                                                                                                        |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actor chính    | Admin toàn hệ thống (Admin)                                                                                                                                                                     |
+| Actor phụ      | Nhà xe (Operator), Hệ thống                                                                                                                                                                     |
+| Mục tiêu       | Kiểm soát việc tham gia marketplace của nhà xe: thẩm định hồ sơ đăng ký; phê duyệt (tạo Operator và cấp tài khoản Owner), từ chối hoặc yêu cầu bổ sung; tạm ngưng và mở lại Operator đang hoạt động. |
+| Tiền điều kiện | Có hồ sơ đăng ký ở trạng thái `SUBMITTED` hoặc Operator đang hoạt động cần được quản trị; Admin có quyền duyệt KYC.                                                                             |
+| Kích hoạt      | Admin mở hàng đợi hồ sơ đăng ký hoặc danh sách Operator toàn hệ thống.                                                                                                                          |
+| Hậu điều kiện  | Hồ sơ đăng ký chuyển `APPROVED`, `NEEDS_INFO` hoặc `REJECTED`; khi duyệt, đúng một Operator và một tài khoản Owner đầu tiên được tạo; Operator đang hoạt động có thể bị tạm ngưng / mở lại; quyền mở bán công khai thay đổi tương ứng. |
+| Ưu tiên        | Cao                                                                                                                                                                                             |
 
 Luồng chính:
 
-1. Admin xem danh sách Operator theo trạng thái hồ sơ, mức độ hoàn thiện và chỉ dấu rủi ro.
-2. Admin mở chi tiết hồ sơ để kiểm tra thông tin doanh nghiệp, người liên hệ, giấy tờ KYC, tài khoản nhận tiền, lịch sử chỉnh sửa và trạng thái vận hành hiện tại.
-3. Admin chọn một trong các hành động: yêu cầu bổ sung, phê duyệt, từ chối, tạm ngưng hoặc mở lại Operator đang hoạt động.
-4. Hệ thống bắt buộc lưu lý do đối với các quyết định nhạy cảm như từ chối, tạm ngưng hoặc yêu cầu bổ sung.
-5. Khi phê duyệt, hệ thống chuyển Operator sang trạng thái được phép mở bán và ghi nhận người duyệt, thời điểm duyệt.
-6. Khi từ chối hoặc tạm ngưng, hệ thống cập nhật trạng thái, chặn hoặc hạn chế hoạt động theo policy và gửi thông báo cho Operator.
+1. Admin xem danh sách hồ sơ đăng ký theo trạng thái, thời điểm gửi và chỉ dấu rủi ro (trùng thông tin định danh).
+2. Admin mở chi tiết hồ sơ để kiểm tra thông tin doanh nghiệp, người liên hệ, giấy tờ KYC, tài khoản nhận tiền và lịch sử trạng thái; mỗi lần xem giấy tờ được ghi audit log.
+3. Admin chọn yêu cầu bổ sung, từ chối hoặc phê duyệt; hệ thống bắt buộc lưu lý do khi yêu cầu bổ sung hoặc từ chối.
+4. Khi phê duyệt, Admin nhập slug cho Operator và tên đăng nhập Owner; hệ thống kiểm tra slug chưa được dùng và yêu cầu Admin xác thực lại theo policy.
+5. Hệ thống tạo Operator ở trạng thái đang hoạt động và tài khoản Owner đầu tiên với mật khẩu tạm có hạn dùng; chuyển giấy tờ KYC và tài khoản nhận tiền sang Operator; chuyển hồ sơ sang `APPROVED` và vô hiệu link bảo mật; ghi người duyệt, thời điểm duyệt và audit log.
+6. Hệ thống gửi email tới email liên hệ đã xác minh gồm tên đăng nhập `{operatorSlug}/{username}` và mật khẩu tạm; Owner phải đổi mật khẩu và bật TOTP ở lần đăng nhập đầu (`UC-01`).
+7. Với Operator đang hoạt động, Admin có thể tạm ngưng hoặc mở lại kèm lý do; hệ thống chặn / mở quyền mở bán theo policy, thu hồi phiên khi tạm ngưng và thông báo cho Operator.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Admin cố duyệt hồ sơ không còn ở trạng thái chờ duyệt, hệ thống từ chối.
-- A2: Admin cố mở lại Operator không ở trạng thái tạm ngưng, hệ thống từ chối.
-- A3: Hồ sơ thiếu tài liệu quan trọng, Admin không thể phê duyệt nếu policy yêu cầu bắt buộc.
+- A1: Hồ sơ không ở trạng thái `SUBMITTED` → hệ thống từ chối thao tác duyệt, từ chối hoặc yêu cầu bổ sung.
+- A2: Slug đã được dùng hoặc không hợp lệ → hệ thống yêu cầu Admin chọn slug khác và không tạo Operator.
+- A3: Thao tác phê duyệt bị gửi lặp → hệ thống xử lý idempotent, chỉ tạo đúng một Operator và một tài khoản Owner.
+- A4: Gửi email mật khẩu tạm thất bại → Operator và tài khoản Owner vẫn được tạo; hệ thống đánh dấu chờ giao thông tin đăng nhập và cho Admin gửi lại trong hạn mức theo policy.
+- A5: Hồ sơ thiếu tài liệu bắt buộc → Admin không thể phê duyệt nếu policy yêu cầu bắt buộc.
+- A6: Admin cố mở lại Operator không ở trạng thái tạm ngưng → hệ thống từ chối.
 
 ### UC-24: Quản lý catalog chuẩn
 
@@ -1785,9 +2104,9 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Catalog item đang được nhiều route hoặc trip dùng, hệ thống không cho xóa cứng mà chỉ cho vô hiệu hóa có kiểm soát.
-- A2: Dữ liệu địa giới không hợp lệ hoặc ward không thuộc province tương ứng, hệ thống từ chối lưu.
-- A3: Hai item bị trùng tên, trùng tọa độ và cùng vai trò nghiệp vụ, hệ thống cảnh báo hợp nhất để tránh phân mảnh dữ liệu.
+- A1: Catalog item đang được nhiều route hoặc trip dùng → hệ thống không cho xóa cứng mà chỉ cho vô hiệu hóa có kiểm soát.
+- A2: Dữ liệu địa giới không hợp lệ hoặc ward không thuộc province tương ứng → hệ thống từ chối lưu.
+- A3: Hai item bị trùng tên, trùng tọa độ và cùng vai trò nghiệp vụ → hệ thống cảnh báo hợp nhất để tránh phân mảnh dữ liệu.
 
 ### UC-25: Cấu hình policy, commission và payout
 
@@ -1816,19 +2135,19 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Giá trị cấu hình không hợp lệ, thiếu phạm vi hoặc thiếu thời gian hiệu lực -> hệ thống từ chối lưu và yêu cầu chỉnh sửa.
-- A2: Policy mới chồng lấn với policy đang có hiệu lực cùng phạm vi -> hệ thống cảnh báo xung đột và chỉ cho lưu khi Admin chọn cách xử lý rõ ràng.
-- A3: Admin không đủ quyền cấu hình nhóm policy hoặc override per-Operator -> hệ thống từ chối thao tác và ghi log bảo mật nếu cần.
-- A4: Thay đổi policy có thể ảnh hưởng quyền lợi hành khách hoặc dòng tiền Operator -> hệ thống yêu cầu lý do thay đổi và audit log bắt buộc.
-- A5: Admin cố áp dụng policy mới ngược về booking đã tạo -> hệ thống từ chối; booking cũ tiếp tục dùng snapshot đã lưu.
-- A6: Cấu hình payout thiếu kênh chuyển khoản ngân hàng hoặc thiếu bước xác nhận thủ công của Admin -> hệ thống không cho kích hoạt policy payout.
+- A1: Giá trị cấu hình không hợp lệ, thiếu phạm vi hoặc thiếu thời gian hiệu lực → hệ thống từ chối lưu và yêu cầu chỉnh sửa.
+- A2: Policy mới chồng lấn với policy đang có hiệu lực cùng phạm vi → hệ thống cảnh báo xung đột và chỉ cho lưu khi Admin chọn cách xử lý rõ ràng.
+- A3: Admin không đủ quyền cấu hình nhóm policy hoặc override per-Operator → hệ thống từ chối thao tác và ghi log bảo mật nếu cần.
+- A4: Thay đổi policy có thể ảnh hưởng quyền lợi hành khách hoặc dòng tiền Operator → hệ thống yêu cầu lý do thay đổi và audit log bắt buộc.
+- A5: Admin cố áp dụng policy mới ngược về booking đã tạo → hệ thống từ chối; booking cũ tiếp tục dùng snapshot đã lưu.
+- A6: Cấu hình payout thiếu kênh chuyển khoản ngân hàng hoặc thiếu bước xác nhận thủ công của Admin → hệ thống không cho kích hoạt policy payout.
 
 ### UC-26: Giám sát payment, refund, escrow, payout
 
 | Thuộc tính     | Nội dung                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Admin toàn hệ thống (Admin)                                                                                                                                   |
-| Actor phụ      | Hệ thống, Nhà xe (Operator), cổng thanh toán                                                                                                                  |
+| Actor phụ      | Hệ thống, Nhà xe (Operator), Cổng thanh toán, Dịch vụ ngân hàng payout                                                                                                                  |
 | Mục tiêu       | Giúp Admin giám sát toàn bộ chuỗi tài chính từ payment, refund, escrow ledger, commission đến payout để phát hiện lệch trạng thái và xử lý ngoại lệ kịp thời. |
 | Tiền điều kiện | Có giao dịch payment, refund, escrow ledger, commission hoặc payout phát sinh; Admin có quyền xem / thao tác theo phạm vi được cấp.                           |
 | Kích hoạt      | Admin cần tra cứu giao dịch, kiểm tra callback, xử lý refund treo, rà soát payout hoặc đối soát theo mã tham chiếu.                                           |
@@ -1839,7 +2158,7 @@ Luồng chính:
 
 1. Admin nhập điều kiện tra cứu theo mã booking, mã vé, mã payment, mã refund, Operator, khoảng thời gian hoặc mã giao dịch của provider.
 2. Hệ thống kiểm tra quyền truy cập dữ liệu tài chính của Admin và áp dụng mask dữ liệu nhạy cảm nếu cần.
-3. Hệ thống hiển thị danh sách giao dịch phù hợp cùng trạng thái payment, refund, escrow, commission, payout và đối soát liên quan.
+3. Hệ thống hiển thị danh sách giao dịch phù hợp cùng trạng thái payment, refund, escrow, commission, payout và đối soát liên quan, kèm phần giảm do Platform chịu nếu booking dùng voucher đổi điểm (`BR-73`).
 4. Admin mở chi tiết một giao dịch để xem dòng thời gian nghiệp vụ từ booking đến payment, ticket, refund, escrow ledger và payout nếu có.
 5. Hệ thống hiển thị số tiền, mã tham chiếu, trạng thái hiện tại, lần callback gần nhất, trạng thái gửi provider và các lỗi đã ghi nhận.
 6. Admin đánh dấu giao dịch cần đối soát, refund treo, callback trễ, payout bất thường hoặc cần chuyển sang xử lý thủ công.
@@ -1848,19 +2167,19 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Không tìm thấy giao dịch phù hợp -> hệ thống hiển thị trạng thái rỗng và gợi ý kiểm tra mã tham chiếu khác nếu có.
-- A2: Callback từ provider đến trễ hoặc bị gửi trùng -> hệ thống đối chiếu trạng thái hiện tại trước khi cập nhật và không ghi nhận trùng tiền.
-- A3: Số tiền payment / refund lệch với snapshot booking -> hệ thống khóa thao tác tự động và chuyển sang đối soát thủ công.
-- A4: Refund treo hoặc payout bất thường -> hệ thống chuyển sang hàng đợi xử lý thủ công và không tự đánh dấu thành công.
-- A5: Admin không đủ quyền thao tác tài chính -> hệ thống chỉ cho xem dữ liệu được phân quyền hoặc từ chối hoàn toàn.
-- A6: Dữ liệu tài chính chứa thông tin nhạy cảm -> hệ thống che bớt dữ liệu theo quyền và ghi nhận thao tác xem chi tiết nếu cần.
+- A1: Không tìm thấy giao dịch phù hợp → hệ thống hiển thị trạng thái rỗng và gợi ý kiểm tra mã tham chiếu khác nếu có.
+- A2: Callback từ provider đến trễ hoặc bị gửi trùng → hệ thống đối chiếu trạng thái hiện tại trước khi cập nhật và không ghi nhận trùng tiền.
+- A3: Số tiền payment / refund lệch với snapshot booking → hệ thống khóa thao tác tự động và chuyển sang đối soát thủ công.
+- A4: Refund treo hoặc payout bất thường → hệ thống chuyển sang hàng đợi xử lý thủ công và không tự đánh dấu thành công.
+- A5: Admin không đủ quyền thao tác tài chính → hệ thống chỉ cho xem dữ liệu được phân quyền hoặc từ chối hoàn toàn.
+- A6: Dữ liệu tài chính chứa thông tin nhạy cảm → hệ thống che bớt dữ liệu theo quyền và ghi nhận thao tác xem chi tiết nếu cần.
 
 ### UC-27: Xử lý dispute case và refund thủ công
 
 | Thuộc tính     | Nội dung                                                                                                                                                           |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Actor chính    | Admin toàn hệ thống (Admin)                                                                                                                                        |
-| Actor phụ      | Người dùng (User), Khách vãng lai (Guest), Nhà xe (Operator), Hệ thống, cổng thanh toán                                                                            |
+| Actor phụ      | Người dùng (User), Khách vãng lai (Guest), Nhà xe (Operator), Hệ thống, Cổng thanh toán, Dịch vụ lưu trữ tệp                                                                            |
 | Mục tiêu       | Cho phép Admin phân xử tranh chấp, yêu cầu bổ sung minh chứng, ra quyết định cuối cùng và thực hiện refund thủ công khi policy hoặc dữ liệu vận hành cho phép.     |
 | Tiền điều kiện | Có dispute case, complaint, support ticket, booking, ticket, payment hoặc refund liên quan; các bên tham gia được xác định và dữ liệu tham chiếu có thể truy xuất. |
 | Kích hoạt      | Dispute được tạo từ khiếu nại, refund thất bại, sai lệch booking / payment, phản ánh chất lượng dịch vụ hoặc Admin chủ động mở hồ sơ xử lý ngoại lệ.               |
@@ -1881,12 +2200,12 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Minh chứng chưa đủ -> hệ thống chuyển hồ sơ sang trạng thái chờ bổ sung và gửi yêu cầu cho bên liên quan.
-- A2: Một bên không phản hồi trong hạn -> hệ thống đánh dấu quá hạn, cho phép Admin leo thang hoặc ra quyết định dựa trên dữ liệu hiện có.
-- A3: Booking hoặc payment không đủ điều kiện refund -> hệ thống yêu cầu Admin nhập lý do từ chối và thông báo kết quả cho hành khách.
-- A4: Refund thủ công thất bại -> hệ thống ghi lỗi, giữ hồ sơ ở trạng thái cần xử lý và chuyển sang đối soát / chạy lại theo quyền.
-- A5: Guest tham gia dispute nhưng chưa xác minh đủ thông tin liên hệ -> hệ thống chỉ hiển thị dữ liệu tối thiểu và yêu cầu xác minh bổ sung.
-- A6: Có dấu hiệu gian lận, vi phạm nghiêm trọng hoặc rủi ro pháp lý -> Admin leo thang hồ sơ, khóa thao tác tự động nếu cần và ghi audit log.
+- A1: Minh chứng chưa đủ → hệ thống chuyển hồ sơ sang trạng thái chờ bổ sung và gửi yêu cầu cho bên liên quan.
+- A2: Một bên không phản hồi trong hạn → hệ thống đánh dấu quá hạn, cho phép Admin leo thang hoặc ra quyết định dựa trên dữ liệu hiện có.
+- A3: Booking hoặc payment không đủ điều kiện refund → hệ thống yêu cầu Admin nhập lý do từ chối và thông báo kết quả cho hành khách.
+- A4: Refund thủ công thất bại → hệ thống ghi lỗi, giữ hồ sơ ở trạng thái cần xử lý và chuyển sang đối soát / chạy lại theo quyền.
+- A5: Guest tham gia dispute nhưng chưa xác minh đủ thông tin liên hệ → hệ thống chỉ hiển thị dữ liệu tối thiểu và yêu cầu xác minh bổ sung.
+- A6: Có dấu hiệu gian lận, vi phạm nghiêm trọng hoặc rủi ro pháp lý → Admin leo thang hồ sơ, khóa thao tác tự động nếu cần và ghi audit log.
 
 ### UC-28: Kiểm duyệt nội dung, review và nội dung công khai
 
@@ -1912,18 +2231,18 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Nội dung có dấu hiệu vi phạm nghiêm trọng -> hệ thống cho phép ẩn ngay, yêu cầu lý do và ghi lịch sử thao tác.
-- A2: Review không liên quan đến ticket hợp lệ hoặc chuyến chưa hoàn thành -> hệ thống không cho ảnh hưởng Operator scorecard.
-- A3: Nội dung đang nằm trong dispute hoặc khiếu nại chưa đóng -> hệ thống có thể giữ ở trạng thái chờ để tránh làm sai kết luận.
-- A4: Admin không đủ quyền kiểm duyệt loại nội dung -> hệ thống từ chối thao tác.
-- A5: Nội dung cần chỉnh sửa bởi Operator hoặc bộ phận nội dung -> hệ thống chuyển trạng thái chờ cập nhật và ghi yêu cầu cụ thể.
+- A1: Nội dung có dấu hiệu vi phạm nghiêm trọng → hệ thống cho phép ẩn ngay, yêu cầu lý do và ghi lịch sử thao tác.
+- A2: Review không liên quan đến ticket hợp lệ hoặc chuyến chưa hoàn thành → hệ thống không cho ảnh hưởng Operator scorecard.
+- A3: Nội dung đang nằm trong dispute hoặc khiếu nại chưa đóng → hệ thống có thể giữ ở trạng thái chờ để tránh làm sai kết luận.
+- A4: Admin không đủ quyền kiểm duyệt loại nội dung → hệ thống từ chối thao tác.
+- A5: Nội dung cần chỉnh sửa bởi Operator hoặc bộ phận nội dung → hệ thống chuyển trạng thái chờ cập nhật và ghi yêu cầu cụ thể.
 
 ### UC-29: Xem báo cáo toàn hệ thống
 
 | Thuộc tính     | Nội dung                                                                                                                                              |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Admin toàn hệ thống (Admin)                                                                                                                           |
-| Actor phụ      | Hệ thống                                                                                                                                              |
+| Actor phụ      | Hệ thống, Dịch vụ lưu trữ tệp                                                                                                                                              |
 | Mục tiêu       | Cung cấp dashboard và báo cáo toàn nền tảng để Admin theo dõi doanh thu, booking, refund, payout, vận hành, chất lượng dịch vụ và rủi ro marketplace. |
 | Tiền điều kiện | Admin có quyền xem báo cáo; hệ thống có dữ liệu booking, ticket, payment, refund, payout, Operator hoặc support/dispute để tổng hợp.                  |
 | Kích hoạt      | Admin mở dashboard, lọc báo cáo, yêu cầu export hoặc tạo báo cáo bất đồng bộ.                                                                         |
@@ -1943,11 +2262,11 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Báo cáo quá lớn -> hệ thống tạo job nền và thông báo khi hoàn tất.
-- A2: Admin không đủ quyền xem dữ liệu tài chính -> hệ thống ẩn hoặc giới hạn chỉ số nhạy cảm.
-- A3: Không có dữ liệu trong khoảng thời gian chọn -> hệ thống hiển thị trạng thái rỗng.
-- A4: Job tạo báo cáo lỗi -> hệ thống ghi lỗi và cho phép chạy lại theo quyền.
-- A5: Dữ liệu đang trong quá trình đối soát -> hệ thống hiển thị nhãn dữ liệu tạm thời / chưa chốt để tránh diễn giải sai.
+- A1: Báo cáo quá lớn → hệ thống tạo job nền và thông báo khi hoàn tất.
+- A2: Admin không đủ quyền xem dữ liệu tài chính → hệ thống ẩn hoặc giới hạn chỉ số nhạy cảm.
+- A3: Không có dữ liệu trong khoảng thời gian chọn → hệ thống hiển thị trạng thái rỗng.
+- A4: Job tạo báo cáo lỗi → hệ thống ghi lỗi và cho phép chạy lại theo quyền.
+- A5: Dữ liệu đang trong quá trình đối soát → hệ thống hiển thị nhãn dữ liệu tạm thời / chưa chốt để tránh diễn giải sai.
 
 ### UC-30: Truy xuất audit log
 
@@ -1974,18 +2293,18 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Không có dữ liệu phù hợp -> hệ thống hiển thị trạng thái rỗng.
-- A2: Log chứa dữ liệu nhạy cảm -> hệ thống che một phần hoặc ẩn trường theo quyền.
-- A3: Admin không đủ quyền xem hoặc xuất audit log -> hệ thống từ chối thao tác.
-- A4: Phạm vi xuất quá lớn -> hệ thống yêu cầu thu hẹp bộ lọc hoặc tạo job xuất file.
-- A5: Log liên quan đã được archive theo policy lưu trữ -> hệ thống hiển thị trạng thái archive và hướng dẫn quy trình truy xuất phù hợp.
+- A1: Không có dữ liệu phù hợp → hệ thống hiển thị trạng thái rỗng.
+- A2: Log chứa dữ liệu nhạy cảm → hệ thống che một phần hoặc ẩn trường theo quyền.
+- A3: Admin không đủ quyền xem hoặc xuất audit log → hệ thống từ chối thao tác.
+- A4: Phạm vi xuất quá lớn → hệ thống yêu cầu thu hẹp bộ lọc hoặc tạo job xuất file.
+- A5: Log liên quan đã được archive theo policy lưu trữ → hệ thống hiển thị trạng thái archive và hướng dẫn quy trình truy xuất phù hợp.
 
 ### UC-31: Gửi notification theo sự kiện nghiệp vụ
 
 | Thuộc tính     | Nội dung                                                                                                                                                       |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Hệ thống                                                                                                                                                       |
-| Actor phụ      | User, Guest, Nhà xe (Operator), Employee, Admin nếu liên quan                                                                                                  |
+| Actor phụ      | Người nhận: Người dùng (User), Khách vãng lai (Guest), Nhà xe (Operator), Nhân viên nhà xe (Employee), Admin toàn hệ thống (Admin) nếu liên quan; Dịch vụ thông báo                                                                                                  |
 | Mục tiêu       | Tạo và gửi notification đúng người, đúng kênh, đúng thời điểm cho các sự kiện nghiệp vụ quan trọng mà không làm lộ dữ liệu nhạy cảm hoặc gửi trùng.            |
 | Tiền điều kiện | Có sự kiện nghiệp vụ phát sinh; template, kênh gửi và dữ liệu người nhận đã được cấu hình ở mức cần thiết.                                                     |
 | Kích hoạt      | Hệ thống ghi nhận sự kiện như đăng ký, đăng nhập nhạy cảm, booking, payment, phát hành vé, hủy / hoàn tiền, đổi / hủy chuyến, phân công Employee hoặc dispute. |
@@ -2005,19 +2324,19 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Không có kênh gửi khả dụng -> hệ thống lưu notification ở trạng thái chờ xử lý.
-- A2: Gửi notification thất bại -> hệ thống ghi lỗi và retry theo policy.
-- A3: Actor đã tắt loại thông báo không bắt buộc -> hệ thống không gửi qua kênh đã tắt.
-- A4: Notification thuộc nhóm bắt buộc -> hệ thống vẫn gửi theo kênh tối thiểu được cấu hình.
-- A5: Template thiếu dữ liệu bắt buộc hoặc có nguy cơ lộ dữ liệu nhạy cảm -> hệ thống không gửi, ghi lỗi và chuyển sang xử lý cấu hình.
-- A6: Sự kiện bị phát lại nhiều lần -> hệ thống dùng idempotency để không gửi trùng notification bắt buộc.
+- A1: Không có kênh gửi khả dụng → hệ thống lưu notification ở trạng thái chờ xử lý.
+- A2: Gửi notification thất bại → hệ thống ghi lỗi và retry theo policy.
+- A3: Actor đã tắt loại thông báo không bắt buộc → hệ thống không gửi qua kênh đã tắt.
+- A4: Notification thuộc nhóm bắt buộc → hệ thống vẫn gửi theo kênh tối thiểu được cấu hình.
+- A5: Template thiếu dữ liệu bắt buộc hoặc có nguy cơ lộ dữ liệu nhạy cảm → hệ thống không gửi, ghi lỗi và chuyển sang xử lý cấu hình.
+- A6: Sự kiện bị phát lại nhiều lần → hệ thống dùng idempotency để không gửi trùng notification bắt buộc.
 
 ### UC-32: Đối soát và chạy lại job nền
 
 | Thuộc tính     | Nội dung                                                                                                                                     |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
 | Actor chính    | Hệ thống, Admin toàn hệ thống (Admin)                                                                                                        |
-| Actor phụ      | Cổng thanh toán, dịch vụ notification, Nhà xe (Operator) nếu có giao dịch liên quan                                                          |
+| Actor phụ      | Cổng thanh toán, Dịch vụ thông báo, Dịch vụ ngân hàng payout, Nhà xe (Operator) nếu có giao dịch liên quan                                                          |
 | Mục tiêu       | Phát hiện lệch trạng thái và chạy lại job nền quan trọng một cách có kiểm soát, idempotent và có khả năng truy vết.                          |
 | Tiền điều kiện | Có job nền hoặc giao dịch cần đối soát như payment callback, refund, payout, notification, reconciliation hoặc báo cáo bất đồng bộ.          |
 | Kích hoạt      | Job đối soát tự động chạy theo lịch, hệ thống phát hiện lỗi, hoặc Admin kích hoạt chạy lại trong phạm vi được cấp quyền.                     |
@@ -2037,12 +2356,12 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Job đang chạy -> hệ thống từ chối chạy trùng hoặc đưa yêu cầu vào hàng đợi.
-- A2: Provider không phản hồi -> hệ thống ghi lỗi tạm thời và retry theo policy.
-- A3: Phát hiện nguy cơ xử lý trùng tiền -> hệ thống dừng tác vụ và yêu cầu Admin kiểm tra.
-- A4: Admin không đủ quyền chạy lại job -> hệ thống từ chối thao tác.
-- A5: Job chạy một phần rồi lỗi -> hệ thống lưu checkpoint hoặc log đủ để chạy lại an toàn theo phạm vi chưa hoàn tất.
-- A6: Dữ liệu lệch vượt ngưỡng an toàn -> hệ thống dừng tự động và chuyển sang xử lý thủ công có audit.
+- A1: Job đang chạy → hệ thống từ chối chạy trùng hoặc đưa yêu cầu vào hàng đợi.
+- A2: Provider không phản hồi → hệ thống ghi lỗi tạm thời và retry theo policy.
+- A3: Phát hiện nguy cơ xử lý trùng tiền → hệ thống dừng tác vụ và yêu cầu Admin kiểm tra.
+- A4: Admin không đủ quyền chạy lại job → hệ thống từ chối thao tác.
+- A5: Job chạy một phần rồi lỗi → hệ thống lưu checkpoint hoặc log đủ để chạy lại an toàn theo phạm vi chưa hoàn tất.
+- A6: Dữ liệu lệch vượt ngưỡng an toàn → hệ thống dừng tự động và chuyển sang xử lý thủ công có audit.
 
 ### UC-33: Quản lý promotion cấp Platform / Operator
 
@@ -2069,12 +2388,12 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Nhà xe chưa được cấp quyền tự tạo promotion -> hệ thống từ chối thao tác.
-- A2: Promotion hết hạn, vượt lượt dùng hoặc không thỏa điều kiện booking -> hệ thống không cho áp dụng.
-- A3: Rule promotion không hợp lệ -> hệ thống yêu cầu chỉnh sửa.
-- A4: Admin thay đổi quyền promotion của Operator -> hệ thống áp dụng cho các promotion phát sinh sau thời điểm hiệu lực.
-- A5: Operator cố tạo promotion ảnh hưởng ngoài phạm vi nhà xe của mình -> hệ thống từ chối theo tenant boundary.
-- A6: Promotion đã được dùng trong booking -> hệ thống không cho sửa ngược snapshot đã áp dụng; actor phải tạo phiên bản / chương trình mới nếu cần thay đổi.
+- A1: Nhà xe chưa được cấp quyền tự tạo promotion → hệ thống từ chối thao tác.
+- A2: Promotion hết hạn, vượt lượt dùng hoặc không thỏa điều kiện booking → hệ thống không cho áp dụng.
+- A3: Rule promotion không hợp lệ → hệ thống yêu cầu chỉnh sửa.
+- A4: Admin thay đổi quyền promotion của Operator → hệ thống áp dụng cho các promotion phát sinh sau thời điểm hiệu lực.
+- A5: Operator cố tạo promotion ảnh hưởng ngoài phạm vi nhà xe của mình → hệ thống từ chối theo tenant boundary.
+- A6: Promotion đã được dùng trong booking → hệ thống không cho sửa ngược snapshot đã áp dụng; actor phải tạo phiên bản / chương trình mới nếu cần thay đổi.
 
 ### UC-34: Cấu hình notification preference
 
@@ -2097,15 +2416,15 @@ Luồng chính:
 5. Actor xác nhận lưu cấu hình.
 6. Hệ thống kiểm tra kênh gửi đã được xác minh hoặc đã cấu hình trước khi cho bật.
 7. Hệ thống lưu preference theo actor, loại notification và kênh gửi.
-8. Hệ thống áp dụng preference ở UC-31 khi gửi notification phù hợp.
+8. Hệ thống áp dụng preference ở `UC-31` khi gửi notification phù hợp.
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Actor cố tắt hoàn toàn thông báo bắt buộc -> hệ thống từ chối và giữ kênh tối thiểu.
-- A2: Kênh gửi chưa được xác minh hoặc chưa cấu hình -> hệ thống không cho bật kênh đó.
-- A3: Preference lưu thất bại -> hệ thống báo lỗi và giữ cấu hình cũ.
-- A4: Actor không có quyền cấu hình loại thông báo -> hệ thống ẩn hoặc khóa tùy chọn tương ứng.
-- A5: Actor bị khóa tài khoản hoặc phiên hết hạn -> hệ thống yêu cầu đăng nhập lại trước khi thay đổi preference.
+- A1: Actor cố tắt hoàn toàn thông báo bắt buộc → hệ thống từ chối và giữ kênh tối thiểu.
+- A2: Kênh gửi chưa được xác minh hoặc chưa cấu hình → hệ thống không cho bật kênh đó.
+- A3: Preference lưu thất bại → hệ thống báo lỗi và giữ cấu hình cũ.
+- A4: Actor không có quyền cấu hình loại thông báo → hệ thống ẩn hoặc khóa tùy chọn tương ứng.
+- A5: Actor bị khóa tài khoản hoặc phiên hết hạn → hệ thống yêu cầu đăng nhập lại trước khi thay đổi preference.
 
 ### UC-35: Tra cứu vé khách vãng lai
 
@@ -2132,18 +2451,160 @@ Luồng chính:
 
 Luồng thay thế / ngoại lệ:
 
-- A1: Mã vé / mã booking hoặc thông tin liên hệ không khớp -> hệ thống từ chối hiển thị dữ liệu.
-- A2: Thao tác nhạy cảm chưa đủ xác minh -> hệ thống yêu cầu xác minh bổ sung.
-- A3: Guest cố xem lịch sử booking dài hạn -> hệ thống chỉ hiển thị dữ liệu thuộc vé đã xác minh.
-- A4: Vé không còn hợp lệ hoặc đã bị hủy -> hệ thống hiển thị trạng thái hiện tại và hướng dẫn liên hệ hỗ trợ nếu cần.
-- A5: Guest nhập sai nhiều lần hoặc có dấu hiệu dò mã vé -> hệ thống áp dụng rate limit / khóa tạm thời theo policy bảo mật.
-- A6: Booking có nhiều ticket -> hệ thống chỉ hiển thị ticket thuộc booking đã xác minh và áp dụng quyền thao tác theo từng ticket.
+- A1: Mã vé / mã booking hoặc thông tin liên hệ không khớp → hệ thống từ chối hiển thị dữ liệu.
+- A2: Thao tác nhạy cảm chưa đủ xác minh → hệ thống yêu cầu xác minh bổ sung.
+- A3: Guest cố xem lịch sử booking dài hạn → hệ thống chỉ hiển thị dữ liệu thuộc vé đã xác minh.
+- A4: Vé không còn hợp lệ hoặc đã bị hủy → hệ thống hiển thị trạng thái hiện tại và hướng dẫn liên hệ hỗ trợ nếu cần.
+- A5: Guest nhập sai nhiều lần hoặc có dấu hiệu dò mã vé → hệ thống áp dụng rate limit / khóa tạm thời theo policy bảo mật.
+- A6: Booking có nhiều ticket → hệ thống chỉ hiển thị ticket thuộc booking đã xác minh và áp dụng quyền thao tác theo từng ticket.
+
+### UC-36: Tích điểm và theo dõi hạng thành viên VXN Plus
+
+| Thuộc tính     | Nội dung                                                                                                                                      |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Actor chính    | Người dùng (User)                                                                                                                             |
+| Actor phụ      | Hệ thống                                                                                                                                      |
+| Mục tiêu       | User được cộng điểm sau chuyến hoàn thành và theo dõi hạng, điểm, lịch sử điểm.                                                              |
+| Tiền điều kiện | User có `LoyaltyAccount` và booking được tạo khi User đã đăng nhập; chương trình có policy đang hiệu lực. Xem hạng / lịch sử điểm cần đăng nhập.                                                               |
+| Kích hoạt      | Chuyến có ticket của User chuyển `COMPLETED`; User mở trang VXN Plus hoặc lịch sử điểm.                                                        |
+| Hậu điều kiện  | Giao dịch điểm được ghi append-only, số dư và hạng được cập nhật; User xem được thông tin mới nhất.                                           |
+| Ưu tiên        | Trung bình                                                                                                                                    |
+
+Luồng chính:
+
+1. Khi trip chuyển `COMPLETED`, hệ thống tìm các booking của User trên chuyến chưa được cộng điểm.
+2. Hệ thống tính số tiền căn cứ bằng số tiền User thực trả cho các ticket không ở trạng thái `CANCELLED`, `REFUNDED`, `NO_SHOW`.
+3. Hệ thống tính điểm theo đơn vị tích điểm và hệ số hạng hiện tại của User, làm tròn xuống số nguyên (`BR-66`).
+4. Hệ thống ghi giao dịch `EARN` kèm booking nguồn, phiên bản policy và idempotency key theo booking, rồi cập nhật số dư điểm.
+5. Hệ thống tính lại hạng theo tổng điểm `EARN` trong 12 tháng gần nhất (`BR-68`) và gửi thông báo không bắt buộc khi tích điểm hoặc đổi hạng.
+6. User mở VXN Plus để xem hạng hiện tại, điểm khả dụng, số điểm cần để lên hạng kế tiếp, bảng hạng và hệ số tích điểm.
+7. User mở lịch sử điểm và lọc theo loại giao dịch (tích, đổi, hết hạn, điều chỉnh / thu hồi) và thời gian.
+
+Luồng thay thế / ngoại lệ:
+
+- A1: Booking tạo bằng guest session → không cộng điểm, kể cả khi sau đó Guest đăng ký bằng cùng email.
+- A2: Sự kiện hoàn thành chuyến bị nhận trùng hoặc job chạy lại → idempotency theo booking, không cộng lần hai.
+- A3: Ticket đã tích điểm sau đó được hoàn tiền qua dispute / refund thủ công → hệ thống ghi `REVERSAL` tương ứng; số dư không âm (`BR-67`).
+- A4: Điểm đến hạn → job nền ghi `EXPIRE` theo nguyên tắc điểm tích trước hết hạn trước (`BR-70`); User đã bật thông báo được nhắc trước hạn.
+- A5: Admin điều chỉnh điểm hoặc đổi tham số chương trình → xử lý tại `UC-39`; User thấy giao dịch `ADJUST` trong lịch sử điểm.
+
+### UC-37: Đổi điểm và sử dụng ví voucher
+
+| Thuộc tính     | Nội dung                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Actor chính    | Người dùng (User)                                                                                                                                            |
+| Actor phụ      | Hệ thống                                                                                                                                                     |
+| Mục tiêu       | User đổi điểm lấy voucher, lưu mã khuyến mãi công khai vào ví và dùng voucher khi đặt vé.                                                                   |
+| Tiền điều kiện | User đã đăng nhập. Đổi điểm: số dư không thấp hơn số điểm đổi tối thiểu. Dùng voucher: voucher `AVAILABLE`, còn hạn và booking thỏa điều kiện áp dụng.       |
+| Kích hoạt      | User bấm đổi điểm lấy ưu đãi, bấm lưu mã trên một khuyến mãi công khai hoặc chọn voucher ở bước tạo booking.                                                 |
+| Hậu điều kiện  | Điểm bị trừ và voucher được tạo trong cùng giao dịch; voucher được giữ / dùng / trả về ví đúng trạng thái booking; booking lưu snapshot voucher và bên chịu phần giảm. |
+| Ưu tiên        | Trung bình                                                                                                                                                   |
+
+Luồng chính:
+
+1. User mở màn đổi điểm; hệ thống hiển thị điểm hiện có, giá trị quy đổi, số điểm tối thiểu và hạn dùng của voucher.
+2. User nhập hoặc chọn nhanh số điểm muốn đổi; hệ thống hiển thị giá trị giảm nhận được và điểm còn lại.
+3. User xác nhận; hệ thống kiểm tra số dư, số điểm tối thiểu và idempotency key của yêu cầu.
+4. Trong một giao dịch, hệ thống ghi `REDEEM` và tạo `UserVoucher` nguồn đổi điểm, giá trị cố định VND, hạn dùng theo policy, trạng thái `AVAILABLE`.
+5. User mở ví voucher để xem voucher đổi điểm và mã đã lưu kèm giá trị, điều kiện, hạn dùng và trạng thái; User có thể lưu thêm mã khuyến mãi công khai đang hiệu lực.
+6. Ở bước tạo booking (`UC-05`), User chọn tối đa một voucher hợp lệ hoặc nhập một mã; hệ thống kiểm tra điều kiện, chuyển voucher sang `RESERVED` và lưu snapshot phần giảm cùng bên chịu.
+7. Khi payment `SUCCESS`, voucher chuyển `USED` và hệ thống tạo redemption record; với voucher đổi điểm, hệ thống ghi phần giảm do Platform chịu vào ledger (`BR-73`).
+
+Luồng thay thế / ngoại lệ:
+
+- A1: Số dư không đủ hoặc dưới mức tối thiểu → hệ thống từ chối, không trừ điểm.
+- A2: Yêu cầu đổi điểm bị gửi trùng → trả kết quả của yêu cầu đầu tiên, không tạo voucher thứ hai.
+- A3: Booking `EXPIRED` hoặc thanh toán thất bại → voucher trở về `AVAILABLE` nếu còn hạn, ngược lại `EXPIRED`.
+- A4: Chuyến bị Operator / Platform hủy → voucher đã dùng được trả về ví nếu còn hạn; User tự hủy vé → voucher không được trả lại (`BR-72`).
+- A5: Voucher hết hạn hoặc promotion gốc đã tạm dừng / kết thúc → không cho chọn; job nền chuyển voucher hết hạn sang `EXPIRED`.
+- A6: Tổng giảm làm số tiền phải trả thấp hơn mức tối thiểu của cổng thanh toán → hệ thống giới hạn mức giảm; phần giá trị dư không quy đổi tiền mặt và không hoàn lại.
+- A7: User dùng voucher của tài khoản khác hoặc voucher đang `RESERVED` cho booking khác → hệ thống từ chối.
+- A8: Mã đã có trong ví → hệ thống không lưu trùng.
+
+### UC-38: Đọc bài viết tin tức / cẩm nang
+
+| Thuộc tính     | Nội dung                                                                             |
+| -------------- | ------------------------------------------------------------------------------------ |
+| Actor chính    | Người dùng (User), Khách vãng lai (Guest)                                            |
+| Actor phụ      | Hệ thống                                                                             |
+| Mục tiêu       | Hành khách đọc tin tức / cẩm nang đã xuất bản ở trang Khám phá.                      |
+| Tiền điều kiện | Không cần đăng nhập; có bài viết ở trạng thái `PUBLISHED`.                           |
+| Kích hoạt      | Hành khách mở trang Khám phá, một chuyên mục hoặc liên kết bài viết.                 |
+| Hậu điều kiện  | Hành khách xem được bài đã xuất bản; lượt xem được ghi nhận.                         |
+| Ưu tiên        | Thấp                                                                                 |
+
+Luồng chính:
+
+1. Hành khách mở Khám phá; hệ thống hiển thị bài nổi bật, danh sách bài đã xuất bản mới nhất trước, bộ lọc chuyên mục kèm số bài và ô tìm kiếm.
+2. Hành khách lọc theo chuyên mục hoặc tìm theo từ khóa.
+3. Hành khách mở chi tiết bài; hệ thống hiển thị nội dung đã làm sạch, chuyên mục, ngày xuất bản và tăng lượt xem.
+
+Luồng thay thế / ngoại lệ:
+
+- A1: Chuyên mục chưa có bài hoặc tìm không có kết quả → hiển thị trạng thái rỗng, gợi ý chuyên mục khác / FAQ.
+- A2: Bài đã gỡ hoặc slug không tồn tại → trả trang không tồn tại.
+- A3: Bài thuộc chuyên mục khuyến mãi → chỉ mang tính mô tả; điều kiện áp dụng theo promotion thực tế (`FR-PROM-*`).
+
+### UC-39: Cấu hình và giám sát chương trình VXN Plus
+
+| Thuộc tính     | Nội dung                                                                                                                              |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Actor chính    | Admin toàn hệ thống (Admin)                                                                                                           |
+| Actor phụ      | Hệ thống, Người dùng (User) được điều chỉnh điểm                                                                                      |
+| Mục tiêu       | Admin cấu hình tham số chương trình theo phiên bản, tra cứu tài khoản thành viên, điều chỉnh điểm có lý do và theo dõi chi phí chương trình. |
+| Tiền điều kiện | Admin đã đăng nhập và có quyền quản trị loyalty.                                                                                     |
+| Kích hoạt      | Admin cần thay đổi tham số, xử lý yêu cầu về điểm của User hoặc xem báo cáo định kỳ.                                                  |
+| Hậu điều kiện  | Phiên bản tham số mới có ngày hiệu lực; điều chỉnh điểm được ghi bằng giao dịch `ADJUST` kèm audit log; báo cáo phản ánh đúng sổ điểm. |
+| Ưu tiên        | Trung bình                                                                                                                            |
+
+Luồng chính:
+
+1. Admin mở màn cấu hình VXN Plus; hệ thống hiển thị phiên bản tham số đang hiệu lực và lịch sử phiên bản.
+2. Admin nhập tham số mới (đơn vị tích điểm, giá trị quy đổi, số điểm đổi tối thiểu, hạn điểm, hạn voucher, mốc và hệ số hạng) cùng ngày hiệu lực.
+3. Hệ thống kiểm tra tham số hợp lệ, lưu phiên bản mới và ghi audit log (`FR-LOY-10`).
+4. Admin tra cứu tài khoản thành viên của một User: hạng, số dư và lịch sử giao dịch điểm.
+5. Khi cần, Admin điều chỉnh điểm (cộng hoặc trừ) kèm lý do; hệ thống ghi `ADJUST`, cập nhật số dư, ghi audit log và gửi thông báo không bắt buộc cho User (`FR-LOY-11`).
+6. Admin xem báo cáo theo kỳ: điểm phát hành, điểm đổi, điểm hết hạn, voucher đã dùng và tổng giá trị giảm Platform chịu (`FR-LOY-12`).
+
+Luồng thay thế / ngoại lệ:
+
+- A1: Tham số không hợp lệ → hệ thống yêu cầu sửa, không tạo phiên bản mới.
+- A2: Phiên bản tham số mới có hiệu lực → hệ thống chỉ áp cho giao dịch phát sinh sau ngày hiệu lực, không tính lại giao dịch điểm và voucher đã ghi.
+- A3: Điều chỉnh trừ vượt số dư → hệ thống từ chối vì số dư không được âm.
+- A4: Thiếu lý do điều chỉnh → hệ thống không cho lưu.
+- A5: Yêu cầu điều chỉnh bị gửi trùng → idempotency, không ghi lần hai.
+
+### UC-40: Quản lý bài viết tin tức / cẩm nang
+
+| Thuộc tính     | Nội dung                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| Actor chính    | Admin toàn hệ thống (Admin)                                                                    |
+| Actor phụ      | Hệ thống, Dịch vụ lưu trữ tệp                                                                  |
+| Mục tiêu       | Admin soạn, xuất bản, gỡ bài viết và quản lý chuyên mục cho trang Khám phá.                    |
+| Tiền điều kiện | Admin đã đăng nhập và có quyền quản lý nội dung.                                               |
+| Kích hoạt      | Admin cần đăng bài mới, sửa, gỡ bài hoặc thay đổi chuyên mục.                                  |
+| Hậu điều kiện  | Bài viết / chuyên mục được lưu đúng trạng thái; thao tác xuất bản / gỡ có audit log.           |
+| Ưu tiên        | Thấp                                                                                           |
+
+Luồng chính:
+
+1. Admin tạo bài gồm tiêu đề, slug, chuyên mục, ảnh bìa, tóm tắt, nội dung và cờ bài nổi bật; bài ở trạng thái `DRAFT`.
+2. Hệ thống kiểm tra trường bắt buộc và slug duy nhất, làm sạch nội dung, lưu ảnh qua dịch vụ lưu trữ tệp (bucket công khai).
+3. Admin xem trước rồi xuất bản; hệ thống chuyển bài sang `PUBLISHED`, ghi thời điểm xuất bản và audit log.
+4. Admin quản lý chuyên mục bài viết: tên, slug, thứ tự hiển thị và trạng thái.
+
+Luồng thay thế / ngoại lệ:
+
+- A1: Slug trùng hoặc thiếu trường bắt buộc → hệ thống yêu cầu sửa.
+- A2: Admin gỡ bài → bài chuyển `ARCHIVED`, không còn hiển thị công khai; có thể xuất bản lại.
+- A3: Nội dung chứa script hoặc HTML không cho phép → bị loại khi làm sạch.
+- A4: Admin sửa bài đã xuất bản → hệ thống cập nhật thời điểm sửa và ghi audit log.
 
 ---
 
 ## 14. Business Rules
 
-Mục này chốt các quy tắc nghiệp vụ áp dụng cho v1, được rút từ phạm vi, ràng buộc, FR, NFR và `UC-01..UC-35` ở các mục trước. Các rule dưới đây là đầu vào bắt buộc cho HLD, LLD, Database Design, API Specification, Test Plan và task triển khai.
+Mục này chốt các quy tắc nghiệp vụ áp dụng cho v1, được rút từ phạm vi, ràng buộc, FR, NFR và `UC-01..UC-40` ở các mục trước. Các rule dưới đây là đầu vào bắt buộc cho HLD, LLD, Database Design, API Specification, Test Plan và task triển khai.
 
 ### 14.1. Nguyên tắc áp dụng Business Rules
 
@@ -2203,12 +2664,12 @@ Mục này chốt các quy tắc nghiệp vụ áp dụng cho v1, được rút 
 | BR-45 | Operation Incident       | Nhật trình, báo cáo sự cố và attachment vận hành phải gắn với trip / Employee / Operator liên quan và đồng bộ về Operator / Admin khi có mạng.                                                           | `FR-EMP-10..13`, `UC-21`, `UC-22`                                 |
 | BR-46 | Promotion Scope          | Promotion cấp Operator chỉ được ảnh hưởng dữ liệu của chính Operator đó và chỉ được tạo khi Platform cấp quyền; Operator không được tạo promotion vượt guardrail.                                        | `FR-PROM-03..04`, `FR-ADM-12`, `UC-33`                            |
 | BR-47 | Promotion Snapshot       | Khi promotion được áp dụng, hệ thống phải lưu snapshot và redemption record vào booking; promotion đã dùng không được sửa ngược rule làm thay đổi giao dịch cũ.                                          | `FR-PROM-05..06`, `UC-05`, `UC-33`                                |
-| BR-48 | Promotion Subsidy        | Subsidy promotion do Platform bù tiền chưa thuộc phạm vi v1; nếu phát sinh phải được review scope trước khi thiết kế.                                                                                    | `§6.4`, `FR-PROM-02`, `FR-ADM-12`, `UC-33`                        |
+| BR-48 | Promotion Subsidy        | Subsidy promotion do Platform bù tiền chưa thuộc phạm vi v1, **ngoại trừ voucher đổi điểm VXN Plus theo `BR-73`**; trường hợp khác nếu phát sinh phải được review scope trước khi thiết kế. | `§6.4`, `FR-PROM-02`, `FR-ADM-12`, `FR-LOY-09`, `UC-33` |
 | BR-49 | Support / Complaint      | Support ticket, complaint và dispute phải gắn được với booking, ticket, payment, Operator hoặc chuyến liên quan; lịch sử trao đổi và attachment minh chứng phải được lưu.                                | `FR-NSR-06..09`, `FR-DSP-01`, `UC-09`, `UC-27`                    |
 | BR-50 | Dispute                  | Dispute phải đi theo state machine đã định nghĩa, mỗi lần đổi trạng thái phải lưu actor, thời điểm, trạng thái trước / sau, lý do và minh chứng nếu có.                                                  | `FR-DSP-02..08`, `UC-27`                                          |
 | BR-51 | Platform Arbiter         | Platform là arbiter cuối cùng trong dispute; Admin có thể quyết định refund, không refund, đổi vé hoặc phương án khác theo policy và bằng chứng, kèm audit log.                                          | `FR-ADM-11`, `FR-DSP-06`, `UC-27`                                 |
 | BR-52 | Notification Mandatory   | Notification bắt buộc về bảo mật, vé, thanh toán, đổi / hủy chuyến và dispute không được tắt hoàn toàn; preference chỉ áp dụng cho notification không bắt buộc.                                          | `FR-NSR-01..05`, `FR-NSR-14`, `UC-31`, `UC-34`                    |
-| BR-53 | Notification Safety      | Notification không được chứa token, OTP, mật khẩu, dữ liệu thanh toán nhạy cảm hoặc dữ liệu ngoài quyền người nhận; với Guest chỉ dùng contact đã lưu trong booking.                                     | `FR-NSR-01..05`, `NFR-PRIV-05`, `UC-31`, `UC-35`                  |
+| BR-53 | Notification Safety      | Notification không được chứa token phiên, OTP đã dùng, mật khẩu, dữ liệu thanh toán nhạy cảm hoặc dữ liệu ngoài quyền người nhận, trừ OTP xác minh (`NTF-01`), link truy cập có hạn dùng cho đúng một đối tượng (tra cứu vé, hồ sơ đăng ký nhà xe) và mật khẩu tạm dùng một lần khi cấp tài khoản Operator / Employee; với Guest chỉ dùng contact đã lưu trong booking.                                     | `FR-NSR-01..05`, `NFR-PRIV-05`, `UC-31`, `UC-35`                  |
 | BR-54 | Notification Idempotency | Cùng một sự kiện nghiệp vụ không được gửi trùng notification bắt buộc; hệ thống phải dùng idempotency key / mã tham chiếu để retry an toàn.                                                              | `FR-NSR-02..03`, `NFR-AVAIL-03`, `UC-31`, `UC-32`                 |
 | BR-55 | Scorecard / Review       | Chỉ review hợp lệ mới ảnh hưởng Operator scorecard; nội dung đang bị dispute, nghi ngờ spam hoặc vi phạm policy có thể bị giữ / ẩn khỏi tính toán công khai.                                             | `FR-NSR-10..11`, `FR-NSR-15`, `UC-09`, `UC-28`                    |
 | BR-56 | Reporting                | Báo cáo Operator và Admin chỉ hiển thị dữ liệu theo quyền; export dữ liệu nhạy cảm phải được kiểm soát phạm vi, mask dữ liệu khi cần và ghi log nếu thuộc nhóm nhạy cảm.                                 | `FR-NSR-12..13`, `FR-ADM-17`, `UC-17`, `UC-29`, `UC-30`           |
@@ -2220,6 +2681,17 @@ Mục này chốt các quy tắc nghiệp vụ áp dụng cho v1, được rút 
 | BR-62 | Background Job           | Payment callback, refund, payout, notification, reconciliation và báo cáo bất đồng bộ phải có job lock / checkpoint / retry để không xử lý trùng tiền, trùng trạng thái hoặc trùng thông báo.            | `NFR-AVAIL-03`, `NFR-MAINT-06`, `UC-31`, `UC-32`                  |
 | BR-63 | External Provider        | Tích hợp cổng thanh toán, notification, routing, object storage và ngân hàng payout phải đi qua adapter hệ thống; external system không được truy cập trực tiếp dữ liệu nội bộ ngoài contract tích hợp.  | `§7.6`, `NFR-COMP-05`, `UC-06`, `UC-31`, `UC-32`                  |
 | BR-64 | Time / Locale            | Dữ liệu thời gian lưu trong database nên dùng UTC; giao diện v1 hiển thị theo Asia/Ho_Chi_Minh, tiền tệ VND và ngôn ngữ chính tiếng Việt.                                                                | `AS-14`, `CO-14`, `UC-02`, `UC-05`, `UC-14`                       |
+| BR-65 | Loyalty Eligibility      | Chỉ User có tài khoản mới có `LoyaltyAccount`, được tích / đổi điểm và có ví voucher; booking tạo bằng guest session không được cộng điểm, kể cả cộng hồi tố sau khi đăng ký. | `FR-LOY-01`, `FR-PROM-08..10`, `UC-36..37` |
+| BR-66 | Point Earning            | Điểm được cộng đúng một lần cho mỗi booking khi chuyến `COMPLETED`; số tiền căn cứ là số tiền User thực trả cho các ticket không ở trạng thái `CANCELLED` / `REFUNDED` / `NO_SHOW`; điểm = làm tròn xuống (số tiền căn cứ ÷ đơn vị tích điểm × hệ số hạng), tính bằng Decimal. | `FR-LOY-02`, `UC-36` |
+| BR-67 | Point Reversal           | Ticket đã tích điểm mà sau đó được hoàn tiền phải bị thu hồi phần điểm tương ứng bằng giao dịch `REVERSAL`; số dư điểm không được âm, nếu không đủ thì thu hồi tối đa bằng số dư hiện có và ghi nhận phần thiếu. | `FR-LOY-02`, `FR-LOY-07`, `UC-36` |
+| BR-68 | Membership Tier          | Hạng được xác định theo tổng điểm `EARN` trong 12 tháng gần nhất (không trừ điểm đã đổi / hết hạn) so với mốc hạng; ở v1 hạng chỉ quyết định hệ số tích điểm, không giảm giá tự động và không ưu tiên CSKH. | `FR-LOY-03..04`, `UC-36` |
+| BR-69 | Point Ledger             | Mọi thay đổi điểm là giao dịch append-only (`EARN`, `REDEEM`, `EXPIRE`, `ADJUST`, `REVERSAL`) có tham chiếu nguồn và phiên bản policy; số dư bằng tổng giao dịch; không sửa / xóa giao dịch đã ghi. | `FR-LOY-05`, `FR-LOY-07`, `FR-LOY-11`, `UC-36..37`, `UC-39` |
+| BR-70 | Point Expiry             | Điểm hết hạn sau thời hạn policy tính từ ngày tích; điểm tích trước được dùng và hết hạn trước; job hết hạn điểm phải idempotent. | `FR-LOY-08`, `UC-36`, `BR-62` |
+| BR-71 | Point Redemption         | Đổi điểm phải đạt số điểm tối thiểu của policy; giá trị voucher = số điểm × giá trị quy đổi (VND, `BIGINT`); mỗi yêu cầu có idempotency key và tạo đúng một voucher; điểm đã đổi không hoàn lại. | `FR-LOY-06..07`, `UC-37` |
+| BR-72 | Voucher Use              | Mỗi booking áp dụng tối đa một mã khuyến mãi hoặc một voucher; voucher chỉ dùng cho booking của chính User sở hữu, chuyển `RESERVED` khi tạo booking, `USED` khi payment `SUCCESS`, trở về `AVAILABLE` (nếu còn hạn) khi booking `EXPIRED`, thanh toán thất bại hoặc chuyến bị Operator / Platform hủy; User tự hủy vé thì voucher không được trả lại. Tổng giảm không làm số tiền phải trả thấp hơn mức tối thiểu của cổng thanh toán; phần giá trị dư không quy đổi tiền mặt. | `FR-PROM-09..10`, `UC-05`, `UC-37` |
+| BR-73 | Loyalty Funding          | Phần giảm từ voucher đổi điểm do Platform chịu: escrow của Operator và commission tính trên giá trước phần giảm này, phần Platform chịu ghi dòng ledger riêng. Khi hoàn vé, số tiền hoàn cho khách tính trên số tiền khách thực trả và phần Platform chịu được đảo theo cùng tỷ lệ hoàn. Đây là ngoại lệ duy nhất của `BR-48` ở v1. | `§4.3`, `FR-LOY-09`, `FR-BTP-15..16`, `UC-37` |
+| BR-74 | Article Publishing       | Chỉ Admin tạo và xuất bản bài viết; chỉ bài `PUBLISHED` hiển thị công khai; nội dung phải được làm sạch trước khi hiển thị; slug duy nhất; bài `ARCHIVED` không hiển thị nhưng được giữ để truy vết. | `FR-ADM-18..19`, `FR-MKT-14`, `UC-38`, `UC-40` |
+| BR-75 | Operator Application     | Hồ sơ đăng ký nhà xe được nộp khi chưa có tài khoản và chỉ truy cập qua link bảo mật gửi tới email liên hệ; link có hạn dùng, chỉ mở đúng một hồ sơ, bị thay khi cấp link mới và hết hiệu lực khi hồ sơ `APPROVED` / `REJECTED`. Tài khoản Owner chỉ được tạo khi Admin phê duyệt; mỗi hồ sơ tạo tối đa một Operator. | `FR-OPR-01..05`, `FR-OPR-12`, `FR-ADM-03`, `UC-10`, `UC-23` |
 
 ---
 
@@ -2264,7 +2736,7 @@ Mục này mô tả phân quyền nghiệp vụ ở mức SRS. Thiết kế API,
 | Hủy vé / yêu cầu hoàn tiền                  | Vé của mình theo policy                                | Vé đã xác minh theo policy                                     | Hỗ trợ / phản hồi theo phạm vi nhà xe                              | Không                                                               | Quyết định refund thủ công / đơn phương              | Hệ thống tính điều kiện, tạo refund request      | `UC-08`, `UC-27`, `BR-06..07`, `BR-35`         |
 | Support ticket / complaint                  | Tạo và theo dõi của mình                               | Tạo sau xác minh booking / ticket                              | Phản hồi phần liên quan đến nhà xe                                 | Gửi sự cố vận hành, không xử lý complaint khách hàng ở mức Platform | Phân loại, phân công, leo thang, đóng                | Hệ thống lưu lịch sử / attachment                | `UC-09`, `UC-27`, `BR-49..51`                  |
 | Review / rating                             | Gửi review nếu có ticket hợp lệ trên chuyến hoàn thành | Không trong v1                                                 | Phản hồi review thuộc nhà xe nếu policy cho phép                   | Không                                                               | Kiểm duyệt / ẩn / xử lý vi phạm                      | Hệ thống tính scorecard từ review hợp lệ         | `UC-09`, `UC-28`, `BR-18`, `BR-55`             |
-| Operator onboarding / KYC                   | Không                                                  | Không                                                          | Tạo / cập nhật hồ sơ và gửi KYC của mình                           | Không                                                               | Duyệt / từ chối / yêu cầu bổ sung / khóa             | Hệ thống kiểm tra trạng thái mở bán              | `UC-10`, `UC-23`, `BR-16`, `BR-36`             |
+| Operator onboarding / KYC                   | Không                                                  | Không                                                          | Người đại diện nộp / bổ sung hồ sơ qua form công khai và link bảo mật (chưa có tài khoản); Owner cập nhật giấy tờ sau khi được duyệt                           | Không                                                               | Duyệt / từ chối / yêu cầu bổ sung / khóa             | Hệ thống kiểm tra trạng thái mở bán              | `UC-10`, `UC-23`, `BR-16`, `BR-36`, `BR-75`             |
 | Hồ sơ tài chính Operator                    | Không                                                  | Không                                                          | Xem escrow, commission, payout, đối soát của mình                  | Không                                                               | Giám sát toàn hệ thống                               | Hệ thống tính ledger / payout eligibility        | `UC-11`, `UC-26`, `BR-30..34`                  |
 | Tài khoản nhận tiền Operator                | Không                                                  | Không                                                          | Tạo / đổi theo quy trình xác minh                                  | Không                                                               | Giám sát / xử lý ngoại lệ                            | Hệ thống ghi audit và kiểm tra policy            | `UC-11`, `BR-37`, `BR-57`                      |
 | Vehicle / VehicleType / SeatMap             | Không                                                  | Không                                                          | Quản lý thuộc nhà xe                                               | Xem xe được phân công                                               | Xem / giám sát khi cần                               | Hệ thống kiểm tra xung đột / seat map            | `UC-12`, `BR-14`, `BR-20`, `BR-39`             |
@@ -2280,6 +2752,9 @@ Mục này mô tả phân quyền nghiệp vụ ở mức SRS. Thiết kế API,
 | Giám sát payment / refund / escrow / payout | Xem giao dịch của mình                                 | Xem giao dịch của booking đã xác minh                          | Xem giao dịch thuộc nhà xe                                         | Không                                                               | Giám sát / đối soát / xác nhận thủ công              | Hệ thống reconciliation / ledger                 | `UC-26`, `UC-32`, `BR-17`, `BR-30..33`         |
 | Dispute case / refund thủ công              | Theo dõi case của mình                                 | Theo dõi case sau xác minh                                     | Phản hồi case liên quan                                            | Không, trừ cung cấp sự cố vận hành nếu được yêu cầu                 | Phân xử cuối cùng                                    | Hệ thống state machine / notification            | `UC-27`, `BR-49..51`                           |
 | Promotion                                   | Áp dụng nếu thỏa điều kiện                             | Áp dụng nếu promotion cho phép Guest / booking không đăng nhập | Tạo / quản lý promotion trong phạm vi được cấp                     | Không                                                               | Quản lý Platform promotion và guardrail Operator     | Hệ thống kiểm tra rule / snapshot / redemption   | `UC-05`, `UC-33`, `BR-15`, `BR-46..48`         |
+| Loyalty VXN Plus                            | Xem hạng, điểm, lịch sử; đổi điểm của mình             | Không                                                          | Không                                                              | Không                                                               | Cấu hình policy; xem tài khoản; điều chỉnh điểm có lý do | Cộng / hết hạn / thu hồi điểm idempotent         | `UC-36..37`, `UC-39`, `BR-65..71`, `BR-73`              |
+| Ví voucher                                  | Lưu mã công khai; xem và dùng voucher của mình         | Không                                                          | Không                                                              | Không                                                               | Xem để hỗ trợ / đối soát                             | Giữ / tiêu / trả voucher theo trạng thái booking | `UC-05`, `UC-37`, `BR-72`                      |
+| Bài viết tin tức / cẩm nang                 | Xem bài đã xuất bản                                    | Xem bài đã xuất bản                                            | Xem bài đã xuất bản                                                | Không                                                               | Tạo, xuất bản, gỡ, quản lý chuyên mục                | Không                                            | `UC-38`, `UC-40`, `BR-74`                               |
 | Notification preference                     | Cấu hình thông báo không bắt buộc                      | Không; nhận theo contact booking                               | Cấu hình thông báo không bắt buộc                                  | Cấu hình thông báo không bắt buộc                                   | Cấu hình vận hành / template nếu có quyền            | Hệ thống gửi notification bắt buộc / retry       | `UC-31`, `UC-34`, `BR-52..54`                  |
 | Audit log                                   | Không                                                  | Không                                                          | Xem log của nhà xe nếu được cấp quyền                              | Không                                                               | Truy xuất theo quyền Admin                           | Hệ thống ghi audit log                           | `UC-30`, `BR-58..59`                           |
 | Dữ liệu cá nhân / export                    | Dữ liệu của mình                                       | Dữ liệu booking đã xác minh                                    | Theo tenant và mục đích vận hành                                   | Theo phân công, mặc định mask số điện thoại                         | Theo quyền, có kiểm soát export                      | Hệ thống mask / log truy cập nhạy cảm            | `BR-19`, `BR-56`, `BR-60`                      |
@@ -2310,7 +2785,9 @@ Mục này mô tả phân quyền nghiệp vụ ở mức SRS. Thiết kế API,
 | Xác nhận payout thành công                            | Admin                                     | Kiểm tra payout eligibility, ledger, kênh chuyển khoản ngân hàng và lý do xác nhận       | Audit log và cập nhật lịch sử payout cho Operator.                                     |
 | Đổi tài khoản nhận tiền Operator                      | Operator, Admin theo quyền                | Xác minh bổ sung, kiểm tra quyền và lưu phiên bản thông tin nhận tiền                    | Audit log bắt buộc; cảnh báo nếu thay đổi gần kỳ payout.                               |
 | Đổi policy, commission, payout policy                 | Admin                                     | Tạo phiên bản policy mới, thời gian hiệu lực, lý do thay đổi; không áp ngược booking cũ  | Audit log; thông báo Operator nếu policy ảnh hưởng trực tiếp.                          |
+| Điều chỉnh điểm loyalty thủ công                      | Admin                                     | Lý do bắt buộc, ghi giao dịch `ADJUST` mới, không sửa giao dịch cũ                       | Audit log bắt buộc; thông báo User (không bắt buộc).                                   |
 | Khóa / mở khóa Operator hoặc tài khoản                | Admin; Operator chỉ với Employee của mình | Lý do thao tác, kiểm tra quyền, không khóa ngoài phạm vi                                 | Audit log; force logout / revoke session nếu cần.                                      |
+| Duyệt hồ sơ đăng ký nhà xe (tạo Operator + Owner)     | Admin                                     | Xác thực lại, kiểm tra slug, xử lý idempotent, lý do khi từ chối / yêu cầu bổ sung       | Audit log bắt buộc; email thông tin đăng nhập chỉ gửi tới email liên hệ đã xác minh.   |
 | Sửa chuyến đã có vé bán                               | Operator, Admin theo quyền                | Yêu cầu lý do, đánh giá ảnh hưởng tới seat / ticket / pickup / refund                    | Operation log / audit log; notification bắt buộc cho hành khách bị ảnh hưởng.          |
 | Xem số điện thoại đầy đủ / export dữ liệu cá nhân     | Actor được cấp quyền rõ ràng              | Mục đích vận hành hợp lệ, phạm vi dữ liệu tối thiểu, mask nếu không cần đầy đủ           | Log truy cập / export nếu thuộc nhóm nhạy cảm.                                         |
 | Chạy lại job payment / refund / payout / notification | Admin, System                             | Job lock, checkpoint, idempotency key và ngưỡng an toàn                                  | Job log, reconciliation record và cảnh báo nếu lệch trạng thái.                        |
@@ -2333,7 +2810,7 @@ Nguyên tắc chung:
 
 | ID    | Luồng nghiệp vụ                               | Actor chính                                | UC / BR liên quan                                   | Kết quả nghiệp vụ chính                                                   |
 | ----- | --------------------------------------------- | ------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------------------------- |
-| BF-01 | Thiết lập Operator và mở bán chuyến           | Operator, Admin, Hệ thống                  | `UC-10..14`, `UC-16`, `UC-23..25`, `BR-36..43`      | Operator đủ điều kiện bán; trip hợp lệ được đưa lên Marketplace.          |
+| BF-01 | Thiết lập Operator và mở bán chuyến           | Operator, Admin, Hệ thống                  | `UC-10..14`, `UC-16`, `UC-23..25`, `BR-36..43`, `BR-75`      | Operator đủ điều kiện bán; trip hợp lệ được đưa lên Marketplace.          |
 | BF-02 | Đặt vé thành công                             | User, Guest, Hệ thống, Cổng thanh toán     | `UC-02..07`, `UC-31`, `BR-01..05`, `BR-21..30`      | Booking được thanh toán, ticket được phát hành, tiền vào escrow.          |
 | BF-03 | Thanh toán lỗi, hết hạn hoặc cần đối soát     | User, Guest, Hệ thống, Admin               | `UC-04..06`, `UC-26`, `UC-32`, `BR-03`, `BR-27..30` | Ghế được giải phóng hoặc giao dịch được đưa vào hàng đợi đối soát.        |
 | BF-04 | Guest tra cứu vé và thao tác sau mua          | Guest, Hệ thống                            | `UC-35`, `UC-07..09`, `BR-21`, `BR-53`, `BR-60..61` | Guest xem được vé đã xác minh và chỉ thao tác nhạy cảm sau xác minh thêm. |
@@ -2343,15 +2820,18 @@ Nguyên tắc chung:
 | BF-08 | Hỗ trợ, khiếu nại, dispute và refund thủ công | User, Guest, Operator, Admin, Hệ thống     | `UC-09`, `UC-27`, `BR-49..51`                       | Vụ việc có hồ sơ, minh chứng, quyết định xử lý và notification.           |
 | BF-09 | Escrow, commission, payout và reconciliation  | Hệ thống, Admin, Operator, Cổng thanh toán | `UC-11`, `UC-25..26`, `UC-32`, `BR-17`, `BR-30..34` | Doanh thu được giữ, tính commission, payout T+3 và đối soát được.         |
 | BF-10 | Notification, audit và job nền                | Hệ thống, Admin                            | `UC-30..32`, `UC-34`, `BR-52..54`, `BR-57..63`      | Sự kiện được thông báo, log và retry an toàn theo idempotency.            |
+| BF-11 | Tích điểm, đổi điểm và dùng voucher           | User, Hệ thống, Admin                      | `UC-05..06`, `UC-36..37`, `BR-65..73`               | Điểm được tích / đổi / hết hạn đúng sổ; voucher dùng một lần; phần giảm Platform chịu đối soát được. |
 
 ### 16.2. BF-01 - Thiết lập Operator và mở bán chuyến
 
 ```mermaid
 flowchart TD
-    A[Operator đăng ký hồ sơ] --> B[Operator gửi KYC và tài khoản nhận tiền]
-    B --> C[Admin thẩm định KYC]
-    C -->|Được duyệt| D[Operator được phép cấu hình vận hành]
-    C -->|Cần bổ sung / từ chối| C1[Operator bổ sung hoặc dừng mở bán]
+    A[Người đại diện nộp hồ sơ qua form công khai] --> B[Mở link bảo mật trong email, khai báo KYC và tài khoản nhận tiền, gửi duyệt]
+    B --> C[Admin thẩm định hồ sơ]
+    C -->|Cần bổ sung| B
+    C -->|Từ chối| C1[Hồ sơ đóng, không cấp tài khoản]
+    C -->|Được duyệt| C2[Hệ thống tạo Operator, cấp slug + tài khoản Owner, gửi mật khẩu tạm]
+    C2 --> D[Owner đổi mật khẩu, bật TOTP, cấu hình vận hành]
     D --> E[Operator cấu hình hồ sơ công khai]
     D --> F[Operator tạo Vehicle / VehicleType / SeatMap]
     D --> G[Operator tạo Route và điểm đón / trả]
@@ -2368,9 +2848,9 @@ flowchart TD
 
 Luồng nghiệp vụ:
 
-1. Operator đăng ký hồ sơ nhà xe, khai báo thông tin doanh nghiệp, thông tin liên hệ, giấy tờ KYC và tài khoản nhận tiền.
-2. Admin thẩm định KYC, yêu cầu bổ sung, từ chối, khóa hoặc phê duyệt Operator theo policy nền tảng.
-3. Chỉ Operator được phê duyệt mới được cấu hình dữ liệu vận hành để mở bán công khai.
+1. Người đại diện nhà xe nộp hồ sơ qua form công khai (chưa có tài khoản), mở link bảo mật gửi tới email liên hệ để khai báo thông tin doanh nghiệp, giấy tờ KYC và tài khoản nhận tiền, rồi gửi duyệt.
+2. Admin thẩm định hồ sơ, yêu cầu bổ sung, từ chối hoặc phê duyệt theo policy nền tảng; khi phê duyệt, hệ thống tạo Operator, cấp slug và tài khoản Owner đầu tiên, gửi mật khẩu tạm qua email.
+3. Owner đăng nhập Operator OS, đổi mật khẩu tạm và bật TOTP; chỉ Operator được phê duyệt mới được cấu hình dữ liệu vận hành để mở bán công khai.
 4. Operator cấu hình Vehicle, VehicleType, SeatMap, Route, điểm đón / trả, fare và inventory theo tenant của mình.
 5. Nếu cần điểm đón / trả chưa có trong catalog, Operator gửi đề xuất StopPoint để Admin duyệt trước khi dùng công khai theo phạm vi catalog chuẩn.
 6. Operator tạo trip, gắn xe / seat map, giá vé, thời gian chạy, thời gian ngừng bán online, điểm đón / trả và trạng thái mở bán.
@@ -2390,7 +2870,7 @@ Luồng nghiệp vụ:
 sequenceDiagram
     actor C as User / Guest
     participant S as Hệ thống
-    participant PG as VNPay Sandbox / Cổng thanh toán
+    participant PG as Cổng thanh toán (VNPay / MoMo)
     participant O as Operator
     participant N as Dịch vụ thông báo
 
@@ -2422,7 +2902,7 @@ Luồng nghiệp vụ:
 4. User hoặc Guest nhập thông tin hành khách, contact nhận vé / xác minh, điểm đón / trả và promotion nếu có.
 5. Hệ thống kiểm tra SeatHold, số lượng ghế, điểm đón / trả, fare, promotion, policy và tổng tiền.
 6. Hệ thống tạo booking ở trạng thái `PENDING_PAYMENT`, lưu snapshot bắt buộc và chuyển actor sang thanh toán.
-7. Hệ thống tạo payment qua cổng thanh toán v1 là VNPay Sandbox; payment phải có mã tham chiếu duy nhất và số tiền khớp booking snapshot.
+7. Hệ thống tạo payment qua cổng thanh toán hành khách chọn (VNPay hoặc MoMo, sandbox ở v1); payment phải có mã tham chiếu duy nhất và số tiền khớp booking snapshot.
 8. Khi nhận callback / webhook, hệ thống xác minh chữ ký, số tiền, mã giao dịch và xử lý idempotent.
 9. Nếu thanh toán thành công, hệ thống cập nhật booking / payment / ghế, ghi escrow ledger, tính dữ liệu commission và phát hành ticket điện tử.
 10. Hệ thống gửi notification vé điện tử cho User / Guest, đồng thời cập nhật danh sách booking / manifest cho Operator.
@@ -2660,6 +3140,26 @@ Luồng cắt ngang này áp dụng cho tất cả BF-01..BF-09.
 - Job nền phải có lock / checkpoint / idempotency key để retry an toàn, đặc biệt với payment, refund, payout và notification.
 - Audit log phải ghi actor, loại actor, hành động, đối tượng tác động, thời điểm, lý do nếu có, kết quả và dữ liệu trước / sau trong phạm vi được phép.
 
+### 16.12. BF-11 - Tích điểm, đổi điểm và dùng voucher
+
+Luồng chỉ áp dụng cho User có tài khoản (`BR-65`).
+
+| Bước | Actor                     | Hành động                                                                  | Kết quả / kiểm soát                                                                                         | Truy vết                     |
+| ---- | ------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| 1    | User                      | Đặt vé theo BF-02, chọn tối đa một voucher trong ví hoặc nhập một mã       | Voucher `RESERVED`; booking lưu snapshot phần giảm và bên chịu                                              | `UC-05`, `UC-37`, `BR-72`    |
+| 2    | Hệ thống, Cổng thanh toán | Payment `SUCCESS`                                                          | Voucher `USED`; escrow Operator và commission theo giá trước giảm loyalty; ledger ghi phần Platform chịu     | `UC-06`, `BR-73`             |
+| 3    | Hệ thống                  | Booking `EXPIRED`, thanh toán lỗi hoặc chuyến bị Operator / Platform hủy   | Voucher trở về ví nếu còn hạn                                                                               | `BR-72`                      |
+| 4    | Hệ thống                  | Trip `COMPLETED`                                                           | Cộng `EARN` một lần cho mỗi booking; cập nhật hạng; thông báo không bắt buộc                                | `UC-36`, `BR-66`, `BR-68`    |
+| 5    | Hệ thống, Admin           | Hoàn tiền ticket đã tích điểm                                              | Ghi `REVERSAL`; phần Platform chịu được đảo theo tỷ lệ hoàn                                                  | `BR-67`, `BR-73`             |
+| 6    | User                      | Đổi điểm lấy voucher                                                       | `REDEEM` và `UserVoucher` tạo trong một giao dịch idempotent                                                | `UC-37`, `BR-71`             |
+| 7    | Hệ thống                  | Job hết hạn điểm / voucher                                                 | Ghi `EXPIRE`, voucher `EXPIRED`; idempotent; nhắc trước hạn nếu User bật thông báo                          | `BR-62`, `BR-70`             |
+
+Điểm kiểm soát bắt buộc:
+
+- Số dư điểm luôn bằng tổng giao dịch điểm; không có thao tác sửa / xóa giao dịch đã ghi.
+- Một voucher chỉ gắn với tối đa một booking đang hiệu lực tại một thời điểm.
+- Tổng phần giảm Platform chịu theo kỳ phải khớp giữa ledger, redemption record và báo cáo loyalty (`FR-LOY-12`).
+
 ---
 
 ## 17. Trạng thái dữ liệu quan trọng
@@ -2683,7 +3183,8 @@ Mục này mô tả state model nghiệp vụ tối thiểu dùng để truy v�
 | Thanh toán và tài chính  | `Payment`, `Refund`, `Payout`                          | `UC-06`, `UC-08`, `UC-25..26`, `BF-03..09` | Idempotency, escrow, commission, payout T+3.        |
 | Hỗ trợ và tranh chấp     | `SupportTicket`, `Complaint`, `DisputeCase`            | `UC-09`, `UC-27`, `BF-08`                  | Lưu minh chứng, hạn phản hồi, quyết định Admin.     |
 | Vận hành và thông báo    | `NotificationDelivery`, `BackgroundJob`                | `UC-21..22`, `UC-30..32`, `BF-06..10`      | Retry, job lock, operation log, audit log.          |
-| Onboarding và phân quyền | `OperatorProfile`, `KycDocument`, `EmployeeAssignment` | `UC-10`, `UC-16`, `UC-18`, `UC-23`         | Chỉ Operator đã duyệt mới được mở bán công khai.    |
+| Onboarding và phân quyền | `OperatorApplication`, `OperatorProfile`, `KycDocument`, `EmployeeAssignment` | `UC-10`, `UC-16`, `UC-18`, `UC-23`         | Chỉ Operator đã duyệt mới được mở bán công khai.    |
+| Loyalty, voucher, nội dung | `PointTransaction`, `UserVoucher`, `Article`         | `UC-36..40`, `BF-11`                       | Sổ điểm append-only, voucher dùng một lần, chỉ bài `PUBLISHED` công khai. |
 
 ### 17.3. Trạng thái chuyến xe (`Trip`)
 
@@ -2828,18 +3329,59 @@ Mục này mô tả state model nghiệp vụ tối thiểu dùng để truy v�
 | RETRYING      | Job đang chờ chạy lại.               | Lỗi tạm thời còn trong giới hạn retry.                           | Idempotent bắt buộc.                                |
 | MANUAL_REVIEW | Job dừng để Admin kiểm tra thủ công. | Lệch tiền, nguy cơ xử lý trùng, vượt ngưỡng an toàn.             | Không tự cập nhật tiền / vé khi chưa có quyết định. |
 
+### 17.15. Loại giao dịch điểm (`PointTransaction`)
+
+Giao dịch điểm là bản ghi append-only, không có vòng đời trạng thái; bảng dưới liệt kê loại giao dịch. Hạng thành viên (`MembershipTier`) gồm `BRONZE`, `SILVER`, `GOLD`, `PLATINUM`; mốc hạng và hệ số tích điểm do Admin cấu hình (`FR-LOY-10`).
+
+| Loại     | Ý nghĩa nghiệp vụ                          | Điều kiện phát sinh                                          | Ghi chú kiểm soát                                     |
+| -------- | ------------------------------------------ | ------------------------------------------------------------ | ----------------------------------------------------- |
+| EARN     | Cộng điểm sau chuyến hoàn thành.           | Trip `COMPLETED`, booking của User chưa được cộng điểm.      | Idempotent theo booking; lưu số tiền căn cứ, hệ số.   |
+| REDEEM   | Trừ điểm khi đổi lấy voucher.              | User đổi điểm hợp lệ.                                        | Cùng giao dịch với việc tạo `UserVoucher`.            |
+| EXPIRE   | Trừ điểm hết hạn.                          | Điểm quá hạn policy.                                         | Job nền idempotent.                                   |
+| ADJUST   | Điều chỉnh thủ công (cộng hoặc trừ).       | Admin điều chỉnh có lý do.                                   | Audit log bắt buộc.                                   |
+| REVERSAL | Thu hồi điểm đã tích.                      | Ticket đã tích điểm được hoàn tiền.                          | Số dư không âm (`BR-67`).                             |
+
+### 17.16. Trạng thái voucher trong ví (`UserVoucher`)
+
+| Trạng thái | Ý nghĩa nghiệp vụ                          | Điều kiện vào trạng thái                                                             | Ghi chú kiểm soát                                  |
+| ---------- | ------------------------------------------ | ------------------------------------------------------------------------------------ | -------------------------------------------------- |
+| AVAILABLE  | Voucher dùng được.                         | Tạo từ đổi điểm / lưu mã; hoặc được trả về từ booking theo `BR-72`.                  | Còn hạn và promotion gốc còn hiệu lực.             |
+| RESERVED   | Voucher đang giữ cho một booking.          | User chọn voucher khi tạo booking.                                                   | Không chọn được cho booking khác.                  |
+| USED       | Voucher đã dùng.                           | Payment của booking `SUCCESS`.                                                       | Chỉ trở về `AVAILABLE` khi chuyến bị Operator / Platform hủy. |
+| EXPIRED    | Voucher hết hạn hoặc promotion gốc kết thúc. | Quá hạn dùng, hoặc promotion gốc tạm dừng / kết thúc.                              | Không dùng lại.                                    |
+
+### 17.17. Trạng thái bài viết (`Article`)
+
+| Trạng thái | Ý nghĩa nghiệp vụ                  | Điều kiện vào trạng thái                    | Ghi chú kiểm soát                                 |
+| ---------- | ---------------------------------- | ------------------------------------------- | ------------------------------------------------- |
+| DRAFT      | Bài đang soạn, chưa công khai.     | Admin tạo bài.                              | Chỉ Admin xem.                                    |
+| PUBLISHED  | Bài đang hiển thị công khai.       | Admin xuất bản.                             | Ghi thời điểm xuất bản và audit log.              |
+| ARCHIVED   | Bài đã gỡ khỏi trang công khai.    | Admin gỡ bài.                               | Giữ để truy vết; có thể xuất bản lại.             |
+
+### 17.18. Trạng thái hồ sơ đăng ký nhà xe (`OperatorApplication`) và Operator
+
+| Trạng thái | Ý nghĩa nghiệp vụ                        | Điều kiện vào trạng thái                                                 | Ghi chú kiểm soát                                          |
+| ---------- | ---------------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| DRAFT      | Hồ sơ đã tạo, người đại diện đang khai báo. | Người đại diện nhập tên nhà xe và email liên hệ ở form công khai.      | Đã gửi link bảo mật; chưa vào hàng đợi duyệt.              |
+| SUBMITTED  | Chờ Admin thẩm định.                     | Người đại diện gửi duyệt hồ sơ đủ thông tin bắt buộc.                    | Người đại diện chỉ xem, không sửa.                         |
+| NEEDS_INFO | Cần bổ sung.                             | Admin yêu cầu bổ sung kèm lý do.                                         | Gửi link mới; gửi duyệt lại → `SUBMITTED`.                 |
+| APPROVED   | Đã duyệt.                                | Admin phê duyệt; Operator và tài khoản Owner được tạo.                   | Trạng thái kết thúc; link hết hiệu lực.                    |
+| REJECTED   | Bị từ chối.                              | Admin từ chối kèm lý do.                                                 | Trạng thái kết thúc; link hết hiệu lực.                    |
+
+Sau khi được duyệt, trạng thái hoạt động của Operator gồm `ACTIVE` (đang hoạt động) và `SUSPENDED` (bị khóa / tạm ngưng, `UC-23`); Operator `SUSPENDED` không được mở bán (`BR-36`).
+
 ---
 
 ## 18. Thông báo hệ thống
 
-Mục này xác định catalog thông báo nghiệp vụ ở mức SRS. Provider cụ thể cho email / push / SMS chưa chốt ở SRS, ngoại trừ quyết định v1 dùng email OTP cho xác minh User tại `OQ-09`. Kênh gửi chi tiết, template, retry policy và localization sẽ được đặc tả trong UI/UX Flow, API Specification và thiết kế Notification Service.
+Mục này xác định catalog thông báo nghiệp vụ ở mức SRS. Provider đã chốt ở §7.6 (email Resend, push FCM / APNs; SMS chưa bật ở v1); v1 dùng email OTP cho xác minh User theo `OQ-09`. Kênh gửi chi tiết, template, retry policy và localization sẽ được đặc tả trong UI/UX Flow, API Specification và thiết kế Notification Service.
 
 ### 18.1. Nguyên tắc thông báo
 
 - Thông báo bắt buộc về bảo mật, booking, ticket, payment, refund, đổi / hủy chuyến và dispute không được tắt hoàn toàn.
 - Notification preference chỉ áp dụng cho thông báo không bắt buộc; nếu actor tắt kênh không bắt buộc, hệ thống phải lưu trạng thái `SKIPPED`.
 - Với Guest, hệ thống chỉ gửi qua contact đã lưu trong booking và không được gửi dữ liệu ngoài booking / ticket đã xác minh.
-- Nội dung notification không được chứa mật khẩu, OTP sau khi đã dùng, token, QR raw secret, dữ liệu thanh toán nhạy cảm hoặc dữ liệu ngoài quyền người nhận.
+- Nội dung notification không được chứa mật khẩu, OTP sau khi đã dùng, token phiên, QR raw secret, dữ liệu thanh toán nhạy cảm hoặc dữ liệu ngoài quyền người nhận. Ngoại lệ theo `BR-53`: OTP xác minh, link truy cập có hạn dùng cho đúng một đối tượng và mật khẩu tạm dùng một lần khi cấp tài khoản Operator / Employee.
 - Notification phải có mã idempotency theo sự kiện nghiệp vụ để retry an toàn và tránh gửi trùng thông báo bắt buộc.
 - Nếu notification gửi lỗi, dữ liệu nghiệp vụ như booking, ticket, refund hoặc dispute vẫn phải tra cứu được trong hệ thống theo quyền.
 
@@ -2861,7 +3403,7 @@ Mục này xác định catalog thông báo nghiệp vụ ở mức SRS. Provide
 | NTF-12 | Nhắc giờ khởi hành                                | User hoặc Guest                                   | Không    | In-app / Push / Email         | Giờ đi, điểm đón, mã vé, lưu ý lên xe.                                    |
 | NTF-13 | Booking / ticket mới thuộc Operator               | Operator                                          | Có       | In-app / Email                | Chuyến, số vé, ghế, doanh thu ghi nhận theo tenant.                       |
 | NTF-14 | Employee được phân công hoặc chuyến thay đổi      | Employee                                          | Có       | In-app / Push nếu bật         | Chuyến, giờ chạy, xe, nhiệm vụ, thay đổi liên quan.                       |
-| NTF-15 | KYC Operator đổi trạng thái                       | Operator                                          | Có       | Email / In-app                | Được duyệt, bị từ chối, cần bổ sung hoặc bị khóa.                         |
+| NTF-15 | Hồ sơ đăng ký / KYC Operator đổi trạng thái       | Người đại diện nhà xe (email liên hệ); Operator sau khi duyệt | Có       | Email (trước khi duyệt); Email / In-app (sau khi duyệt) | Link bảo mật khi tạo hồ sơ / cần bổ sung; kết quả duyệt kèm tên đăng nhập Owner và mật khẩu tạm; từ chối kèm lý do; bị khóa / mở lại. |
 | NTF-16 | Payout đổi trạng thái                             | Operator, Admin                                   | Có       | In-app / Email                | Kỳ payout, số tiền, trạng thái, lý do hold / failed nếu có.               |
 | NTF-17 | Support ticket / complaint được tạo hoặc phản hồi | User, Guest, Operator, Admin theo case            | Có       | In-app / Email                | Mã hồ sơ, trạng thái xử lý, yêu cầu bổ sung nếu có.                       |
 | NTF-18 | DisputeCase đổi trạng thái / có quyết định        | User hoặc Guest, Operator, Admin                  | Có       | Email / In-app                | Trạng thái dispute, hạn phản hồi, quyết định refund / không refund.       |
@@ -2869,6 +3411,10 @@ Mục này xác định catalog thông báo nghiệp vụ ở mức SRS. Provide
 | NTF-20 | Promotion khả dụng hoặc sắp hết hạn               | User, Operator theo phạm vi                       | Không    | In-app / Email nếu bật        | Mã promotion, điều kiện chính, thời gian hiệu lực.                        |
 | NTF-21 | Bảo trì hệ thống                                  | User, Guest, Operator, Employee, Admin            | Có       | In-app / Email                | Thời gian dự kiến, phạm vi ảnh hưởng, hướng dẫn thao tác.                 |
 | NTF-22 | Job nền thất bại vượt ngưỡng an toàn              | Admin                                             | Có       | In-app / Email                | Tên job, phạm vi, lỗi, yêu cầu kiểm tra thủ công.                         |
+| NTF-23 | Tích / điều chỉnh / thu hồi điểm                  | User                                              | Không    | In-app / Push nếu bật         | Số điểm, booking nguồn hoặc lý do, số dư mới.                             |
+| NTF-24 | Thay đổi hạng thành viên                          | User                                              | Không    | In-app / Push nếu bật / Email | Hạng mới, hệ số tích điểm mới.                                            |
+| NTF-25 | Điểm sắp hết hạn                                  | User                                              | Không    | In-app / Email nếu bật        | Số điểm và ngày hết hạn.                                                  |
+| NTF-26 | Voucher trong ví sắp hết hạn                      | User                                              | Không    | In-app / Push nếu bật         | Mã / nguồn voucher, giá trị, hạn dùng.                                    |
 
 ### 18.3. Yêu cầu tối thiểu cho thiết kế thông báo
 
@@ -2891,14 +3437,14 @@ Mục này xác định tiêu chí nghiệm thu cấp SRS cho v1. Test Plan chi 
 - Mỗi tiêu chí nghiệm thu phải truy vết được ít nhất một FR / UC / BR / BF tương ứng.
 - Tiêu chí liên quan tiền, vé, ghế, dữ liệu cá nhân, quyền truy cập, audit và payout là nhóm bắt buộc kiểm thử trước production.
 - Một luồng chỉ được nghiệm thu khi kiểm thử cả happy path và tối thiểu các ngoại lệ chính đã mô tả trong UC.
-- Test môi trường tích hợp payment v1 dùng VNPay Sandbox; không kiểm thử tiền thật ở phạm vi SRS.
+- Test tích hợp payment v1 dùng sandbox của VNPay và MoMo; không kiểm thử tiền thật ở phạm vi SRS.
 - Guest flow phải được kiểm thử riêng, không được suy diễn từ User flow.
 
 ### 19.2. Tiêu chí nghiệm thu theo nhóm nghiệp vụ
 
 | ID    | Nhóm                     | Tiêu chí nghiệm thu                                                                                                                                    | Truy vết                                                        |
 | ----- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
-| AC-01 | Identity                 | User đăng ký / đăng nhập / đặt lại mật khẩu bằng cơ chế dành cho hành khách; Admin, Operator, Employee dùng đúng cổng đăng nhập riêng.                 | `FR-IAM-01..04`, `UC-01`                                        |
+| AC-01 | Identity                 | User đăng ký / đăng nhập bằng email OTP hoặc OAuth Google / Facebook / Apple, không có mật khẩu; Owner, Employee, Admin đăng nhập đúng cổng và namespace; tài khoản được cấp phải đổi mật khẩu tạm ở lần đầu; Owner và Admin bắt buộc TOTP. | `FR-IAM-01..04`, `FR-IAM-17..18`, `UC-01` |
 | AC-02 | Identity                 | Hệ thống revoke session khi tài khoản bị khóa, quyền bị thu hồi hoặc mật khẩu bị cấp lại.                                                              | `FR-IAM-13..16`, `BR-57`                                        |
 | AC-03 | Marketplace search       | User và Guest tìm được chuyến theo điểm đi, điểm đến, ngày đi, số khách; kết quả chỉ gồm chuyến mở bán, còn ghế và chưa hết thời gian bán online.      | `FR-MKT-01..04`, `UC-02`, `BR-22`                               |
 | AC-04 | Trip detail              | User và Guest xem được chi tiết chuyến, profile Operator, giá, seat map, điểm đón / trả và điều kiện hủy trước khi đặt.                                | `FR-MKT-05..06`, `UC-03`, `BR-23`                               |
@@ -2906,7 +3452,7 @@ Mục này xác định tiêu chí nghiệm thu cấp SRS cho v1. Test Plan chi 
 | AC-06 | Seat hold expiry         | Khi SeatHold hết hạn mà chưa có booking / payment hợp lệ, ghế được giải phóng và booking cũ không thanh toán tiếp được.                                | `UC-04..06`, `BR-03`                                            |
 | AC-07 | Booking                  | User và Guest tạo được booking `PENDING_PAYMENT` từ SeatHold hợp lệ; booking lưu snapshot chuyến, fare, policy, promotion, contact và tổng tiền.       | `FR-MKT-08..10`, `FR-BTP-05..06`, `UC-05`, `BR-21`, `BR-24..26` |
 | AC-08 | Promotion                | Promotion chỉ áp dụng khi đúng phạm vi, thời gian, lượt dùng, actor và điều kiện booking; snapshot / redemption được lưu.                              | `FR-PROM-05..06`, `UC-05`, `UC-33`, `BR-15`, `BR-47`            |
-| AC-09 | Payment                  | Booking đủ điều kiện tạo payment qua VNPay Sandbox; callback thành công cập nhật booking / payment / ghế, ghi escrow và phát hành ticket.              | `FR-BTP-07..10`, `UC-06..07`, `BF-02`, `BR-27..30`              |
+| AC-09 | Payment                  | Booking đủ điều kiện tạo payment qua VNPay hoặc MoMo (sandbox); callback thành công cập nhật booking / payment / ghế, ghi escrow và phát hành ticket.              | `FR-BTP-07..10`, `UC-06..07`, `BF-02`, `BR-27..30`              |
 | AC-10 | Payment exception        | Callback trễ / trùng / lệch số tiền không tạo trùng ticket hoặc trùng tiền; giao dịch được đưa vào đối soát.                                           | `FR-BTP-08..09`, `UC-06`, `UC-32`, `BF-03`, `BR-54`, `BR-62`    |
 | AC-11 | Ticket                   | Ticket điện tử có mã vé, QR token không đoán được, thông tin chuyến, ghế, hành khách, điểm đón / trả và trạng thái ticket.                             | `FR-BTP-11`, `UC-07`, `BR-29`                                   |
 | AC-12 | Guest lookup             | Guest tra cứu được booking / ticket bằng mã và contact hợp lệ; thao tác nhạy cảm yêu cầu xác minh bổ sung.                                             | `FR-MKT-12`, `UC-35`, `BR-21`, `BR-60..61`                      |
@@ -2914,7 +3460,7 @@ Mục này xác định tiêu chí nghiệm thu cấp SRS cho v1. Test Plan chi 
 | AC-14 | Manual refund            | Admin xử lý refund thủ công / refund đơn phương với quyền phù hợp, lý do, xác thực lại nếu cần, audit log và notification bắt buộc.                    | `FR-BTP-14`, `FR-ADM-11`, `UC-27`, `BR-35`, `BR-51`             |
 | AC-15 | Support / complaint      | User tạo và theo dõi support ticket; Guest đã xác minh tạo và theo dõi support / complaint gắn với booking / ticket đã xác minh.                       | `FR-NSR-06..09`, `UC-09`, `UC-35`, `BR-49`                      |
 | AC-16 | Review                   | Chỉ User có ticket hợp lệ trên chuyến đã hoàn thành được gửi review; Guest không gửi review trong v1.                                                  | `FR-NSR-10..11`, `UC-09`, `BR-18`, `BR-55`                      |
-| AC-17 | Operator onboarding      | Operator gửi KYC đầy đủ; Admin duyệt, từ chối, yêu cầu bổ sung hoặc khóa Operator; Operator chưa duyệt không mở bán công khai.                         | `FR-OPR-01..06`, `FR-ADM-03`, `UC-10`, `UC-23`, `BR-36`         |
+| AC-17 | Operator onboarding      | Người đại diện nộp hồ sơ không cần tài khoản, mở / bổ sung hồ sơ qua link bảo mật; Admin duyệt, từ chối hoặc yêu cầu bổ sung; khi duyệt tạo đúng một Operator và một Owner với mật khẩu tạm; link hết hiệu lực khi hồ sơ kết thúc; Operator chưa duyệt hoặc bị khóa không mở bán công khai. | `FR-OPR-01..06`, `FR-OPR-12`, `FR-ADM-03`, `UC-10`, `UC-23`, `BR-36`, `BR-75` |
 | AC-18 | Operator resources       | Operator quản lý được Vehicle, VehicleType, SeatMap, Route, StopPoint đề xuất, Trip, Fare và Inventory trong tenant của mình.                          | `FR-OPS-01..13`, `UC-12..14`, `BR-38..42`                       |
 | AC-19 | Trip change              | Operator sửa thông tin quan trọng của chuyến đã bán vé phải nhập lý do, ghi log và gửi notification cho hành khách bị ảnh hưởng.                       | `FR-OPS-11..12`, `UC-14`, `BF-06`, `BR-10..12`                  |
 | AC-20 | Operator booking         | Operator xem / lọc / xuất booking và ticket thuộc nhà xe; không truy cập dữ liệu Operator khác.                                                        | `FR-OPS-14..15`, `FR-OPR-11`, `UC-15`, `BR-08`                  |
@@ -2933,12 +3479,16 @@ Mục này xác định tiêu chí nghiệm thu cấp SRS cho v1. Test Plan chi 
 | AC-33 | Job nền                  | Payment, refund, payout, notification và reconciliation job có lock, checkpoint, retry và trạng thái xử lý.                                            | `UC-32`, `NFR-AVAIL-03`, `NFR-MAINT-06`, `BR-62`                |
 | AC-34 | Privacy / security       | Backend enforce RBAC, tenant boundary, rate limit, mask dữ liệu cá nhân và không lộ token / OTP / dữ liệu thanh toán nhạy cảm.                         | `NFR-SEC-*`, `NFR-PRIV-*`, `BR-57`, `BR-60..61`                 |
 | AC-35 | Backup / audit readiness | Booking, ticket, payment, refund, escrow, payout, KYC, dispute và audit log được ưu tiên backup / restore trước production.                            | `NFR-AUDIT-01..06`, `BR-59`                                     |
+| AC-36 | Loyalty                  | Điểm được cộng đúng một lần khi chuyến `COMPLETED` theo `BR-66`, thu hồi khi ticket được hoàn, hạng tính theo điểm 12 tháng; Guest không tích điểm; User xem được hạng và lịch sử điểm; Admin cấu hình tham số theo phiên bản và điều chỉnh điểm có lý do, audit log. | `FR-LOY-01..05`, `FR-LOY-08`, `FR-LOY-10..12`, `UC-36`, `UC-39`, `BR-65..70` |
+| AC-37 | Loyalty money            | Đổi điểm trừ điểm và tạo voucher trong một giao dịch idempotent, không âm số dư; escrow Operator và commission tính trên giá trước giảm loyalty; phần Platform chịu có dòng ledger riêng khớp đối soát. | `FR-LOY-06..07`, `FR-LOY-09`, `UC-37`, `BR-71`, `BR-73` |
+| AC-38 | Ví voucher               | User lưu mã công khai, xem trạng thái voucher, chọn tối đa một voucher cho mỗi booking; voucher được giữ / dùng / trả đúng `BR-72`; không dùng được voucher của User khác. | `FR-PROM-08..10`, `UC-37`, `BR-72` |
+| AC-39 | Bài viết                 | Admin tạo / xuất bản / gỡ bài và quản lý chuyên mục; Marketplace chỉ hiển thị bài `PUBLISHED`, lọc chuyên mục, tìm kiếm; nội dung đã được làm sạch. | `FR-ADM-18..19`, `FR-MKT-14`, `UC-38`, `UC-40`, `BR-74` |
 
 ### 19.3. Điều kiện đủ để chuyển sang tài liệu thiết kế tiếp theo
 
 | Điều kiện      | Tiêu chí hoàn tất                                                                                                                              | Ghi chú                                                            |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| SRS scope      | Các mục 1..20 không còn nội dung cũ mâu thuẫn với Guest checkout, VNPay Sandbox, SeatHold 10 phút, escrow / payout T+3 và managed marketplace. | §21 Decisions Log vẫn là nguồn chốt quyết định.                    |
+| SRS scope      | Các mục 1..20 không còn nội dung cũ mâu thuẫn với Guest checkout, cổng thanh toán VNPay + MoMo, SeatHold 10 phút, escrow / payout T+3 và managed marketplace. | §21 Decisions Log vẫn là nguồn chốt quyết định.                    |
 | Traceability   | FR, UC, BR, BF và AC có thể truy vết lẫn nhau ở mức đủ để viết HLD, DB Design, API Spec và Test Plan.                                          | Không yêu cầu tạo traceability matrix riêng trong SRS.             |
 | Open decision  | Không còn Open Question chưa chốt trong phạm vi SRS v1; quyết định mới nếu phát sinh ở HLD / LLD phải ghi nhận riêng.                          | §21 hiện là Decisions Log, không phải backlog câu hỏi mở.          |
 | Risk readiness | Các rủi ro mức cao / rất cao đã có biện pháp giảm thiểu tối thiểu trước khi vào thiết kế.                                                      | Xem §20.                                                           |
@@ -2979,11 +3529,15 @@ Mục này ghi nhận các rủi ro cấp SRS cần được theo dõi khi chuy�
 | RSK-14 | Notification gửi lỗi hoặc gửi trùng.                                           | Cao        | Khách không nhận vé / thông báo hủy chuyến, khiếu nại tăng.            | NotificationDelivery state, retry idempotent, dữ liệu vẫn tra cứu được trong hệ thống.             | `BR-52..54`, `AC-32`                         |
 | RSK-15 | Job nền chạy trùng hoặc retry không an toàn.                                   | Cao        | Gửi trùng thông báo, xử lý trùng refund / payout, lệch báo cáo.        | Job lock, checkpoint, idempotency, trạng thái `MANUAL_REVIEW` khi vượt ngưỡng.                     | `BR-62`, `AC-33`                             |
 | RSK-16 | Hệ thống quá tải dịp lễ / Tết.                                                 | Cao        | Search chậm, giữ ghế lỗi, payment timeout, UX kém.                     | Cache / index search, queue cho callback / notification, rate limit, test tải peak.                | `CO-19`, `NFR-PERF-*`, `NFR-SCALE-*`         |
-| RSK-17 | Báo cáo lớn làm chậm luồng đặt vé / thanh toán.                                | Trung bình | Ảnh hưởng giao dịch chính và vận hành Admin / Operator.                | Reporting job bất đồng bộ, MongoDB aggregation có kiểm soát, export theo job.                      | `OQ-15`, `NFR-PERF-05`, `AC-30`              |
+| RSK-17 | Báo cáo lớn làm chậm luồng đặt vé / thanh toán.                                | Trung bình | Ảnh hưởng giao dịch chính và vận hành Admin / Operator.                | Reporting job bất đồng bộ, Postgres CTE / materialized view (dữ liệu nghiệp vụ) và Mongo aggregation (audit) có kiểm soát, export theo job.                      | `OQ-15`, `NFR-PERF-05`, `AC-30`              |
 | RSK-18 | Dữ liệu audit / backup không đủ để điều tra tranh chấp.                        | Rất cao    | Không chứng minh được thao tác tiền / vé / policy / KYC.               | Append-only audit log, backup / restore định kỳ, không xóa cứng dữ liệu tài chính / KYC / dispute. | `BR-58..59`, `NFR-AUDIT-*`, `AC-31`, `AC-35` |
 | RSK-19 | Chính sách hủy / hoàn / commission thay đổi nhưng áp nhầm vào booking cũ.      | Cao        | Sai quyền lợi khách hàng, sai payout Operator.                         | Policy versioning, snapshot vào booking, chặn áp ngược, test regression policy.                    | `BR-07`, `BR-24`, `BR-31`, `AC-07`, `AC-13`  |
-| RSK-20 | Provider chưa chốt cho SMS / push / object storage làm chậm thiết kế chi tiết. | Trung bình | Chậm API / hạ tầng file KYC, attachment dispute, notification đa kênh. | Dùng adapter contract ở thiết kế, giữ provider cụ thể là quyết định HLD / infra sau.               | `DP-06`, `DP-12`, `BR-63`                    |
+| RSK-20 | Provider bên ngoài (thanh toán, email, push, bản đồ, lưu trữ) gián đoạn, đổi giá hoặc hết hạn mức miễn phí. | Trung bình | Chậm hoặc lỗi thông báo, bản đồ, thanh toán, file KYC / minh chứng. | Mọi provider đi qua adapter (ADR-006) có retry / DLQ; đổi provider không sửa domain; theo dõi hạn mức tier miễn phí. | `DP-06`, `DP-07`, `DP-12`, `BR-63` |
 | RSK-21 | Rủi ro pháp lý về vận tải, dữ liệu cá nhân, hóa đơn / thuế.                    | Cao        | Không đủ điều kiện production hoặc phải sửa policy sau triển khai.     | Rà soát pháp chế trước production; SRS chỉ là yêu cầu phần mềm, không thay thế tư vấn pháp lý.     | `CO-20`, `NFR-AUDIT-06`                      |
+| RSK-22 | Lạm dụng loyalty: đặt vé rồi hủy để tích điểm, tài khoản ảo đổi điểm.         | Cao        | Platform mất tiền do chịu phần giảm voucher đổi điểm.                  | Chỉ cộng điểm khi chuyến `COMPLETED`, thu hồi khi hoàn, rate limit đổi điểm, báo cáo loyalty cho Admin. | `FR-LOY-02`, `FR-LOY-07`, `BR-66..67` |
+| RSK-23 | Sai số dư điểm hoặc voucher bị dùng trùng.                                     | Rất cao    | Platform chịu tiền sai, khiếu nại, lệch đối soát.                      | Sổ điểm append-only, idempotency key, ràng buộc một voucher / booking, test bắt buộc. | `FR-LOY-07`, `FR-PROM-10`, `BR-69`, `BR-71..72` |
+| RSK-24 | Bài viết chứa mã độc (XSS) hoặc thông tin sai lệch.                            | Trung bình | Tấn công người đọc, ảnh hưởng uy tín Platform.                         | Làm sạch nội dung, chỉ Admin soạn, audit xuất bản. | `FR-ADM-18`, `BR-74` |
+| RSK-25 | Chi phí loyalty Platform chịu vượt doanh thu commission.                       | Cao        | Platform lỗ trên từng vé khi giá trị voucher lớn hơn commission.       | Tham số chương trình theo phiên bản do Admin cấu hình, báo cáo chi phí theo kỳ (`FR-LOY-12`). | `FR-LOY-09..10`, `FR-LOY-12`, `BR-73` |
 
 ### 20.3. Điều kiện kiểm soát trước production
 
@@ -3002,33 +3556,35 @@ Mục này ghi nhận các rủi ro cấp SRS cần được theo dõi khi chuy�
 
 Toàn bộ Open Questions (`OQ-*`) và Marketplace Questions (`MQ-*`) phát sinh trong quá trình viết SRS đã được chốt và liệt kê dưới đây làm nguồn chính thức. Các tài liệu HLD / LLD / DB / API / UI / Security / Test Plan cần đồng bộ theo các quyết định này ở lượt hiệu chỉnh riêng. Open Question mới phát sinh trong các phase thiết kế sẽ được ghi nhận tại `context/PROJECT-STATE.md` và được đồng bộ ngược về SRS khi ảnh hưởng yêu cầu.
 
-| ID        | Quyết định / nội dung chốt                                                                                                                                                                                                                                                                                                      | Ghi chú / hệ quả                                                                           |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| ~~OQ-01~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Trip của SRS. Code phải mở rộng từ 5 → 10 trạng thái theo §17.3.                                                                                                                                                                                                                  | Đã chốt                                                                                    |
-| ~~OQ-02~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Booking của SRS. Code phải bổ sung `PAID`, `PARTIALLY_CANCELLED`, `REFUND_FAILED`, `PENDING_PAYMENT`, `PENDING_CONFIRMATION` theo §17.6.                                                                                                                                          | Đã chốt                                                                                    |
-| ~~OQ-03~~ | **CHỐT (05/05/2026):** Payment status chuẩn hóa tên `SUCCESS`. Code phải đổi `COMPLETED` → `SUCCESS` và bổ sung `INITIATED`, `EXPIRED`, `CANCELLED`, `RECONCILING` theo §17.8.                                                                                                                                                  | Đã chốt                                                                                    |
-| ~~OQ-04~~ | **CHỐT (05/05/2026):** dùng `Employee` với hệ role `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`. SRS đã được cập nhật ở §7.4, §10.1 (`FR-IAM-05..06`) và §10.7 (`FR-EMP-*`).                                                                                                                                                       | Đã chốt                                                                                    |
-| ~~OQ-05~~ | **CHỐT (11/05/2026):** cổng thanh toán tích hợp đầu tiên là **VNPay Sandbox**. Thiết kế vẫn phải dùng adapter để có thể bổ sung provider khác sau này.                                                                                                                                                                          | Ảnh hưởng `05-API Specification`, schema Payment, callback flow                            |
-| ~~OQ-06~~ | **CHỐT (11/05/2026):** thời gian giữ ghế mặc định là **10 phút**, cấu hình ở cấp Platform cho v1. Không cấu hình riêng per Operator trong v1.                                                                                                                                                                                   | Ảnh hưởng Booking flow, UI timer, Redis / SeatHold TTL, test chống bán trùng ghế           |
-| ~~OQ-07~~ | **CHỐT (11/05/2026):** v1 ưu tiên luồng **thanh toán trước** cho Marketplace. `PENDING_CONFIRMATION` vẫn giữ trong enum để hỗ trợ vận hành / thanh toán sau ở phase sau, nhưng không mở mặc định cho passenger checkout v1.                                                                                                     | Ảnh hưởng `06-UI/UX Flow`, `FR-BTP-07..10`, `FR-OPS-14`                                    |
-| ~~OQ-08~~ | **CHỐT (11/05/2026):** `Fare` / `FareRule` là bảng / collection riêng. `Trip` tham chiếu rule đang hiệu lực và booking phải lưu fare snapshot. Giá theo chặng (`segment-based fare`) chưa hỗ trợ trong v1.                                                                                                                      | Ảnh hưởng `04-Database Design`, Pricing service, Booking snapshot                          |
-| ~~OQ-09~~ | **CHỐT (11/05/2026):** v1 dùng **email OTP** cho đăng ký / đăng nhập / xác minh thao tác nhạy cảm. SMS OTP chưa thuộc phạm vi v1; hệ thống giữ notification adapter để bổ sung SMS provider sau.                                                                                                                                | Ảnh hưởng `FR-IAM-01`, `FR-IAM-02a`, `FR-IAM-03a`, Notification Service                    |
-| ~~OQ-10~~ | **CHỐT (10/05/2026):** Mobile app dùng chung một codebase Expo cho User và Employee; app phải tách giao diện, session, quyền và luồng nghiệp vụ theo actor. User dùng đặt / quản lý vé, Employee dùng check-in / nhật trình / sự cố.                                                                                            | Đã chốt                                                                                    |
-| ~~OQ-11~~ | **CHỐT (11/05/2026):** số điện thoại hành khách hiển thị cho Employee theo mặc định phải mask dạng giữ 1 số đầu và 3 số cuối, ví dụ `0*** *** 789`. Chỉ actor có quyền hỗ trợ / xử lý sự cố được xem số đầy đủ và thao tác này phải ghi audit log.                                                                              | Ảnh hưởng `BR-19`, `NFR-PRIV-04`, UI manifest hành khách                                   |
-| ~~OQ-12~~ | **CHỐT (11/05/2026):** v1 chỉ hỗ trợ **VND** và **tiếng Việt**. Multi-currency / multi-language không thuộc phạm vi v1.                                                                                                                                                                                                         | Ảnh hưởng Payment, Fare, UI                                                                |
-| ~~OQ-13~~ | **CHỐT (11/05/2026):** chính sách hủy vé / hoàn tiền dùng **Platform default policy** làm nền; Admin có thể duyệt override theo Operator nếu được cấu hình. Booking luôn lưu policy snapshot tại thời điểm tạo booking.                                                                                                         | Ảnh hưởng `BR-07`, `FR-ADM-06`, `FR-BTP-12..13`, dispute / refund workflow                 |
-| ~~OQ-14~~ | **CHỐT (11/05/2026):** audit log lưu trong MongoDB cùng cluster ở v1, theo collection append-only và không xóa cứng. Tách storage / archive riêng là hướng mở rộng khi cần retention dài hoặc chi phí lưu trữ tăng.                                                                                                             | Ảnh hưởng NFR-AUDIT-01..04, Audit module, vận hành backup                                  |
-| ~~OQ-15~~ | **CHỐT (11/05/2026):** reporting v1 dùng MongoDB aggregation và job bất đồng bộ cho báo cáo lớn. Chưa tách data warehouse; read model chỉ thêm khi báo cáo ảnh hưởng hiệu năng giao dịch chính.                                                                                                                                 | Ảnh hưởng NFR-PERF-05, NFR-SCALE-04, Reporting module                                      |
-| ~~MQ-01~~ | **CHỐT (05/05/2026):** Payment flow = **escrow**. Platform giữ tiền trong escrow account và chuyển cho Operator theo chu kỳ T+3 sau khi chuyến hoàn thành. Đã phản ánh trong §4.2, §6.1, §6.2 và chốt chi tiết tại `OQ-16`.                                                                                                     | Chi tiết payout đã chốt tại `OQ-16`                                                        |
-| ~~MQ-02~~ | **CHỐT (05/05/2026):** Operator tự định giá theo những gì đã kê khai với cơ quan nhà nước. Platform có quyền kiểm tra và áp khung giá trần / sàn theo quy định pháp luật vào các dịp quan trọng. Đã phản ánh trong §5.3, §6.2, §6.3.                                                                                            | Quy tắc cảnh báo / chặn đã chốt tại `OQ-17`                                                |
-| ~~MQ-03~~ | **CHỐT (05/05/2026):** Platform là **arbiter cuối cùng** trong tranh chấp. Có quyền refund đơn phương qua đầu Operator, có audit log và thông báo bắt buộc cho Operator. Đã phản ánh trong §4.2, §6.3, `FR-ADM-11`, `FR-DSP-*` và `UC-27`.                                                                                      | Đã chốt                                                                                    |
-| ~~MQ-04~~ | **CHỐT (05/05/2026):** mô hình thu phí = **commission % mặc định** trên mỗi giao dịch vé bán thành công, cấu hình per Operator hoặc theo tier. Service fee phụ thu khách và subsidy promotion chưa hỗ trợ ở v1. Đã phản ánh trong §4.3, §6.3.                                                                                   | Commission mặc định đã chốt tại `OQ-18`                                                    |
-| ~~MQ-05~~ | **CHỐT (05/05/2026):** mô hình marketplace = **B (Managed marketplace)**. Platform cung cấp đủ 3 lớp: Marketplace, Operator OS và Platform admin. Pure marketplace và pure SaaS bị loại. Hybrid API integration cho Operator lớn chưa hỗ trợ ở v1, đặt vào §6.4. SRS §4, §5, §6 đã được tái cấu trúc theo MQ-05.                | Đã chốt                                                                                    |
-| ~~OQ-16~~ | **CHỐT (11/05/2026):** escrow payout dùng chu kỳ **T+3 ngày sau khi chuyến hoàn thành**. V1 không đặt ngưỡng tối thiểu để tạo payout. Kênh chi trả là chuyển khoản ngân hàng trực tiếp, Admin xác nhận thủ công trước khi đánh dấu payout thành công.                                                                           | Ảnh hưởng `04-Database Design` (Payout collection), Operator OS Finance UI, reconciliation |
-| ~~OQ-17~~ | **CHỐT (10/05/2026):** khi giá vé Operator vượt khung trần / sàn pháp luật vào dịp quan trọng, Platform chỉ cảnh báo cho Operator và ghi nhận dữ liệu phục vụ kiểm tra; không tự động chặn mở bán ở v1.                                                                                                                         | Đã phản ánh trong `FR-OPS-09` và `FR-ADM-09`                                               |
-| ~~OQ-18~~ | **CHỐT (11/05/2026):** commission mặc định cho Operator mới là **5% trên giá vé bán thành công**. V1 chưa dùng tier tự động; Admin có thể cấu hình override theo Operator bằng commission rule có ngày hiệu lực.                                                                                                                | Ảnh hưởng commission engine, báo cáo, Operator dashboard                                   |
-| ~~OQ-19~~ | **CHỐT (11/05/2026):** bộ KYC Operator v1 bắt buộc gồm giấy phép đăng ký kinh doanh / giấy tờ pháp nhân tương đương, giấy phép kinh doanh vận tải, giấy tờ người đại diện hoặc giấy ủy quyền hợp lệ, thông tin tài khoản ngân hàng nhận payout. Hồ sơ xe như đăng ký / đăng kiểm / bảo hiểm được xử lý ở luồng Vehicle nếu cần. | Ảnh hưởng `FR-OPR-03`, `FR-ADM-03`, UI onboarding nhà xe, FileStorage provider             |
-| ~~OQ-20~~ | **CHỐT (11/05/2026):** Platform dùng định vị **managed marketplace trung lập**: thương hiệu Platform hiển thị để bảo chứng giao dịch / hỗ trợ / tranh chấp, nhưng thông tin nhà xe, tuyến, giờ chạy và điều kiện dịch vụ vẫn là tín hiệu chính với hành khách.                                                                  | Ảnh hưởng UI hành khách, scorecard, review, dispute và nội dung public Operator profile    |
+| ID        | Quyết định / nội dung chốt                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Ghi chú / hệ quả                                                                           |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| ~~OQ-01~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Trip của SRS. Code phải mở rộng từ 5 → 10 trạng thái theo §17.3.                                                                                                                                                                                                                                                                                                                                                                      | Đã chốt                                                                                    |
+| ~~OQ-02~~ | **CHỐT (05/05/2026):** dùng tập 10 trạng thái Booking của SRS. Code phải bổ sung `PAID`, `PARTIALLY_CANCELLED`, `REFUND_FAILED`, `PENDING_PAYMENT`, `PENDING_CONFIRMATION` theo §17.6.                                                                                                                                                                                                                                                                                              | Đã chốt                                                                                    |
+| ~~OQ-03~~ | **CHỐT (05/05/2026):** Payment status chuẩn hóa tên `SUCCESS`. Code phải đổi `COMPLETED` → `SUCCESS` và bổ sung `INITIATED`, `EXPIRED`, `CANCELLED`, `RECONCILING` theo §17.8.                                                                                                                                                                                                                                                                                                      | Đã chốt                                                                                    |
+| ~~OQ-04~~ | **CHỐT (05/05/2026):** dùng `Employee` với hệ role `TICKET_STAFF`, `DRIVER`, `SUPPORT_STAFF`. SRS đã được cập nhật ở §7.4, §10.1 (`FR-IAM-05..06`) và §10.7 (`FR-EMP-*`).                                                                                                                                                                                                                                                                                                           | Đã chốt                                                                                    |
+| ~~OQ-05~~ | **CHỐT (11/05/2026) → RE-CHỐT (31/05/2026, ADR-019):** cổng thanh toán v1 là **VNPay** (chính) và **MoMo** (phương thức 2), chạy sandbox tới khi giải quyết `OQ-22`. Thiết kế vẫn phải dùng adapter để có thể bổ sung provider khác sau này.                                                                                                                                                                                                                                                                                                                              | Ảnh hưởng `05-API Specification`, schema Payment, callback flow                            |
+| ~~OQ-06~~ | **CHỐT (11/05/2026):** thời gian giữ ghế mặc định là **10 phút**, cấu hình ở cấp Platform cho v1. Không cấu hình riêng per Operator trong v1.                                                                                                                                                                                                                                                                                                                                       | Ảnh hưởng Booking flow, UI timer, Redis / SeatHold TTL, test chống bán trùng ghế           |
+| ~~OQ-07~~ | **CHỐT (11/05/2026):** v1 ưu tiên luồng **thanh toán trước** cho Marketplace. `PENDING_CONFIRMATION` vẫn giữ trong enum để hỗ trợ vận hành / thanh toán sau ở phase sau, nhưng không mở mặc định cho passenger checkout v1.                                                                                                                                                                                                                                                         | Ảnh hưởng `06-UI/UX Flow`, `FR-BTP-07..10`, `FR-OPS-14`                                    |
+| ~~OQ-08~~ | **CHỐT (11/05/2026):** `Fare` / `FareRule` là bảng / collection riêng. `Trip` tham chiếu rule đang hiệu lực và booking phải lưu fare snapshot. Giá theo chặng (`segment-based fare`) chưa hỗ trợ trong v1.                                                                                                                                                                                                                                                                          | Ảnh hưởng `04-Database Design`, Pricing service, Booking snapshot                          |
+| ~~OQ-09~~ | **CHỐT (11/05/2026):** v1 dùng **email OTP** cho đăng ký / đăng nhập / xác minh thao tác nhạy cảm. SMS OTP chưa thuộc phạm vi v1; hệ thống giữ notification adapter để bổ sung SMS provider sau.                                                                                                                                                                                                                                                                                    | Ảnh hưởng `FR-IAM-01`, `FR-IAM-02a`, `FR-IAM-03a`, Notification Service                    |
+| ~~OQ-10~~ | **CHỐT (10/05/2026) → RE-CHỐT (25/05/2026, ADR-014) → RE-CHỐT (08/09/2026, ADR-028):** Mobile = **hai app Flutter tách biệt** — `passenger_mobile` (Hành khách: đặt / quản lý vé) và `employee_mobile` (Employee: check-in / nhật trình / sự cố); mỗi app tách giao diện, session, quyền và luồng nghiệp vụ theo actor. _(Closure gốc 10/05 là "một codebase Expo dùng chung"; ADR-014 đổi thành 2-app split; ADR-028 đổi framework Expo/React Native → Flutter, giữ 2-app split.)_ | Đã chốt                                                                                    |
+| ~~OQ-11~~ | **CHỐT (11/05/2026):** số điện thoại hành khách hiển thị cho Employee theo mặc định phải mask dạng giữ 1 số đầu và 3 số cuối, ví dụ `0*** *** 789`. Chỉ actor có quyền hỗ trợ / xử lý sự cố được xem số đầy đủ và thao tác này phải ghi audit log.                                                                                                                                                                                                                                  | Ảnh hưởng `BR-19`, `NFR-PRIV-04`, UI manifest hành khách                                   |
+| ~~OQ-12~~ | **CHỐT (11/05/2026):** v1 chỉ hỗ trợ **VND** và **tiếng Việt**. Multi-currency / multi-language không thuộc phạm vi v1.                                                                                                                                                                                                                                                                                                                                                             | Ảnh hưởng Payment, Fare, UI                                                                |
+| ~~OQ-13~~ | **CHỐT (11/05/2026):** chính sách hủy vé / hoàn tiền dùng **Platform default policy** làm nền; Admin có thể duyệt override theo Operator nếu được cấu hình. Booking luôn lưu policy snapshot tại thời điểm tạo booking.                                                                                                                                                                                                                                                             | Ảnh hưởng `BR-07`, `FR-ADM-06`, `FR-BTP-12..13`, dispute / refund workflow                 |
+| ~~OQ-14~~ | **CHỐT (11/05/2026) → RE-CHỐT (25/05/2026, ADR-011):** audit log lưu trong MongoDB **cluster riêng** (time-series collection), append-only và không xóa cứng; dữ liệu nghiệp vụ ở PostgreSQL.                                                                                                                                                                                                                                                                 | Ảnh hưởng NFR-AUDIT-01..04, Audit module, vận hành backup                                  |
+| ~~OQ-15~~ | **CHỐT (11/05/2026), điều chỉnh theo ADR-011:** reporting v1 dùng Postgres CTE / materialized view cho dữ liệu nghiệp vụ và Mongo aggregation cho audit, chạy job bất đồng bộ cho báo cáo lớn. Chưa tách data warehouse; read model chỉ thêm khi báo cáo ảnh hưởng hiệu năng giao dịch chính.                                                                                                                                                                                                                                                                                     | Ảnh hưởng NFR-PERF-05, NFR-SCALE-04, Reporting module                                      |
+| ~~MQ-01~~ | **CHỐT (05/05/2026):** Payment flow = **escrow**. Platform giữ tiền trong escrow account và chuyển cho Operator theo chu kỳ T+3 sau khi chuyến hoàn thành. Đã phản ánh trong §4.2, §6.1, §6.2 và chốt chi tiết tại `OQ-16`.                                                                                                                                                                                                                                                         | Chi tiết payout đã chốt tại `OQ-16`                                                        |
+| ~~MQ-02~~ | **CHỐT (05/05/2026):** Operator tự định giá theo những gì đã kê khai với cơ quan nhà nước. Platform có quyền kiểm tra và áp khung giá trần / sàn theo quy định pháp luật vào các dịp quan trọng. Đã phản ánh trong §5.3, §6.2, §6.3.                                                                                                                                                                                                                                                | Quy tắc cảnh báo / chặn đã chốt tại `OQ-17`                                                |
+| ~~MQ-03~~ | **CHỐT (05/05/2026):** Platform là **arbiter cuối cùng** trong tranh chấp. Có quyền refund đơn phương qua đầu Operator, có audit log và thông báo bắt buộc cho Operator. Đã phản ánh trong §4.2, §6.3, `FR-ADM-11`, `FR-DSP-*` và `UC-27`.                                                                                                                                                                                                                                          | Đã chốt                                                                                    |
+| ~~MQ-04~~ | **CHỐT (05/05/2026):** mô hình thu phí = **commission % mặc định** trên mỗi giao dịch vé bán thành công, cấu hình per Operator hoặc theo tier. Service fee phụ thu khách và subsidy promotion chưa hỗ trợ ở v1. Đã phản ánh trong §4.3, §6.3.                                                                                                                                                                                                                                       | Commission mặc định đã chốt tại `OQ-18`                                                    |
+| ~~MQ-05~~ | **CHỐT (05/05/2026):** mô hình marketplace = **B (Managed marketplace)**. Platform cung cấp đủ 3 lớp: Marketplace, Operator OS và Platform admin. Pure marketplace và pure SaaS bị loại. Hybrid API integration cho Operator lớn chưa hỗ trợ ở v1, đặt vào §6.4. SRS §4, §5, §6 đã được tái cấu trúc theo MQ-05.                                                                                                                                                                    | Đã chốt                                                                                    |
+| ~~OQ-16~~ | **CHỐT (11/05/2026):** escrow payout dùng chu kỳ **T+3 ngày sau khi chuyến hoàn thành**. V1 không đặt ngưỡng tối thiểu để tạo payout. Kênh chi trả là chuyển khoản ngân hàng trực tiếp, Admin xác nhận thủ công trước khi đánh dấu payout thành công.                                                                                                                                                                                                                               | Ảnh hưởng `04-Database Design` (Payout collection), Operator OS Finance UI, reconciliation |
+| ~~OQ-17~~ | **CHỐT (10/05/2026):** khi giá vé Operator vượt khung trần / sàn pháp luật vào dịp quan trọng, Platform chỉ cảnh báo cho Operator và ghi nhận dữ liệu phục vụ kiểm tra; không tự động chặn mở bán ở v1.                                                                                                                                                                                                                                                                             | Đã phản ánh trong `FR-OPS-09` và `FR-ADM-09`                                               |
+| ~~OQ-18~~ | **CHỐT (11/05/2026):** commission mặc định cho Operator mới là **5% trên giá vé bán thành công**. V1 chưa dùng tier tự động; Admin có thể cấu hình override theo Operator bằng commission rule có ngày hiệu lực.                                                                                                                                                                                                                                                                    | Ảnh hưởng commission engine, báo cáo, Operator dashboard                                   |
+| ~~OQ-19~~ | **CHỐT (11/05/2026):** bộ KYC Operator v1 bắt buộc gồm giấy phép đăng ký kinh doanh / giấy tờ pháp nhân tương đương, giấy phép kinh doanh vận tải, giấy tờ người đại diện hoặc giấy ủy quyền hợp lệ, thông tin tài khoản ngân hàng nhận payout. Hồ sơ xe như đăng ký / đăng kiểm / bảo hiểm được xử lý ở luồng Vehicle nếu cần.                                                                                                                                                     | Ảnh hưởng `FR-OPR-03`, `FR-ADM-03`, UI onboarding nhà xe, FileStorage provider             |
+| ~~OQ-20~~ | **CHỐT (11/05/2026):** Platform dùng định vị **managed marketplace trung lập**: thương hiệu Platform hiển thị để bảo chứng giao dịch / hỗ trợ / tranh chấp, nhưng thông tin nhà xe, tuyến, giờ chạy và điều kiện dịch vụ vẫn là tín hiệu chính với hành khách.                                                                                                                                                                                                                      | Ảnh hưởng UI hành khách, scorecard, review, dispute và nội dung public Operator profile    |
+| ~~UX-OQ-06~~ | **CHỐT (29/09/2026, Khanh):** đưa chương trình thành viên **VXN Plus** và **ví voucher** vào v1: (a) phần giảm từ voucher đổi điểm **do Platform chịu** — Operator nhận escrow và commission tính trên giá trước giảm; đây là ngoại lệ duy nhất của `BR-48`; (b) hạng thành viên v1 **chỉ ảnh hưởng hệ số tích điểm** — không giảm giá tự động theo hạng, không ưu tiên CSKH; (c) ví voucher chứa voucher đổi điểm và mã khuyến mãi công khai User đã lưu. Phản ánh ở §4.3, §6, §10.6, §10.11, `UC-36..37`, `UC-39`, `BR-65..73`. Giá trị mặc định của tham số chương trình (đơn vị tích điểm, giá trị quy đổi, mốc hạng, hạn điểm / voucher) do Admin cấu hình; giá trị seed chốt trước khi triển khai (`TASK-LOY-001`). | `UX-OQ-06` mở ở 06 UI v0.4 (Figma VXN Plus, SCR-PSG-33..35); đóng tại đây, 06 UI §11 cập nhật tương ứng. Mở `LLD-OQ-06` (giá trị seed) và `LLD-OQ-07` (bên chịu giảm của promotion cấp Platform). |
+| ~~UX-OQ-08~~ | **CHỐT (29/09/2026, Khanh):** trang **Khám phá** dùng module bài viết riêng (`Article`, `ArticleCategory`), khác `ContentPage` (trang nội dung tĩnh); chỉ Admin soạn và xuất bản. Phản ánh ở `FR-MKT-14`, `FR-ADM-18..19`, `UC-38`, `UC-40`, `BR-74`. | `UX-OQ-08` mở ở 06 UI v0.4 (Figma Khám phá, SCR-PSG-02); `FR-ADM-13` (banner / FAQ / trang tĩnh) giữ nguyên. |
 
 ---
 

@@ -7,6 +7,7 @@
 
 - [x] Đã đối chiếu SDLC/code và tạo bộ ba todo/guide/checklist; nhánh `TASK-TRN-001` tạo từ `TASK-CAT-001`.
 - [x] Q1–Q4 được Khanh chốt 25/09/2026.
+- [x] **Port 30/09/2026** (code viết 25/09 ở repo bản sao `Marketplace-Ve-Xe-Nhanh-Clould`, commit `1b59a9b`): nhánh `TASK-TRN-001` mới từ `develop`; `apps/api/src/vehicle/*` + migration **giống hệt** bản đã review; migration đổi tên `20260925020000` → `20260930020000_add_vehicle` để chạy sau `split_employee_login` của IAM-006; gỡ xung đột `app.module.ts`, `openapi.module.ts`, `openapi.spec.ts` (giữ cả Catalog lẫn Vehicle); client TS + Dart sinh lại trên `develop`. Evidence bên dưới đo lại sau port.
 
 ## PHẦN A — Quyết định & ranh giới
 
@@ -26,7 +27,7 @@
 - [x] FK RESTRICT, không cascade.
 - [x] 4 bảng `ENABLE + FORCE RLS`, policy `app_rls_allows(operator_id)` cho USING + WITH CHECK; có trong `RLS_TABLES`; `rlsProblems()` rỗng.
 - [x] Role app: tenant B không đọc/sửa/xoá/tạo dữ liệu tenant A dù query quên lọc; không ngữ cảnh → 0 dòng.
-- [x] 9 migration áp tuần tự trên DB trống; `db:app-role` pass.
+- [x] 9 migration áp tuần tự trên DB trống; `db:app-role` pass. Sau port (30/09): **10** migration trên DB trống, `db:app-role` pass, `prisma migrate diff` DB ↔ `schema.prisma` rỗng, `migrate status` up to date.
 
 ## PHẦN C — SeatMap
 
@@ -49,21 +50,21 @@
 
 - [x] OpenAPI có 8 route, Bearer, requestBody/param/query, RFC 7807.
 - [x] `openapi.spec.ts` chặn mất route/requestBody/path param.
-- [x] Client TS + Dart sinh lại, chỉ thêm phần vehicle/seat-map; `dart test` 250/250, `dart analyze` 0 error.
+- [x] Client TS + Dart sinh lại, chỉ thêm phần vehicle/seat-map; `dart test` 250/250, `dart analyze` 0 error. Sau port: OpenAPI so với `develop` chỉ **thêm** 8 operation, không operation/schema cũ nào đổi hay mất; `dart test` 250/250, `dart analyze` 0 error (13 warning `unused_import` / `unused_element_parameter` của generator).
 
 ## PHẦN F — Test & regression
 
 - [x] Unit + HTTP: DTO/bố cục/biển số/RBAC/400/mass assignment/`requireTenant`.
 - [x] Tích hợp Postgres thật bằng role app: RLS (cả `vehicle_amenities`), IDOR, FK ghép 3 quan hệ, unique, CHECK, transaction `PUT`, PUT đồng thời.
 - [x] Mutation tắt RLS / bỏ unique / bỏ FK ghép làm 4 test đỏ.
-- [x] `REQUIRE_DB_TESTS=1` pass, 0 skip: 55/55 file, 560/560 test (sau khi sửa review); regression IAM + CAT xanh.
+- [x] `REQUIRE_DB_TESTS=1` pass, 0 skip: 55/55 file, 560/560 test (sau khi sửa review); regression IAM + CAT xanh. Sau port trên `develop` (có IAM-006): **56/56 file, 576/576 test**, 0 skip.
 - [x] Hai `PUT` đồng thời cùng xe: bản sau thắng trọn vẹn (test bắt được lỗi cũ 2/3 lần).
-- [x] `pnpm turbo run typecheck lint build` xanh 26/26.
+- [x] `pnpm turbo run typecheck lint build` xanh 26/26. Sau port: `pnpm turbo run typecheck lint test build --force` **35/35**.
 
 ## PHẦN G — Review, CI & đóng task
 
-- [x] `code-reviewer` + `security-auditor` không có finding blocking/high; medium đã sửa (bảng ở todo #7).
-- [ ] Smoke guide §3 trên API chạy thật — chưa chạy (cần env đầy đủ + token Owner). Tương đương đã có: `vehicle.http.spec.ts` (route + guard thật) + `vehicle.int.spec.ts` (Postgres thật).
+- [x] `code-reviewer` + `security-auditor` không có finding blocking/high; medium đã sửa (bảng ở todo #7). Port 30/09 không đổi dòng nào trong `vehicle/` và migration nên không review lại; phần riêng của port (3 file gỡ xung đột + tên migration) do Khanh review trên diff.
+- [x] Smoke guide §3 trên API chạy thật — 30/09/2026, API build (`dist/main.js`) + Postgres/Redis/Mongo container tạm: Owner 2 tenant + Platform login qua MFA, Driver qua `/auth/employee/login`; **28/28 kiểm tra đạt** (3A bố cục sai 400 không ghi, trùng tên 409, bản sao độc lập mẫu; 3B biển số chuẩn hoá, 409, 422 cho id lạ / loại xe + tiện ích `INACTIVE`, xe cũ giữ item `INACTIVE` vẫn sửa được, thiếu trường 400; 3C khác tenant 404, `SEAT_MAP_NOT_FOUND`, list tách tenant, Driver / Platform 403, không token 401).
 - [x] AI journal đã ghi (4 dòng `add`); không commit journal.
 - [ ] CI branch xanh — Khanh xác nhận.
 - [ ] Task row §7.3 → `Done`; không đổi trạng thái Approved của tài liệu SDLC.

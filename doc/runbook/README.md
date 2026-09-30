@@ -16,7 +16,6 @@ Guide theo task (`doc/task-propreties/<TASK>-guide.md`) vẫn giữ để nghi�
 | [RB-06](RB-06-git-pr.md) | Nhánh → commit → PR → merge |
 | [RB-07](RB-07-render-deploy.md) | Deploy API lên Render |
 | [RB-08](RB-08-catalog-seed.md) | Seed catalog chuẩn (tỉnh/xã, loại xe, tiện ích) |
-| [RB-09](RB-09-web-e2e.md) | Chạy E2E Playwright cho web Operator OS / Admin |
 
 ## Báo cáo dùng thẻ thế nào
 
