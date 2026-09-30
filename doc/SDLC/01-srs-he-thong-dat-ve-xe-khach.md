@@ -49,6 +49,7 @@
 | v1.27     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | Đồng bộ các chỗ còn ghi stack cũ theo ADR (Khanh yêu cầu 30/09/2026): §4.6 dòng backend (Postgres + Prisma, Mongo audit riêng, BullMQ, Better Auth; bỏ Socket.IO, OSRM), `AS-08`, §8.3 (bỏ "chưa chính thức", `DP-01`, `DP-06`, `DP-07`), §9.5, BF-02 (sơ đồ + bước 7), §18 đoạn mở đầu, §19.1, `AC-09`, §19.3, `RSK-17`, `RSK-20` (viết lại thành rủi ro phụ thuộc provider), §21 ghi re-chốt `OQ-05` (ADR-019), `OQ-14` (ADR-011), `OQ-15` (điều chỉnh ADR-011). Không đổi phạm vi. Giữ trạng thái Review. |
 | v1.28     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **TASK-TRN-003 Q1 (Khanh chốt 30/09/2026):** `BR-14` bỏ "thời gian quay đầu" — xe bận trong khoảng [giờ đi, giờ đến) của chuyến, chuyến sau được khởi hành đúng giờ đến chuyến trước; nhà xe tự sắp xếp. `BR-13` (tài xế) chưa đổi, chốt ở EMP-001. Giữ trạng thái Review. |
 | v1.29     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **TASK-TRN-005 Q3 (Khanh chốt 30/09/2026):** `BR-41` làm rõ "thời điểm" của fare = giờ khởi hành của chuyến; giá theo lúc mua vé ngoài v1. Giữ trạng thái Review. |
+| v1.30     | 30/09/2026 | AI Agent, Nguyễn Hồng Khanh | **TASK-TRN-005 Q1 = PA1 (Khanh chốt 30/09/2026):** `FR-OPS-08` thêm chiều **loại xe**; §9 + `UC-14` bước 4: mỗi tuyến một bảng giá, rule theo loại xe × loại chỗ × giờ khởi hành, trip tự áp giá theo loại xe đang gắn (xe thường ≠ xe VIP). Lịch sử giá (BR-40) = audit Mongo (Q4). Giữ trạng thái Review. |
 
 ---
 
@@ -585,7 +586,7 @@ Phần này mô tả mô hình dữ liệu **mức khái niệm** để làm n�
 - Một `Vehicle` có một `SeatMap`; `SeatMap` gồm nhiều `Seat`. Trạng thái ghế bán vé phải được quản lý theo `TripSeat` hoặc cấu trúc tương đương trên từng chuyến.
 - Một `Route` gồm nhiều `RouteStop`; mỗi `RouteStop` tham chiếu một `StopPoint` chuẩn hoặc điểm được Platform duyệt.
 - Một `Trip` là phiên bản vận hành cụ thể của một `Route`, dùng một `Vehicle` hoặc cấu hình xe hợp lệ, có nhiều `TripStop`, nhiều `TripSeat` và có thể gán nhiều `Employee`.
-- Một `Fare` hoặc `FareRule` có thể áp dụng theo tuyến, chuyến, loại ghế, chặng, thời điểm hoặc chính sách nhà xe; giá đã áp dụng cho booking phải được lưu snapshot.
+- Một `Fare` hoặc `FareRule` có thể áp dụng theo tuyến, chuyến, loại ghế, chặng, thời điểm hoặc chính sách nhà xe; giá đã áp dụng cho booking phải được lưu snapshot. v1 (TASK-TRN-005, Khanh chốt 30/09/2026): mỗi `Route` có một `Fare`; `FareRule` định giá theo **loại xe** (`VehicleType`) × loại chỗ × khung giờ khởi hành; `Trip` tự áp giá theo tuyến + loại xe đang gắn.
 - Một `Booking` thuộc một `User` hoặc khách vãng lai, chứa thông tin liên hệ, một hoặc nhiều `PassengerInfo`, một hoặc nhiều `Ticket`, tổng tiền và snapshot chính sách.
 - Một `Ticket` gắn với một hành khách, một ghế / giường, một `Trip`, điểm đón, điểm trả và QR token dùng để check-in.
 - Một `SeatHold` gắn với ghế trên chuyến, có TTL và phải hết hiệu lực nếu booking hết hạn hoặc thanh toán không thành công.
@@ -725,7 +726,7 @@ Phần này mô tả yêu cầu chức năng ở mức SRS. Mỗi yêu cầu ph�
 | FR-OPS-05 | Hệ thống phải cho phép Operator đề xuất StopPoint mới để Admin duyệt nếu điểm chưa có trong danh mục chuẩn.                                                                 | Nhà xe      |
 | FR-OPS-06 | Hệ thống phải cho phép Operator tạo chuyến cụ thể theo tuyến, ngày giờ, phương tiện, giá vé và điểm đón / trả áp dụng.                                                      | Nhà xe      |
 | FR-OPS-07 | Hệ thống phải cho phép Operator tạo lịch chuyến lặp lại theo rule được cấu hình.                                                                                            | Nhà xe      |
-| FR-OPS-08 | Hệ thống phải cho phép Operator cấu hình fare theo tuyến, chuyến, loại ghế, chặng, thời điểm hoặc policy nhà xe.                                                            | Nhà xe      |
+| FR-OPS-08 | Hệ thống phải cho phép Operator cấu hình fare theo tuyến, loại xe, chuyến, loại ghế, chặng, thời điểm hoặc policy nhà xe (v1: tuyến × loại xe × loại chỗ × giờ khởi hành — xem §9).                                                            | Nhà xe      |
 | FR-OPS-09 | Hệ thống phải kiểm tra giá vé theo policy nền tảng và khung trần / sàn nếu đã được Admin cấu hình; ở v1 hệ thống chỉ cảnh báo Operator theo quyết định đã chốt tại `OQ-17`. | Hệ thống    |
 | FR-OPS-10 | Hệ thống phải cho phép Operator mở bán, khóa bán, tạm dừng bán hoặc hủy chuyến theo quyền được cấp.                                                                         | Nhà xe      |
 | FR-OPS-11 | Hệ thống phải yêu cầu lý do và ghi audit log khi Operator thay đổi thông tin quan trọng của chuyến đã có vé bán.                                                            | Nhà xe      |
@@ -1818,7 +1819,7 @@ Luồng chính:
 1. Operator chọn route, ngày giờ khởi hành, ngày giờ đến và tạo trip mới.
 2. Hệ thống kiểm tra thời gian đến phải sau thời gian đi và kiểm soát xung đột xe nếu trip được gắn xe ngay từ đầu.
 3. Operator chọn xe áp dụng cho chuyến; hệ thống nạp seat map, số ghế và loại xe từ phương tiện đã gắn.
-4. Operator khai báo fare áp dụng cho trip, gồm giá cơ bản, quy tắc theo loại ghế hoặc theo thời điểm nếu có; giá theo chặng chưa thuộc baseline v1 nếu chưa có quyết định thiết kế riêng.
+4. Operator khai báo fare áp dụng cho trip, gồm giá cơ bản, quy tắc theo loại ghế hoặc theo thời điểm nếu có; giá theo chặng chưa thuộc baseline v1 nếu chưa có quyết định thiết kế riêng. v1: fare khai báo một lần cho **tuyến** theo loại xe × loại chỗ × giờ khởi hành; trip tự áp giá theo loại xe đang gắn (đổi xe thường → xe VIP thì giá đổi theo).
 5. Hệ thống tính giá cuối cùng và cảnh báo nếu giá vượt khung kiểm tra của Platform; ở v1 chỉ cảnh báo theo quyết định tại `OQ-17`.
 6. Operator cấu hình điểm đón / trả thực tế của chuyến, cửa sổ thời gian đón khách, thời gian ngừng bán online, ghi chú như trung chuyển, đón dọc đường, hành lý hoặc phụ thu.
 7. Nếu khai thác tuyến lặp lại, Operator có thể tạo lịch chuyến lặp theo rule ngày chạy, giờ chạy và thời gian áp dụng.

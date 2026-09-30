@@ -28,6 +28,7 @@
 | v0.7      | 29/09/2026 | AI Agent       | **Loyalty VXN Plus / ví voucher / bài viết (Khanh chốt 29/09/2026, SRS v1.21):** §5.2 thêm `loyalty/`, `content/`, `UserVoucherService`; §6.2/§6.3 voucher trong create booking + payment callback (`fundedBy`, `PLATFORM_FUNDED_DISCOUNT`); thêm §6.7–§6.10 (cộng điểm, đổi điểm, hết hạn điểm, xuất bản bài viết); §7 error `LOYALTY_*` / `VOUCHER_*` / `ARTICLE_*`; §8 state; §9 audit; mở `LLD-OQ-06` (giá trị seed loyalty), `LLD-OQ-07` (bên chịu giảm của promotion cấp Platform). Trạng thái Approved → **Review**. |
 | v0.8      | 30/09/2026 | AI Agent       | **A2 — đăng ký nhà xe theo closed enrollment (Khanh duyệt 30/09/2026, SRS v1.23)**: §5.2 `OperatorApplicationService`; thêm §6.11 đăng ký và duyệt hồ sơ nhà xe; §7 error `OPERATOR_APPLICATION_*`, `OPERATOR_SLUG_CONFLICT`; §9 audit duyệt hồ sơ. Giữ trạng thái Review. |
 | v0.9      | 30/09/2026 | AI Agent       | **TASK-TRN-003:** §5 nhóm Trip & Inventory — TripSeat do `TripService` trong module `trip/` quản lý (sinh ghế từ SeatMap lúc gắn xe), bỏ module `trip-seat/` / `TripSeatService` riêng cho khớp code; BR-14 giữ bằng ràng buộc EXCLUDE ở DB, không có thời gian đệm quay đầu (Q1). Giữ trạng thái Review. |
+| v0.10     | 30/09/2026 | AI Agent       | **TASK-TRN-005** (Khanh chốt Q1 = PA1, Q4 = Mongo): `FareService` — mỗi tuyến một bảng giá, rule giá tuyệt đối theo loại xe × loại chỗ × khung giờ khởi hành, rule cụ thể hơn thắng (có khung giờ > không; đúng loại xe > mọi loại; đúng loại chỗ > mọi loại); giá ghế của chuyến tính khi đọc theo loại xe đang gắn. §audit thêm dòng "Tạo/sửa bảng giá": `audit_event` ghi trong transaction Postgres trước commit, đồng thời là lịch sử giá BR-40. Giữ trạng thái Review. |
 
 ---
 
@@ -289,6 +290,7 @@ Sự kiện nhạy cảm ghi vào Mongo `audit_event` (cluster RIÊNG, append-on
 | Refund thủ công                | Có             | adminId, booking/payment/refund id, amount, reason |
 | Đổi policy/commission/payout   | Có             | before/after, effective date, actor                |
 | Đổi trip đã có vé bán          | Có             | tripId, affected bookings, reason                  |
+| Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit (Mongo lỗi → không đổi giá); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
 | Khóa/mở khóa tài khoản         | Có             | target actor, actor thực hiện, reason              |
 | Confirm payout / nhập bank ref | Có             | adminId, payoutId, operatorId, amount, bank ref    |
 | Điều chỉnh điểm loyalty        | Có             | adminId, userId, points (+/−), reason, số dư trước / sau |

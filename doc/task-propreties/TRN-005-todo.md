@@ -4,12 +4,11 @@
 > **Dependency:** TASK-TRN-003 (chuyến) — nhánh `TASK-TRN-005` tách từ nhánh TRN-003 (`claude/admiring-thompson-38d7s8`), chưa merge `develop`. Merge TRN-003 trước rồi đưa `develop` vào nhánh này.
 > **Mở khóa:** TASK-TRN-006 (mở bán cần fare hợp lệ — BR-39), TASK-TRN-004 (search hiển thị giá), TASK-BTP-002 (booking snapshot giá).
 
-## Trạng thái (30/09/2026) — ⏸ **CHỜ KHANH CHỐT Q1 + Q4 TRƯỚC KHI CODE**
+## Trạng thái (30/09/2026) — 🔨 **ĐANG TRIỂN KHAI**
 
 - ✅ Tạo nhánh `TASK-TRN-005`; đối chiếu SDLC (mới có nguyên tắc, chưa có cột bảng / endpoint / cách tính giá / nơi lưu lịch sử).
-- ✅ Khanh chốt **Q2, Q3, Q5, Q6, Q7** theo khuyến nghị (30/09/2026). Tài liệu đã đồng bộ ngay: SRS `BR-41` v1.29 + GLOSSARY (Q3 — thời điểm = giờ khởi hành); file 11 TRN-005 + **ADM-001** (Q6 — cảnh báo trần/sàn chuyển sang ADM-001). Q2/Q5/Q7 đồng bộ vào API §7.3 / DB §7 / Security §7 cùng lúc với Q1/Q4 (phụ thuộc mô hình bảng).
-- ⏳ **Q1** — Khanh muốn giá **tách bạch theo loại xe** (cùng tuyến, xe thường khác xe VIP): đề xuất lại 3 phương án bên dưới.
-- ⏳ **Q4** — Khanh yêu cầu xem xét phương án Mongo: so sánh bên dưới.
+- ✅ Khanh chốt **Q2, Q3, Q5, Q6, Q7** theo khuyến nghị (30/09/2026). Tài liệu đã đồng bộ ngay: SRS `BR-41` v1.29 + GLOSSARY (Q3 — thời điểm = giờ khởi hành); file 11 TRN-005 + **ADM-001** (Q6 — cảnh báo trần/sàn chuyển sang ADM-001).
+- ✅ Khanh chốt **Q1 = PA1** (bảng giá theo tuyến × loại xe catalog) và **Q4 = Mongo `audit_event`** (30/09/2026). **Đồng bộ tài liệu trước khi code** (rà mọi chỗ nhắc tới fare): SRS v1.30 (`FR-OPS-08`, §9, `UC-14` bước 4), GLOSSARY `Fare / FareRule`, HLD v0.9 (`HLD-OQ-05`), LLD v0.10 (FareService + dòng audit), DB v0.16 (§7 `fares`, `fare_rules`; không bảng lịch sử), API v0.14 (§7.3 route fare + giá ghế), Security v0.12, Test plan v0.8 (`TC-FARE-001..003`), file 11 v0.27.
 
 ---
 
@@ -44,7 +43,7 @@
 
 ---
 
-## Q1 — Giá tách bạch theo loại xe (đề xuất lại theo yêu cầu Khanh)
+## Q1 — Giá tách bạch theo loại xe — ✅ Khanh chọn **PA1** (30/09/2026)
 
 **Yêu cầu:** cùng một tuyến, xe thường và xe VIP có giá khác nhau; đổi xe của chuyến (thường → VIP) thì giá đổi theo.
 
@@ -62,7 +61,7 @@ Hệ quả của PA1 lên Q5: `POST /operator/fares` có `routeId` (một bảng
 
 ---
 
-## Q4 — Lịch sử giá: Postgres hay Mongo? (xem xét phương án Mongo theo yêu cầu)
+## Q4 — Lịch sử giá: Postgres hay Mongo? — ✅ Khanh chọn **M (Mongo `audit_event`)** (30/09/2026)
 
 Bối cảnh:
 - ADR-011: Mongo (cluster riêng) = **audit/log**, append-only (`audit_event`, FND-007; production chỉ cấp quyền `find` + `insert`).
@@ -98,7 +97,7 @@ Chọn **P** nếu Khanh muốn lịch sử giá vẫn xem/sửa giá được k
 ## Todo (ID = thứ tự thực hiện, sau khi chốt Q1 + Q4)
 
 - [x] #0 Chốt Q2, Q3, Q5, Q6, Q7; đồng bộ SRS BR-41, GLOSSARY, file 11 (TRN-005 + ADM-001).
-- [ ] #1 [TRN-005.1] Chốt Q1 + Q4; cập nhật API §7.3, DB §5.2/§7, Security §7, LLD, Test plan, file 11 — **rà mọi tài liệu nhắc tới fare** (bài học TRN-003).
+- [x] #1 [TRN-005.1] Chốt Q1 + Q4; đồng bộ SRS, GLOSSARY, HLD, LLD, DB, API, Security, Test plan, file 11 — đã rà mọi tài liệu nhắc tới fare (bài học TRN-003).
 - [ ] #2 [TRN-005.2] Schema + migration + RLS.
 - [ ] #3 [TRN-005.3] Module `fare/` + API + tính giá ghế trong chi tiết chuyến.
 - [ ] #4 [TRN-005.4] OpenAPI + client TS/Dart.
