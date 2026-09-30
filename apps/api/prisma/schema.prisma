@@ -153,6 +153,7 @@ model OperatorProfile {
   routes             Route[]
   vehicles           Vehicle[]
   trips              Trip[]
+  fares              Fare[]
 
   @@unique([id, operatorSlug])
   @@map("operator_profiles")
@@ -429,7 +430,8 @@ model VehicleType {
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
-  vehicles Vehicle[]
+  vehicles  Vehicle[]
+  fareRules FareRule[]
 
   @@map("vehicle_types")
 }
@@ -649,6 +651,7 @@ model Route {
   operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   stops    RouteStop[]
   trips    Trip[]
+  fare     Fare?
 
   @@unique([operatorId, name])
   @@unique([id, operatorId])
@@ -779,4 +782,57 @@ model TripSeat {
   @@unique([tripId, seatCode])
   @@index([tripId, status])
   @@map("trip_seats")
+}
+
+// ════════════════════════════ Trip & Inventory — Fare (TASK-TRN-005) ════════════════════════════
+// Operator-owned + RLS (migration `add_fare`). Mỗi tuyến một bảng giá (Q1 = PA1); rule theo loại xe × loại chỗ ×
+// khung giờ khởi hành. Chống hai rule cùng phạm vi bằng EXCLUDE trong migration (Prisma không mô tả được).
+// Lịch sử giá (BR-40) = Mongo `audit_event` (Q4), không có bảng lịch sử.
+
+/// Trạng thái bảng giá; `INACTIVE` → ghế của chuyến trên tuyến không có giá (không mở bán được, TRN-006).
+enum FareStatus {
+  ACTIVE
+  INACTIVE
+}
+
+/// Bảng giá của một tuyến (FR-OPS-08, OQ-08).
+model Fare {
+  id         String     @id @default(uuid())
+  operatorId String     @map("operator_id")
+  routeId    String     @map("route_id")
+  status     FareStatus @default(ACTIVE)
+  note       String?
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  operator OperatorProfile @relation(fields: [operatorId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  route    Route           @relation(fields: [routeId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  rules    FareRule[]
+
+  // Mỗi tuyến một bảng giá: route thuộc đúng một tenant (FK ghép) nên unique này tương đương unique `route_id`.
+  @@unique([routeId, operatorId])
+  @@unique([id, operatorId])
+  @@index([operatorId, status])
+  @@map("fares")
+}
+
+/// Một giá tuyệt đối (VND) cho loại xe × loại chỗ × khung giờ khởi hành; `null` = mọi loại / không khung giờ.
+model FareRule {
+  id            String    @id @default(uuid())
+  operatorId    String    @map("operator_id")
+  fareId        String    @map("fare_id")
+  vehicleTypeId String?   @map("vehicle_type_id")
+  seatType      SeatType? @map("seat_type")
+  /// Khung giờ khởi hành `[valid_from, valid_to)` (UTC); cả hai trống = giá thường.
+  validFrom     DateTime? @map("valid_from")
+  validTo       DateTime? @map("valid_to")
+  /// VND, số nguyên đồng ≥ 0 (CHECK trong migration).
+  price         BigInt
+
+  fare        Fare         @relation(fields: [fareId, operatorId], references: [id, operatorId], onDelete: Restrict, onUpdate: Restrict)
+  vehicleType VehicleType? @relation(fields: [vehicleTypeId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+
+  @@index([fareId])
+  @@index([vehicleTypeId])
+  @@map("fare_rules")
 }

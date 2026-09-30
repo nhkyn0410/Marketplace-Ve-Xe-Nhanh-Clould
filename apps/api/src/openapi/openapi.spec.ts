@@ -231,7 +231,8 @@ describe("OpenAPI generation", () => {
         ["/v1/operator/seat-maps", "seatMapId"],
         ["/v1/operator/routes", "routeId"],
         ["/v1/operator/stop-points", "stopPointId"],
-        ["/v1/operator/trips", "tripId"]
+        ["/v1/operator/trips", "tripId"],
+        ["/v1/operator/fares", "fareId"]
       ] as const) {
         const item = `${collection}/{${param}}`;
         for (const operation of [
@@ -274,6 +275,15 @@ describe("OpenAPI generation", () => {
       expect(tripQuery).toEqual(
         expect.arrayContaining(["routeId", "vehicleId", "status", "departureFrom", "departureTo", "cursor", "limit"])
       );
+      // TRN-005: lịch sử giá có route riêng; giá ghế của chuyến có trong hợp đồng (số nguyên đồng, có thể null).
+      const revisions = document.paths["/v1/operator/fares/{fareId}/revisions"]?.get;
+      expect(revisions, "thiếu route lịch sử giá").toBeDefined();
+      expect(revisions?.security).toEqual([{ bearer: [] }]);
+      const tripSeat = (
+        schemas?.TripResponseDto_Output?.properties?.seats as { items?: Schema } | undefined
+      )?.items;
+      expect(Object.keys(tripSeat?.properties ?? {})).toContain("price");
+      expect(document.paths["/v1/operator/fares"]?.post?.responses?.[409]).toBeDefined();
     } finally {
       await app.close();
     }

@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { PrismaService, type DbTransaction } from "../database/prisma.service";
-import { RouteStatus, TripStatus, type RouteStopRole, type SeatType } from "../database/prisma.types";
+import { FareStatus, RouteStatus, TripStatus, type RouteStopRole, type SeatType } from "../database/prisma.types";
+import { resolveSeatPrice, vndToJson } from "../fare/fare-pricing";
 import type { Authorization } from "../iam/role/authorization";
 import { requireTenant } from "../iam/role/require-tenant";
 import type { TripInput, TripListResponse, TripResponse } from "./dto/trip.dto";
@@ -342,8 +343,19 @@ function findDetail(tx: DbTransaction, operatorId: string, tripId: string) {
       note: true,
       createdAt: true,
       updatedAt: true,
-      route: { select: { name: true } },
-      vehicle: { select: { plateNumber: true } },
+      route: {
+        select: {
+          name: true,
+          // Bảng giá của tuyến (TRN-005): giá ghế tính khi đọc theo loại xe đang gắn + giờ khởi hành.
+          fare: {
+            select: {
+              status: true,
+              rules: { select: { vehicleTypeId: true, seatType: true, validFrom: true, validTo: true, price: true } },
+            },
+          },
+        },
+      },
+      vehicle: { select: { plateNumber: true, vehicleTypeId: true } },
       stops: {
         orderBy: { sequence: "asc" },
         select: {
@@ -367,6 +379,15 @@ function findDetail(tx: DbTransaction, operatorId: string, tripId: string) {
 
 function toResponse(row: NonNullable<Awaited<ReturnType<typeof findDetail>>>): TripResponse {
   const { route, vehicle, stops, seats, ...trip } = row;
+  // Không gắn xe / tuyến chưa có bảng giá / bảng giá INACTIVE / không có rule khớp → giá `null` (TRN-006 chặn mở bán).
+  const rules = route.fare?.status === FareStatus.ACTIVE ? route.fare.rules : [];
+  const priceOf = (seatType: SeatType): number | null => {
+    if (!vehicle) {
+      return null;
+    }
+    const price = resolveSeatPrice(rules, vehicle.vehicleTypeId, seatType, trip.departureAt);
+    return price === null ? null : vndToJson(price);
+  };
   return {
     ...trip,
     routeName: route.name,
@@ -380,6 +401,6 @@ function toResponse(row: NonNullable<Awaited<ReturnType<typeof findDetail>>>): T
       const point = catalogStopPoint ?? stopPoint!;
       return { ...stop, name: point.name, address: point.address, plannedAt: plannedAt.toISOString() };
     }),
-    seats: seats.map(({ seatCode, ...seat }) => ({ code: seatCode, ...seat })),
+    seats: seats.map(({ seatCode, ...seat }) => ({ code: seatCode, ...seat, price: priceOf(seat.type) })),
   };
 }

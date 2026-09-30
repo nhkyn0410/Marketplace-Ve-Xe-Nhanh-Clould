@@ -6,6 +6,7 @@
 export {
   CatalogStatus,
   EmployeeRole,
+  FareStatus,
   OperatorRole,
   PlatformRole,
   RouteStatus,

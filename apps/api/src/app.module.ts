@@ -7,6 +7,7 @@ import { AuditModule } from "./audit/audit.module";
 import { CatalogModule } from "./catalog/catalog.module";
 import { AppConfigModule } from "./config/app-config.module";
 import { DatabaseModule } from "./database/database.module";
+import { FareModule } from "./fare/fare.module";
 import { MongoAuditModule } from "./database/mongo-audit.module";
 import { IamModule } from "./iam/iam.module";
 import { QueueModule } from "./queue/queue.module";
@@ -28,7 +29,8 @@ import { VehicleModule } from "./vehicle/vehicle.module";
     VehicleModule,
     StopPointModule,
     RouteModule,
-    TripModule
+    TripModule,
+    FareModule
   ],
   controllers: [AppController],
   providers: [{ provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor }]

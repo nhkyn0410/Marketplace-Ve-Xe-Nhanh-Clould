@@ -31,6 +31,30 @@ export class AuditService {
     });
   }
 
+  /**
+   * Đọc audit event của một đối tượng trong một tenant, mới nhất trước — dùng cho lịch sử hiển thị (vd lịch sử giá,
+   * BR-40). Chỉ đọc; nơi gọi phải kiểm đối tượng thuộc tenant trước (Mongo không có RLS).
+   */
+  async listAuditEvents(query: {
+    targetType: string;
+    targetId: string;
+    operatorId: string;
+    before?: Date;
+    limit: number;
+  }): Promise<AuditEvent[]> {
+    return this.auditEventModel
+      .find({
+        targetType: query.targetType,
+        targetId: query.targetId,
+        operatorId: query.operatorId,
+        ...(query.before ? { createdAt: { $lt: query.before } } : {}),
+      })
+      .sort({ createdAt: -1 })
+      .limit(query.limit)
+      .lean<AuditEvent[]>()
+      .exec();
+  }
+
   async recordSystemLog(input: SystemLogInput): Promise<void> {
     await this.systemLogModel.create({
       ...withCorrelation(input),

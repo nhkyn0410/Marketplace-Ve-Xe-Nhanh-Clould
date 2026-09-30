@@ -40,6 +40,9 @@ export const RLS_TABLES = [
   "trips",
   "trip_stops",
   "trip_seats",
+  // Fare (TASK-TRN-005).
+  "fares",
+  "fare_rules",
 ] as const;
 
 @Injectable()
