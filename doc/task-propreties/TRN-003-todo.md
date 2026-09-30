@@ -53,7 +53,8 @@
 - **TripSeat** là bản chụp `seats` của SeatMap lúc gắn xe (mã, tầng, hàng, cột, loại), tham chiếu `seat_code` (DB §7). Chỉ sinh lại khi đổi xe; giữ xe thì trạng thái ghế giữ nguyên.
 - **Route/xe đang gắn được giữ** dù đã `INACTIVE`/`MAINTENANCE` (mẫu TRN-001/002); route/xe **mới chọn** phải hợp lệ: route `ACTIVE` của tenant; xe `ACTIVE` của tenant và có SeatMap (UC-14 A2).
 - **Khoá**: sinh ghế khoá dòng xe + SeatMap `FOR SHARE`; `PUT` SeatMap / đổi SeatMap của xe ghi (khoá) trước rồi mới kiểm "đang dùng" → bên nào đến sau thấy bên kia, không có chuyến lấy ghế từ bố cục sửa dở.
-- **"Chuyến chưa kết thúc"** (UC-12 A3) = chưa `COMPLETED`/`CANCELLED` và chưa qua giờ đến dự kiến — chuyến nháp quá hạn không khoá SeatMap mãi.
+- **"Chuyến chưa kết thúc"** (UC-12 A3) = chưa `COMPLETED`/`CANCELLED`; riêng chuyến nháp hết giữ khi đã qua giờ đến dự kiến — nháp bỏ quên không khoá SeatMap mãi. Dời nháp quá hạn sang lịch mới = chọn lại xe (sinh lại ghế từ sơ đồ hiện tại).
+- **Khoá**: `PUT` chuyến khoá dòng chuyến ngay khi đọc (`FOR NO KEY UPDATE`); `PUT` xe khoá dòng xe trước khi đọc. Deadlock hiếm gặp (đổi chéo xe) → 409.
 - **List** sắp theo `(departureAt, id)`; cursor = id chuyến cuối trang (không lặp/sót khi trùng giờ đi); cursor lạ/khác tenant → trang rỗng.
 - **Mã lỗi**: `TRIP_NOT_FOUND` 404, `TRIP_NOT_EDITABLE` 409, `VEHICLE_SCHEDULE_CONFLICT` 409, `ROUTE_UNAVAILABLE` 422, `VEHICLE_UNAVAILABLE` 422, `TRIP_STOP_TIMES_INVALID` 422, `SEAT_MAP_IN_USE` 409 (vehicle). Route/xe "không có" / "tenant khác" / "ngừng dùng" chung một mã để không lộ dữ liệu tenant khác.
 
@@ -90,6 +91,29 @@ DTO Zod, `TripService`, `TripController` mỏng, quyền `trip:manage`, đăng k
 ### 🔶 #7 — [TRN-003.7] Review, CI và đóng phần BE
 
 `code-reviewer` + `security-auditor` (chạm tenant/RLS); AI journal; CI xanh (Khanh xác nhận).
+
+**Success:** — ✅ Review 30/09/2026: security-auditor 0 blocking/high; code-reviewer 1 high (trùng M1 của security) — đã sửa cùng các medium/low bên dưới. Sau sửa: 67/67 file, **783/783 test**, 0 skip; turbo 35/35; `migrate diff` rỗng; OpenAPI không đổi. ⏳ Chờ CI.
+
+#### Finding review và xử lý (30/09/2026)
+
+| Nguồn | Mức | Finding | Xử lý |
+| --- | --- | --- | --- |
+| cả hai | High/Medium | Hai `PUT` chuyến đồng thời (đổi xe ↔ giữ xe) đọc trạng thái cũ trước khi khoá → chuyến xe A mang ghế xe B | ✅ Đọc chuyến bằng `FOR NO KEY UPDATE`; test giữ khoá dòng để dựng thứ tự đua (code cũ đỏ 2/2, code mới xanh) |
+| security | Low | `PUT` xe đọc `seatMapId` cũ trước khoá → bỏ sót kiểm UC-12 A3 | ✅ Khoá dòng xe trước khi đọc |
+| security | Low | EXCLUDE kiểm trước FK ghép và bỏ qua RLS → dòng gắn nhầm xe tenant khác có thể báo "trùng lịch" (lộ lịch) | ✅ Thêm `operator_id` vào EXCLUDE; test: FK lỗi, không phải 23P01 (mutation bỏ `operator_id` → đỏ) |
+| security | Low | `btree_gist` cài vào `public` (Supabase advisor cảnh báo) | ✅ `WITH SCHEMA extensions`; role app vẫn chạy được ràng buộc |
+| security | Low | Năm `9999-12-31T23:00-07:00` thành năm 10000 UTC → GET/list trả 500 | ✅ Chặn năm UTC > 9999 ở giờ vào + test |
+| code-reviewer | Medium | Nháp quá hạn (không còn giữ sơ đồ) bị sửa sơ đồ rồi dời sang lịch mới vẫn giữ ghế cũ | ✅ Nháp quá hạn khi `PUT` = chọn lại xe: sinh lại ghế từ sơ đồ hiện tại + test |
+| code-reviewer | Low | `FOR SHARE` trên JOIN: chờ PUT xe đổi sơ đồ rồi kiểm lại với dòng sơ đồ cũ → báo nhầm 422 | ✅ Tách hai câu khoá (xe rồi sơ đồ) + test giữ khoá (code cũ đỏ) |
+| code-reviewer | Low | Deadlock (hai request đổi chéo xe giữa hai chuyến chồng giờ) → 500 | ✅ `40P01` → 409 `VEHICLE_SCHEDULE_CONFLICT` |
+| code-reviewer | Low | Mốc giờ đến nhả khoá cho mọi trạng thái → chuyến đang chạy trễ giờ không giữ sơ đồ | ✅ Mốc giờ chỉ áp cho `DRAFT` + test `IN_PROGRESS` |
+| code-reviewer | Nit | Giờ chia tỉ lệ ra lẻ mili-giây | ✅ Làm tròn xuống theo phút tính từ giờ đi |
+| code-reviewer | Nit | Chú thích index `vehicle_id` sai sau khi EXCLUDE có `operator_id` + partial | ✅ Sửa chú thích; thêm index khi đo được tải |
+| code-reviewer | Low | Cursor tra lại dòng mỗi trang: chuyến bị dời giờ giữa hai trang có thể lặp/sót; cursor lạ → trang rỗng | ⏸ Giữ cursor = uuid như các module khác (đổi sang cursor mã hoá = đổi hợp đồng API) — mở lại nếu UI gặp |
+| code-reviewer | Low | Migration sửa sau khi đã push | ⏸ Chưa DB dùng chung nào chạy bản cũ; khi merge nên **Squash** để lịch sử migration chỉ có bản cuối. DB dev nào đã chạy bản `6e173ce` → `prisma migrate reset` |
+| security | Low | Chưa rate limit / quota cho API ghi của Operator (có từ trước) | ⏸ Xử lý chung ở task rate-limit |
+| security | Info | Supabase: bảng mới trong `public` thừa hưởng grant mặc định cho anon/authenticated (RLS FORCE vẫn chặn) | ⏸ Khanh kiểm Data API không mở schema `public` (có từ trước, không riêng TRN-003) |
+| code-reviewer | Nit | `PUT` sơ đồ chỉ đổi tên cũng bị chặn khi đang dùng | Chấp nhận — UC-12 A3 "không sửa tùy tiện" |
 
 ### ⏳ #8 — [TRN-003.8] Màn Operator OS
 

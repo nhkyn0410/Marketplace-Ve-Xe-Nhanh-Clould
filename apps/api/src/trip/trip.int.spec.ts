@@ -105,8 +105,50 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
     return { vehicle, map };
   }
 
-  async function setTripStatus(tripId: string, status: "OPEN_FOR_SALE" | "CANCELLED" | "COMPLETED") {
+  async function setTripStatus(tripId: string, status: "OPEN_FOR_SALE" | "CANCELLED" | "COMPLETED" | "IN_PROGRESS") {
     await prisma.withSystem((tx) => tx.trip.update({ where: { id: tripId }, data: { status } }));
+  }
+
+  /** Đưa chuyến về quá khứ (ghi thẳng DB) để thử nhánh "nháp quá hạn". */
+  async function moveTripToPast(tripId: string) {
+    const past = Date.UTC(2020, 0, 1) + day++ * 24 * HOUR;
+    await prisma.withSystem((tx) =>
+      tx.trip.update({ where: { id: tripId }, data: { departureAt: new Date(past), arrivalAt: new Date(past + HOUR) } }),
+    );
+  }
+
+  /**
+   * Dựng thứ tự đua xác định: `hold` chạy trong transaction riêng và giữ khoá dòng; `race` bắt đầu các request
+   * cần dòng đó; chờ tới khi đủ `waiters` request đang chờ khoá rồi mới commit transaction giữ khoá.
+   */
+  async function raceBehindLock<T>(
+    hold: (tx: Parameters<Parameters<PrismaService["withSystem"]>[0]>[0]) => Promise<unknown>,
+    race: () => Promise<T>,
+    waiters: number,
+  ): Promise<T> {
+    let release!: () => void;
+    let held!: () => void;
+    const gate = new Promise<void>((resolve) => (release = resolve));
+    const lockHeld = new Promise<void>((resolve) => (held = resolve));
+    const holder = prisma.withSystem(async (tx) => {
+      await hold(tx);
+      held();
+      await gate;
+    });
+    await lockHeld;
+    const result = race();
+    for (let attempt = 0; ; attempt++) {
+      const [row] = await prisma.$queryRaw<{ waiting: bigint }[]>`
+        SELECT count(*) AS waiting FROM pg_stat_activity
+        WHERE wait_event_type = 'Lock' AND datname = current_database()`;
+      if (Number(row!.waiting) >= waiters || attempt > 150) {
+        break;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
+    release();
+    await holder;
+    return result;
   }
 
   beforeAll(async () => {
@@ -421,18 +463,40 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
         [small.id, 2],
         [large.id, 6],
       ]);
-      // Race phụ thuộc thời điểm: nhiều vòng để bản đọc-không-khoá (lỗi M1 security review) đỏ ổn định.
-      for (let round = 0; round < 30; round++) {
+      // Giữ khoá dòng chuyến tới khi cả hai PUT đã xếp hàng: bản đọc-không-khoá (lỗi M1 security review) khi đó
+      // luôn đọc giá trị cũ và đỏ ~1/2 mỗi vòng; bản khoá-khi-đọc thì PUT sau luôn thấy kết quả PUT trước.
+      for (let round = 0; round < 6; round++) {
         const start = nextDay();
         const base = { routeId: route3, departureAt: at(start, 1), arrivalAt: at(start, 3) };
         const trip = await trips.create(authzA, tripInput({ ...base, vehicleId: small.id }));
-        await Promise.allSettled([
-          trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: large.id })),
-          trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: small.id, note: "giữ xe" })),
-        ]);
+        await raceBehindLock(
+          (tx) => tx.$queryRaw`SELECT 1 FROM trips WHERE id = ${trip.id} FOR UPDATE`,
+          () =>
+            Promise.allSettled([
+              trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: large.id })),
+              trips.update(authzA, trip.id, tripInput({ ...base, vehicleId: small.id, note: "giữ xe" })),
+            ]),
+          2,
+        );
         const final = await trips.get(authzA, trip.id);
         expect(final.seatCount, `vòng ${round}`).toBe(seatsOf.get(final.vehicleId!));
       }
+    });
+
+    it("nháp quá hạn được dời sang lịch mới: ghế sinh lại theo sơ đồ HIỆN TẠI của xe (sơ đồ có thể đã bị sửa)", async () => {
+      const { vehicle, map } = await vehicleWithSeats(authzA, 4);
+      const start = nextDay();
+      const base = { routeId: route3, vehicleId: vehicle.id, departureAt: at(start, 1), arrivalAt: at(start, 3) };
+      const trip = await trips.create(authzA, tripInput(base));
+      await moveTripToPast(trip.id);
+      // Nháp quá hạn không còn giữ sơ đồ (UC-12 A3) → sửa được.
+      await seatMaps.update(
+        authzA,
+        map.id,
+        SeatMapInputSchema.parse({ name: map.name, layout: map.layout, seats: [{ code: "Z1", deck: 1, row: 1, column: 1, type: "BED" }] }),
+      );
+      const revived = await trips.update(authzA, trip.id, tripInput(base));
+      expect(revived.seats.map((seat) => [seat.code, seat.type])).toEqual([["Z1", "BED"]]);
     });
 
     it("route/xe ĐANG gắn đã ngừng dùng vẫn sửa được chuyến; route/xe MỚI thì phải hợp lệ", async () => {
@@ -518,6 +582,36 @@ describe.skipIf(!url && !requireDb)("Trip — Postgres thật, role app", () => 
       await setTripStatus(trip.id, "CANCELLED");
       expect((await seatMaps.update(authzA, map.id, layout)).seatCount).toBe(1);
       expect((await vehicles.update(authzA, vehicle.id, vehicleInput(otherMap.id))).seatMapId).toBe(otherMap.id);
+    });
+
+    it("mốc giờ đến chỉ nhả khoá cho chuyến nháp; chuyến đang chạy trễ giờ vẫn giữ sơ đồ", async () => {
+      const { vehicle, map } = await vehicleWithSeats(authzA, 2);
+      const start = nextDay();
+      const trip = await trips.create(
+        authzA,
+        tripInput({ routeId: route3, vehicleId: vehicle.id, departureAt: at(start, 1), arrivalAt: at(start, 3) }),
+      );
+      await moveTripToPast(trip.id);
+      await setTripStatus(trip.id, "IN_PROGRESS");
+      const layout = SeatMapInputSchema.parse({ name: map.name, layout: map.layout, seats: [{ code: "C1", deck: 1, row: 1, column: 1, type: "SEAT" }] });
+      expect((await rejectionOf(seatMaps.update(authzA, map.id, layout))).code).toBe("SEAT_MAP_IN_USE");
+    });
+
+    it("PUT xe đổi sơ đồ chạy cùng lúc tạo chuyến: chuyến lấy ghế sơ đồ MỚI, không báo nhầm VEHICLE_UNAVAILABLE", async () => {
+      const { vehicle } = await vehicleWithSeats(authzA, 2);
+      const { map: newMap } = await vehicleWithSeats(authzA, 5);
+      const start = nextDay();
+      // Transaction giữ khoá đóng vai PUT xe (đổi sơ đồ, chưa commit); tạo chuyến phải chờ rồi đọc lại.
+      const created = await raceBehindLock(
+        (tx) => tx.vehicle.update({ where: { id: vehicle.id }, data: { seatMapId: newMap.id } }),
+        () =>
+          trips.create(
+            authzA,
+            tripInput({ routeId: route3, vehicleId: vehicle.id, departureAt: at(start, 1), arrivalAt: at(start, 3) }),
+          ),
+        1,
+      );
+      expect(created.seatCount).toBe(5);
     });
   });
 

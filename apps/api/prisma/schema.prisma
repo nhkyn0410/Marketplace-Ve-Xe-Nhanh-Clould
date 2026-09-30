@@ -735,7 +735,8 @@ model Trip {
   @@unique([id, operatorId])
   @@index([operatorId, departureAt])
   @@index([routeId])
-  // Tra theo `vehicle_id` dùng index GiST của ràng buộc EXCLUDE (migration) — không cần btree riêng.
+  // Không có btree riêng cho `vehicle_id`: index GiST của EXCLUDE (partial, bắt đầu bằng `operator_id`) chỉ
+  // phục vụ một phần; truy vấn theo xe hiện lọc thêm `operator_id` + giờ đi. Thêm index khi đo được tải.
   @@map("trips")
 }
 

@@ -45,13 +45,22 @@ export function vehicleScheduleConflict(): HttpException {
   return problem(HttpStatus.CONFLICT, "VEHICLE_SCHEDULE_CONFLICT", "Xe đã được gắn cho chuyến khác trùng thời gian.");
 }
 
+// Prisma 7 + driver adapter: lỗi DB nằm ở `cause` của `DriverAdapterError` (test tích hợp giữ bất biến này khi nâng Prisma).
+function dbCause(error: unknown): { originalCode?: unknown; originalMessage?: unknown } | undefined {
+  return (error as { cause?: { originalCode?: unknown; originalMessage?: unknown } } | null)?.cause;
+}
+
 /** Lỗi Postgres do ràng buộc EXCLUDE chống chồng giờ của xe (`trips_vehicle_no_overlap`, SQLSTATE 23P01). */
 export function isVehicleOverlapViolation(error: unknown): boolean {
-  // Prisma 7 + driver adapter: lỗi DB nằm ở `cause` của `DriverAdapterError`.
-  const cause = (error as { cause?: { originalCode?: unknown; originalMessage?: unknown } } | null)?.cause;
+  const cause = dbCause(error);
   return (
     cause?.originalCode === "23P01" &&
     typeof cause.originalMessage === "string" &&
     cause.originalMessage.includes("trips_vehicle_no_overlap")
   );
+}
+
+/** Postgres huỷ một transaction vì deadlock (SQLSTATE 40P01). */
+export function isDeadlock(error: unknown): boolean {
+  return dbCause(error)?.originalCode === "40P01";
 }

@@ -62,11 +62,13 @@
 
 ## PHẦN H — Test, review, CI & đóng task
 
-- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 67/67 file, 777/777 test, 0 skip.
+- [x] `REQUIRE_DB_TESTS=1`, role app, Postgres 16 + Redis 7 + Mongo 7: 67/67 file, **783/783** test, 0 skip (sau khi sửa review).
 - [x] `pnpm turbo run lint typecheck test build --force` 35/35.
-- [ ] `code-reviewer` + `security-auditor` không còn finding blocking/high.
-- [ ] Smoke guide §3 trên API chạy thật — chưa chạy. Tương đương đã có: `trip.http.spec.ts` (route + guard thật) + `trip.int.spec.ts` (Postgres thật).
-- [ ] AI journal đã ghi; không commit journal.
+- [x] `code-reviewer` + `security-auditor` không còn finding blocking/high (bảng xử lý ở todo #7).
+- [x] Đồng thời: hai `PUT` (đổi xe ↔ giữ xe), `PUT` xe đổi sơ đồ cùng lúc tạo chuyến, nháp quá hạn dời lịch, mốc giờ chỉ cho `DRAFT` — 4 test đỏ ổn định với code trước review, xanh sau sửa.
+- [x] Mutation: EXCLUDE thiếu `operator_id` → test "không lộ lịch B" đỏ.
+- [ ] Smoke guide §3 đầy đủ (token Owner qua MFA) — chưa chạy. Đã có: API build chạy thật trả `/v1/health` 200, `/v1/operator/trips` không token → 401 RFC 7807, OpenAPI runtime có 2 path trip; cộng `trip.http.spec.ts` (route + guard thật) và `trip.int.spec.ts` (Postgres thật).
+- [x] AI journal đã ghi; không commit journal.
 - [ ] CI branch xanh — Khanh xác nhận.
 - [ ] Màn Operator OS (danh sách + form chuyến) — sub-task #8.
 - [ ] Task row §7.3 → `Done`; không đổi trạng thái tài liệu SDLC.

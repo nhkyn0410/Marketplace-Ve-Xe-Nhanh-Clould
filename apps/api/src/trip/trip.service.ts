@@ -5,6 +5,7 @@ import type { Authorization } from "../iam/role/authorization";
 import { requireTenant } from "../iam/role/require-tenant";
 import type { TripInput, TripListResponse, TripResponse } from "./dto/trip.dto";
 import {
+  isDeadlock,
   isVehicleOverlapViolation,
   routeUnavailable,
   tripNotEditable,
@@ -34,6 +35,7 @@ type RouteStopRow = {
 };
 
 const POINT_SELECT = { name: true, address: true } as const;
+const MINUTE = 60_000;
 const SEAT_ORDER = [{ deck: "asc" }, { row: "asc" }, { column: "asc" }] as const;
 
 /**
@@ -147,16 +149,20 @@ export class TripService {
 
   /**
    * Thay toàn bộ chuyến `DRAFT`. Route/xe ĐANG gắn được giữ dù đã ngừng dùng (mẫu TRN-001/002); chỉ route/xe
-   * MỚI chọn phải hợp lệ. Điểm dừng luôn chép lại từ route; ghế chỉ sinh lại khi đổi xe. Khoá dòng chuyến
-   * NGAY KHI ĐỌC: "đổi xe hay không" và "route/xe đang gắn" phải tính trên giá trị mới nhất, nếu không hai
-   * PUT đồng thời (đổi xe ↔ giữ xe) để lại ghế của xe này trên chuyến của xe kia.
+   * MỚI chọn phải hợp lệ. Điểm dừng luôn chép lại từ route; ghế chỉ sinh lại khi đổi xe — hoặc khi nháp đã
+   * quá giờ đến: lúc đó nó thôi giữ sơ đồ ghế (UC-12 A3) nên sơ đồ có thể đã bị sửa, ghế cũ không còn tin được;
+   * dời nháp quá hạn sang lịch mới = chọn lại xe (xe phải hợp lệ như mới chọn). Khoá dòng chuyến NGAY KHI ĐỌC:
+   * "đổi xe hay không" và "route/xe đang gắn" phải tính trên giá trị mới nhất, nếu không hai PUT đồng thời
+   * (đổi xe ↔ giữ xe) để lại ghế của xe này trên chuyến của xe kia.
    */
   async update(authz: Authorization, tripId: string, input: TripInput): Promise<TripResponse> {
     const { db, operatorId } = requireTenant(authz);
     const row = await this.withOverlapConflict(() =>
       this.prisma.withScope(db, async (tx) => {
-        const [current] = await tx.$queryRaw<{ routeId: string; vehicleId: string | null; status: TripStatus }[]>`
-          SELECT route_id AS "routeId", vehicle_id AS "vehicleId", status::text AS "status"
+        const [current] = await tx.$queryRaw<
+          { routeId: string; vehicleId: string | null; status: TripStatus; arrivalAt: Date }[]
+        >`
+          SELECT route_id AS "routeId", vehicle_id AS "vehicleId", status::text AS "status", arrival_at AS "arrivalAt"
           FROM trips
           WHERE id = ${tripId} AND operator_id = ${operatorId}
           FOR NO KEY UPDATE`;
@@ -168,8 +174,9 @@ export class TripService {
         }
         const routeStops = await loadRouteStops(tx, operatorId, input.routeId, input.routeId === current.routeId);
         const stopTimes = planStopTimes(input, routeStops);
-        const vehicleChanged = input.vehicleId !== current.vehicleId;
-        const seats = vehicleChanged && input.vehicleId ? await lockVehicleSeats(tx, operatorId, input.vehicleId) : [];
+        const expired = new Date(current.arrivalAt).getTime() <= Date.now();
+        const rebuildSeats = expired || input.vehicleId !== current.vehicleId;
+        const seats = rebuildSeats && input.vehicleId ? await lockVehicleSeats(tx, operatorId, input.vehicleId) : [];
         const updated = await tx.trip.updateMany({
           where: { id: tripId, operatorId, status: TripStatus.DRAFT },
           data: {
@@ -186,7 +193,7 @@ export class TripService {
         }
         await tx.tripStop.deleteMany({ where: { tripId, operatorId } });
         await tx.tripStop.createMany({ data: stopRows(operatorId, tripId, routeStops, stopTimes) });
-        if (vehicleChanged) {
+        if (rebuildSeats) {
           await tx.tripSeat.deleteMany({ where: { tripId, operatorId } });
           await tx.tripSeat.createMany({ data: seatRows(operatorId, tripId, seats) });
         }
@@ -200,7 +207,9 @@ export class TripService {
     try {
       return await work();
     } catch (error) {
-      if (isVehicleOverlapViolation(error)) {
+      // Deadlock chỉ xảy ra khi hai request đổi chéo xe giữa hai chuyến chồng giờ (mỗi bên chờ dòng của bên
+      // kia ở ràng buộc EXCLUDE) — bản chất vẫn là tranh chấp lịch xe, trả 409 để client tải lại rồi thử lại.
+      if (isVehicleOverlapViolation(error) || isDeadlock(error)) {
         throw vehicleScheduleConflict();
       }
       throw error;
@@ -258,8 +267,11 @@ function planStopTimes(input: TripInput, stops: RouteStopRow[]): Date[] {
   const cumulative = stops.map((stop) => (elapsed += stop.durationSecondsFromPrevious ?? 0));
   const total = cumulative[cumulative.length - 1]!;
   const last = stops.length - 1;
+  // Làm tròn XUỐNG theo phút tính từ giờ đi: giờ hiển thị gọn, vẫn không giảm dần và không vượt giờ đến.
   return cumulative.map((seconds, index) =>
-    index === last ? input.arrivalAt : new Date(departure + (total === 0 ? 0 : Math.round((seconds / total) * span))),
+    index === last
+      ? input.arrivalAt
+      : new Date(departure + (total === 0 ? 0 : Math.floor(((seconds / total) * span) / MINUTE) * MINUTE)),
   );
 }
 
@@ -269,15 +281,17 @@ function planStopTimes(input: TripInput, stops: RouteStopRow[]): Date[] {
  * chuyến không bao giờ lấy từ bố cục đang bị sửa dở. Xe phải `ACTIVE` và có sơ đồ ghế (UC-14 A2).
  */
 async function lockVehicleSeats(tx: DbTransaction, operatorId: string, vehicleId: string) {
+  // Hai câu riêng, KHÔNG `FOR SHARE` trên JOIN: nếu phải chờ một PUT xe vừa đổi sơ đồ, Postgres kiểm lại dòng
+  // xe mới nhưng giữ dòng sơ đồ CŨ của phép JOIN → điều kiện nối sai → báo nhầm "xe không dùng được".
   const [vehicle] = await tx.$queryRaw<{ seatMapId: string }[]>`
-    SELECT v.seat_map_id AS "seatMapId"
-    FROM vehicles v
-    JOIN seat_maps m ON m.id = v.seat_map_id AND m.operator_id = v.operator_id
-    WHERE v.id = ${vehicleId} AND v.operator_id = ${operatorId} AND v.status = 'ACTIVE'
+    SELECT seat_map_id AS "seatMapId" FROM vehicles
+    WHERE id = ${vehicleId} AND operator_id = ${operatorId} AND status = 'ACTIVE' AND seat_map_id IS NOT NULL
     FOR SHARE`;
   if (!vehicle) {
     throw vehicleUnavailable();
   }
+  // Sơ đồ không xoá được (không có DELETE, FK RESTRICT) nên dòng luôn còn; câu này chỉ để khoá.
+  await tx.$queryRaw`SELECT 1 FROM seat_maps WHERE id = ${vehicle.seatMapId} AND operator_id = ${operatorId} FOR SHARE`;
   return tx.seat.findMany({
     where: { seatMapId: vehicle.seatMapId, operatorId },
     orderBy: [...SEAT_ORDER],
