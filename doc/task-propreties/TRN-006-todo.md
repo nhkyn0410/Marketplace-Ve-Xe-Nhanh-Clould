@@ -141,12 +141,12 @@ Bảng giá bị tắt / thiếu rule, xe chuyển `INACTIVE`, điểm hoặc tu
 
 | # | Việc | Trạng thái |
 | --- | --- | --- |
-| 1 | Đồng bộ tài liệu theo Q (SRS §17.3 nếu Q1-B, API §7.3, DB §7, LLD §8/§9, Security §7, Test plan TC-TRN-xxx, GLOSSARY, file 11) | ⏸ |
-| 2 | Migration (cột theo Q4/Q6) + Prisma | ⏸ |
-| 3 | `TripService`: chuyển trạng thái + kiểm điều kiện + khóa ghế; DTO/controller/errors | ⏸ |
-| 4 | Test: unit (bảng chuyển trạng thái, điều kiện), HTTP (RBAC, 400), int (RLS, đồng thời, audit lỗi, đổi xe giữ ghế khóa) | ⏸ |
-| 5 | OpenAPI + client TS/Dart | ⏸ |
-| 6 | Review (`code-reviewer` + `security-auditor`) + guide/checklist + commit/push | ⏸ |
+| 1 | Đồng bộ tài liệu theo Q (SRS, API §6.2/§7.3, DB §7, LLD §8/§9, Security §7, Test plan TC-TRN-004..007, GLOSSARY, file 11) | ✅ `951a761` |
+| 2 | Migration (cột theo Q4/Q6) + Prisma | ✅ `20260930130000_trip_sale_lifecycle` (cutoff 0–1440 mặc định 60, `status_reason`, CHECK hủy có lý do); `migrate diff` rỗng |
+| 3 | `TripService`: chuyển trạng thái + kiểm điều kiện + khóa ghế; DTO/controller/errors | ✅ `trip-sale.ts` (bảng chuyển + điều kiện, hàm thuần), `changeStatus`, `setSeatStatus`, `update` giữ ghế khóa; `reasons[]` RFC 7807 |
+| 4 | Test: unit (bảng chuyển trạng thái, điều kiện), HTTP (RBAC, 400), int (RLS, đồng thời, audit lỗi, đổi xe giữ ghế khóa) | ✅ 74/74 file, **942/942** test, 0 skip (PG + Redis + Mongo thật); mutation 3/3 đỏ đúng chỗ. Sửa 3 test TRN-003 do đổi hành vi có chủ đích (giữ ghế khóa khi đổi xe; CHECK hủy có lý do; mock thiếu trường mới) |
+| 5 | OpenAPI + client TS/Dart | ✅ TS: 2 route, 2 DTO, 2 trường chuyến, `reasons`; Dart 7.25.0 + `build_runner`: analyze 0 error, test 533/533 |
+| 6 | Review (`code-reviewer` + `security-auditor`) + guide/checklist + commit/push | 🔨 code `90deb62`, client `bb0af69` đã push; guide/checklist xong; review đang chạy |
 | 7 | Màn Operator OS (mở/khóa bán, sơ đồ ghế khóa) — sau M1 | ⏸ |
 
 ---
