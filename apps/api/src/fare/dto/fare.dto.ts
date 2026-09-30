@@ -67,11 +67,14 @@ export class FareListQueryDto extends createZodDto(
   }),
 ) {}
 
-/** Query lịch sử giá: mới nhất trước, `cursor` = `createdAt` của dòng cuối trang trước. */
+/**
+ * Query lịch sử giá: mới nhất trước, `cursor` = `createdAt` của dòng cuối trang trước. Tối đa 20 dòng / trang: mỗi dòng
+ * mang cả bản trước + sau (tới 200 rule mỗi bản) nên trang 100 dòng lên tới vài MB.
+ */
 export class FareRevisionQueryDto extends createZodDto(
   z.object({
     cursor: InstantSchema.optional(),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
+    limit: z.coerce.number().int().min(1).max(20).default(20),
   }),
 ) {}
 

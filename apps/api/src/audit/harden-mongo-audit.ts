@@ -42,7 +42,7 @@ async function ensureAuditCollections(db: MongoDb): Promise<void> {
 
   await db.collection(AUDIT_EVENT_COLLECTION).createIndexes([
     { key: { actorId: 1, createdAt: -1 }, name: "actorId_1_createdAt_-1" },
-    { key: { targetType: 1, targetId: 1 }, name: "targetType_1_targetId_1" },
+    { key: { targetType: 1, targetId: 1, createdAt: -1 }, name: "targetType_1_targetId_1_createdAt_-1" },
     { key: { operatorId: 1, createdAt: -1 }, name: "operatorId_1_createdAt_-1" }
   ]);
 

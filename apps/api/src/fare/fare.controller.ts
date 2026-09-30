@@ -68,6 +68,7 @@ export class FareController {
     description: "`ROUTE_UNAVAILABLE` / `CATALOG_ITEM_UNAVAILABLE`.",
     content: problemContent,
   })
+  @ApiResponse({ status: 503, description: "Chưa ghi được lịch sử giá — không tạo gì, thử lại.", content: problemContent })
   create(
     @CurrentUser() actor: VerifiedAccessToken,
     @Authz() authz: Authorization,
@@ -85,6 +86,7 @@ export class FareController {
   @ApiResponse({ status: 400, description: "Dữ liệu sai / `FARE_RULES_OVERLAP`.", content: problemContent })
   @ApiResponse({ status: 404, description: "`FARE_NOT_FOUND` (kể cả khác tenant).", content: problemContent })
   @ApiResponse({ status: 422, description: "`CATALOG_ITEM_UNAVAILABLE`.", content: problemContent })
+  @ApiResponse({ status: 503, description: "Chưa ghi được lịch sử giá — bảng giá không đổi, thử lại.", content: problemContent })
   update(
     @CurrentUser() actor: VerifiedAccessToken,
     @Authz() authz: Authorization,
@@ -99,7 +101,7 @@ export class FareController {
   @Authorize("trip:manage")
   @ApiParam({ name: "fareId", type: String, format: "uuid" })
   @ApiQuery({ name: "cursor", required: false, type: String, format: "date-time" })
-  @ApiQuery({ name: "limit", required: false, type: Number, minimum: 1, maximum: 100 })
+  @ApiQuery({ name: "limit", required: false, type: Number, minimum: 1, maximum: 20 })
   @ZodResponse({ status: 200, description: "Lịch sử thay đổi bảng giá.", type: FareRevisionListResponseDto })
   @ApiResponse({ status: 404, description: "`FARE_NOT_FOUND` (kể cả khác tenant).", content: problemContent })
   revisions(

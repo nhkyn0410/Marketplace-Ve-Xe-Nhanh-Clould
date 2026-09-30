@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { AuditService } from "../audit/audit.service";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { AuditWriteError, type AuditService } from "../audit/audit.service";
 import { connectAuditForTest } from "../audit/audit.testing";
 import { parseAppConfig } from "../config/env.config";
 import { tenantScope } from "../database/db-scope";
@@ -219,7 +219,7 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare — Postgres + Mongo th�
       expect((await fares.get(authzA, fare.id)).rules[0]!.price).toBe(300_000);
     });
 
-    it("ghi thẳng DB: giá âm, khung giờ thiếu một đầu, trùng giá thường, chồng khung giờ đều bị chặn; khung giờ nối tiếp được", async () => {
+    it("ghi thẳng DB: giá âm / vượt trần, khung giờ thiếu một đầu, trùng giá thường, chồng khung giờ đều bị chặn; khung giờ nối tiếp được", async () => {
       const fare = await fares.create(actor, authzA, createInput(await newRoute(authzA), []));
       const insert = (data: Record<string, unknown>) =>
         rejectionOf(
@@ -229,6 +229,8 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare — Postgres + Mongo th�
         );
       const jan = (d: number) => new Date(Date.UTC(2031, 0, d));
       expect((await insert({ price: -1n })).text).toMatch(/fare_rules_price_non_negative/);
+      expect((await insert({ price: 100_000_001n })).text).toMatch(/fare_rules_price_max/);
+      expect((await insert({ seatType: "SEAT", price: 100_000_000n })).text).toBe(""); // đúng trần
       expect((await insert({ validFrom: jan(1) })).text).toMatch(/fare_rules_window_consistent/);
       expect((await insert({ validFrom: jan(5), validTo: jan(1) })).text).toMatch(/fare_rules_window_consistent/);
       expect((await insert({})).text).toBe("");
@@ -332,7 +334,11 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare — Postgres + Mongo th�
 
   describe("Lịch sử giá (BR-40) = audit Mongo", () => {
     it("mỗi lần tạo/sửa đúng một bản ghi; mới nhất trước; before = after của lần trước; phân trang; B không đọc được", async () => {
+      const record = vi.spyOn(audit, "recordAuditEvent");
       const fare = await fares.create(actor, authzA, createInput(await newRoute(authzA), [rule({ price: 100_000 })]));
+      // Ghi trong transaction PHẢI có giới hạn thời gian (Mongo chậm → 503, không giữ kết nối pool / khoá dòng).
+      expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: "fare.create" }), { timeoutMs: 2_000 });
+      record.mockRestore();
       await fares.update(actor, authzA, fare.id, updateInput([rule({ price: 200_000 })]));
       await fares.update(actor, authzA, fare.id, updateInput([rule({ price: 300_000 })], { status: "INACTIVE" }));
       const all = await fares.revisions(authzA, fare.id, { limit: 10 });
@@ -348,26 +354,58 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare — Postgres + Mongo th�
       const page1 = await fares.revisions(authzA, fare.id, { limit: 2 });
       const page2 = await fares.revisions(authzA, fare.id, { limit: 2, cursor: new Date(page1.nextCursor!) });
       expect([...page1.items, ...page2.items].map((item) => item.after.rules[0]!.price)).toEqual([300_000, 200_000, 100_000]);
+      expect(page2.nextCursor).toBeNull();
+      expect((await fares.revisions(authzA, fare.id, { limit: 3 })).nextCursor).toBeNull(); // trang vừa đủ: không còn trang rỗng
       expect((await rejectionOf(fares.revisions(authzB, fare.id, { limit: 10 })))).toMatchObject({ code: "FARE_NOT_FOUND" });
     });
 
-    it("ghi lịch sử lỗi (Mongo) → không đổi giá, không tạo bảng giá", async () => {
+    it("PUT không đổi gì (kể cả đảo thứ tự rule) → không ghi DB, không thêm dòng lịch sử", async () => {
+      const rules = [rule({ price: 100_000 }), rule({ seatType: "BED", price: 150_000 })];
+      const fare = await fares.create(actor, authzA, createInput(await newRoute(authzA), rules));
+      const same = await fares.update(actor, authzA, fare.id, updateInput([...rules].reverse()));
+      expect(same.updatedAt).toBe(fare.updatedAt);
+      expect((await fares.revisions(authzA, fare.id, { limit: 10 })).items).toHaveLength(1);
+      await fares.update(actor, authzA, fare.id, updateInput(rules, { note: "Đổi ghi chú" }));
+      expect((await fares.revisions(authzA, fare.id, { limit: 10 })).items).toHaveLength(2);
+    });
+
+    it("ghi lịch sử lỗi (Mongo) → 503, không đổi giá, không tạo bảng giá", async () => {
       const route = await newRoute(authzA);
       const fare = await fares.create(actor, authzA, createInput(route, [rule({ price: 100_000 })]));
       const broken = {
         recordAuditEvent: async () => {
-          throw new Error("Mongo down");
+          throw new AuditWriteError(new Error("Mongo down"));
         },
       } as unknown as AuditService;
       const failing = new FareService(prisma, broken);
-      expect((await rejectionOf(failing.update(actor, authzA, fare.id, updateInput([rule({ price: 999 })])))).text).toMatch(
-        /Mongo down/,
-      );
+      expect(await rejectionOf(failing.update(actor, authzA, fare.id, updateInput([rule({ price: 999 })])))).toMatchObject({
+        status: 503,
+        code: "SERVICE_UNAVAILABLE",
+      });
       expect((await fares.get(authzA, fare.id)).rules[0]!.price).toBe(100_000);
       const otherRoute = await newRoute(authzA);
-      await rejectionOf(failing.create(actor, authzA, createInput(otherRoute, [rule()])));
+      expect(await rejectionOf(failing.create(actor, authzA, createInput(otherRoute, [rule()])))).toMatchObject({ status: 503 });
       expect((await fares.list(authzA, { routeId: otherRoute, limit: 10 })).items).toEqual([]);
     });
+
+    it(
+      "ghi lịch sử chậm hơn hạn transaction (5s) → 503 thay vì 500, không đổi giá, khoá dòng được nhả",
+      async () => {
+        // Audit thật bị driver giới hạn 2s; bản giả chậm 6s mô phỏng trường hợp giới hạn đó không có tác dụng.
+        const fare = await fares.create(actor, authzA, createInput(await newRoute(authzA), [rule({ price: 100_000 })]));
+        const slow = {
+          recordAuditEvent: () => new Promise<void>((resolve) => setTimeout(resolve, 6_000)),
+        } as unknown as AuditService;
+        expect(
+          await rejectionOf(new FareService(prisma, slow).update(actor, authzA, fare.id, updateInput([rule({ price: 999 })]))),
+        ).toMatchObject({ status: 503, code: "SERVICE_UNAVAILABLE" });
+        expect((await fares.get(authzA, fare.id)).rules[0]!.price).toBe(100_000);
+        // Khoá dòng đã nhả: lần sửa kế tiếp (audit thật) chạy được.
+        await fares.update(actor, authzA, fare.id, updateInput([rule({ price: 200_000 })]));
+        expect((await fares.get(authzA, fare.id)).rules[0]!.price).toBe(200_000);
+      },
+      20_000,
+    );
   });
 
   describe("Giá ghế của chuyến (Q1 = PA1)", () => {

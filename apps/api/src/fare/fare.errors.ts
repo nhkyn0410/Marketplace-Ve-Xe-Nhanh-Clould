@@ -26,6 +26,20 @@ export function fareRulesOverlap(): HttpException {
   );
 }
 
+/** Không ghi được lịch sử giá (Mongo chậm / sập) hoặc transaction hết hạn — bảng giá KHÔNG đổi, client thử lại. */
+export function fareHistoryUnavailable(): HttpException {
+  return problem(
+    HttpStatus.SERVICE_UNAVAILABLE,
+    "SERVICE_UNAVAILABLE",
+    "Chưa ghi được lịch sử giá nên bảng giá chưa thay đổi. Vui lòng thử lại sau.",
+  );
+}
+
+/** Prisma P2028: transaction tương tác đã hết hạn / đóng (vd chờ khoá quá lâu) — Postgres đã rollback. */
+export function isTransactionExpired(error: unknown): boolean {
+  return (error as { code?: unknown } | null)?.code === "P2028";
+}
+
 /** Lỗi Postgres do EXCLUDE chống trùng phạm vi rule (SQLSTATE 23P01) — chốt chặn cuối sau kiểm tra ở service. */
 export function isFareRuleOverlapViolation(error: unknown): boolean {
   // Prisma 7 + driver adapter: lỗi DB nằm ở `cause` của `DriverAdapterError`.

@@ -14,13 +14,14 @@ const optionalText = (max: number) =>
     .nullable()
     .transform((value) => value || null);
 
-// Nhận ISO 8601 có múi giờ (vd `+07:00`) hoặc `Z`; lưu UTC. Chặn năm UTC > 9999 (vd `9999-12-31T23:00-07:00`):
-// `toISOString()` khi đó ra `+010000-…`, response schema từ chối → GET/list của tenant trả 500.
-/** Giờ vào API: ISO 8601 có múi giờ → `Date` UTC, năm ≤ 9999 (dùng chung cho trip và fare). */
+// Nhận ISO 8601 có múi giờ (vd `+07:00`) hoặc `Z`; lưu UTC. Chặn năm UTC ngoài 1970–9999 (vd `9999-12-31T23:00-07:00`
+// hay `0000-01-01T00:00+01:00`): `toISOString()` khi đó ra `+010000-…` / `-000001-…`, response schema từ chối → GET/list
+// của tenant trả 500. Fare là nơi đầu tiên nhận mốc quá khứ (khung giờ giá).
+/** Giờ vào API: ISO 8601 có múi giờ → `Date` UTC, năm 1970–9999 (dùng chung cho trip và fare). */
 export const InstantSchema = z.iso
   .datetime({ offset: true })
   .transform((value) => new Date(value))
-  .refine((date) => date.getUTCFullYear() <= 9999, "Năm phải từ 9999 trở xuống.");
+  .refine((date) => date.getUTCFullYear() >= 1970 && date.getUTCFullYear() <= 9999, "Năm phải trong khoảng 1970–9999.");
 const instant = InstantSchema;
 
 // Không `.default()`: POST và PUT (thay toàn bộ) phải gửi đủ trường. Trạng thái không nằm trong body —

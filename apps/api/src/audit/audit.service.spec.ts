@@ -64,6 +64,24 @@ describe("AuditService", () => {
       })
     );
   });
+
+  it.each([
+    ["operatorId rỗng", { operatorId: "" }],
+    ["targetId rỗng", { targetId: "" }],
+    ["không liệt kê action", { actions: [] }]
+  ])("listAuditEvents từ chối bộ lọc rỗng (%s) trước khi chạm Mongo", async (_case, override) => {
+    const service = new AuditService(createModelMock().model, createModelMock().model);
+    await expect(
+      service.listAuditEvents({
+        targetType: "fare",
+        targetId: "fare_1",
+        operatorId: "operator_1",
+        actions: ["fare.update"],
+        limit: 10,
+        ...override
+      })
+    ).rejects.toThrow(/cần operatorId/);
+  });
 });
 
 describe("audit schemas", () => {

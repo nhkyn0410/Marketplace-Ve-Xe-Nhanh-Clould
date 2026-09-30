@@ -284,6 +284,11 @@ describe("OpenAPI generation", () => {
       )?.items;
       expect(Object.keys(tripSeat?.properties ?? {})).toContain("price");
       expect(document.paths["/v1/operator/fares"]?.post?.responses?.[409]).toBeDefined();
+      // Review TRN-005: ghi lịch sử lỗi / chậm → 503 (bảng giá không đổi); trang lịch sử tối đa 20.
+      expect(document.paths["/v1/operator/fares"]?.post?.responses?.[503]).toBeDefined();
+      expect(document.paths["/v1/operator/fares/{fareId}"]?.put?.responses?.[503]).toBeDefined();
+      const revisionLimit = revisions?.parameters?.find((parameter) => "name" in parameter && parameter.name === "limit");
+      expect(revisionLimit && "schema" in revisionLimit ? revisionLimit.schema : undefined).toMatchObject({ maximum: 20 });
     } finally {
       await app.close();
     }
