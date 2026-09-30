@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus } from "@nestjs/common";
+import type { SaleReadinessReason } from "./trip-sale";
 
 const TITLE = "Trip error";
 
@@ -23,7 +24,7 @@ export function tripStatusTransitionInvalid(detail: string): HttpException {
 }
 
 /** BR-39: chưa đủ điều kiện mở bán — `reasons` liệt kê MỌI điều kiện chưa đạt để Owner sửa một lần. */
-export function tripNotReadyForSale(reasons: string[]): HttpException {
+export function tripNotReadyForSale(reasons: SaleReadinessReason[]): HttpException {
   return problem(
     HttpStatus.UNPROCESSABLE_ENTITY,
     "TRIP_NOT_READY_FOR_SALE",
@@ -42,12 +43,15 @@ export function tripSeatNotAvailable(): HttpException {
   return problem(HttpStatus.CONFLICT, "TRIP_SEAT_NOT_AVAILABLE", "Có ghế đang được giữ hoặc đã bán.");
 }
 
-/** Đổi xe mà sơ đồ mới thiếu ghế đang khóa (bán ngoài Platform) — mất ghế khóa là bán trùng (BR-42). */
-export function tripBlockedSeatsMissing(): HttpException {
+/**
+ * Sinh lại ghế (đổi / bỏ xe, nháp quá hạn) mà sơ đồ mới thiếu ghế đang khóa (bán ngoài Platform) — mất ghế khóa là bán
+ * trùng (BR-42). `detail` nêu mã ghế để Owner biết mở khóa ghế nào.
+ */
+export function tripBlockedSeatsMissing(seatCodes: string[]): HttpException {
   return problem(
     HttpStatus.CONFLICT,
     "TRIP_BLOCKED_SEATS_MISSING",
-    "Sơ đồ ghế của xe mới thiếu ghế đang khóa. Mở khóa các ghế đó trước khi đổi xe.",
+    `Sơ đồ ghế sau khi đổi không còn ghế đang khóa: ${seatCodes.join(", ")}. Mở khóa các ghế này trước rồi thử lại.`,
   );
 }
 
@@ -57,6 +61,15 @@ export function tripHistoryUnavailable(): HttpException {
     HttpStatus.SERVICE_UNAVAILABLE,
     "SERVICE_UNAVAILABLE",
     "Chưa ghi được lịch sử thay đổi nên chuyến chưa đổi trạng thái. Vui lòng thử lại sau.",
+  );
+}
+
+/** Transaction hết hạn (vd chờ khoá dòng chuyến quá lâu) — chuyến KHÔNG đổi, client thử lại. */
+export function tripBusy(): HttpException {
+  return problem(
+    HttpStatus.SERVICE_UNAVAILABLE,
+    "SERVICE_UNAVAILABLE",
+    "Chuyến đang được cập nhật bởi thao tác khác. Vui lòng thử lại.",
   );
 }
 

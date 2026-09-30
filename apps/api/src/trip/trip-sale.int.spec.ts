@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { AuditWriteError, type AuditService } from "../audit/audit.service";
 import { connectAuditForTest } from "../audit/audit.testing";
 import { parseAppConfig } from "../config/env.config";
@@ -29,15 +29,18 @@ const HOUR = 3_600_000;
 
 async function rejectionOf(
   promise: Promise<unknown>,
-): Promise<{ status?: number; code?: string; reasons?: string[]; text: string }> {
+): Promise<{ status?: number; code?: string; detail?: string; reasons?: string[]; text: string }> {
   try {
     await promise;
     return { text: "" };
   } catch (error) {
-    const response = (error as { getResponse?: () => { code?: string; reasons?: string[] } }).getResponse?.();
+    const response = (
+      error as { getResponse?: () => { code?: string; detail?: string; reasons?: string[] } }
+    ).getResponse?.();
     return {
       status: (error as { getStatus?: () => number }).getStatus?.(),
       code: response?.code,
+      detail: response?.detail,
       reasons: response?.reasons,
       text: JSON.stringify(error, Object.getOwnPropertyNames(error)) + String(error),
     };
@@ -102,9 +105,24 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
 
   /** Chuyến đủ điều kiện mở bán: tuyến + bảng giá (ghế 300k, giường 320k) + xe giường nằm A1 ghế / A2 giường. */
   async function readyTrip(
-    options: { rules?: object[]; stops?: string[]; departureAt?: Date; cutoffMinutes?: number; withFare?: boolean } = {},
+    options: {
+      rules?: object[];
+      stops?: string[];
+      privateStopId?: string;
+      departureAt?: Date;
+      cutoffMinutes?: number;
+      withFare?: boolean;
+    } = {},
   ) {
-    const stops = (options.stops ?? points.slice(0, 2)).map((id) => ({ catalogStopPointId: id, stopPointId: null, note: null }));
+    const stops = (options.stops ?? points.slice(0, 2)).map((id) => ({
+      catalogStopPointId: id as string | null,
+      stopPointId: null as string | null,
+      note: null,
+    }));
+    if (options.privateStopId) {
+      // Điểm cuối là điểm riêng của nhà xe (không thuộc catalog).
+      stops[stops.length - 1] = { catalogStopPointId: null, stopPointId: options.privateStopId, note: null };
+    }
     const route = await routes.create(
       authzA,
       RouteInputSchema.parse({ name: `R${seq++} ${tag}`, status: "ACTIVE", note: null, stops }),
@@ -225,6 +243,7 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
       await tx.fare.deleteMany({ where: { operatorId } });
       await tx.routeStop.deleteMany({ where: { operatorId } });
       await tx.route.deleteMany({ where: { operatorId } });
+      await tx.stopPoint.deleteMany({ where: { operatorId } });
       await tx.vehicle.deleteMany({ where: { operatorId } });
       await tx.seat.deleteMany({ where: { operatorId } });
       await tx.seatMap.deleteMany({ where: { operatorId } });
@@ -305,6 +324,26 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
       await prisma.withSystem((tx) => tx.stopPointCatalog.update({ where: { id: points[2]! }, data: { status: "INACTIVE" } }));
       expect(await reasonsOf(stopGone.trip.id)).toEqual(["STOP_POINT_INACTIVE"]);
 
+      const privateStop = randomUUID();
+      await prisma.withTenant(tenantA, (tx) =>
+        tx.stopPoint.create({
+          data: {
+            id: privateStop,
+            operatorId: tenantA,
+            name: `Điểm riêng ${tag}`,
+            type: "BUS_STATION",
+            address: "x",
+            provinceId: province,
+            wardId: ward,
+            latitude: 11,
+            longitude: 107,
+          },
+        }),
+      );
+      const privateGone = await readyTrip({ privateStopId: privateStop });
+      await prisma.withTenant(tenantA, (tx) => tx.stopPoint.update({ where: { id: privateStop }, data: { status: "INACTIVE" } }));
+      expect(await reasonsOf(privateGone.trip.id)).toEqual(["STOP_POINT_INACTIVE"]);
+
       const routeGone = await readyTrip();
       await prisma.withTenant(tenantA, (tx) => tx.route.update({ where: { id: routeGone.routeId }, data: { status: "INACTIVE" } }));
       expect(await reasonsOf(routeGone.trip.id)).toEqual(["ROUTE_INACTIVE"]);
@@ -321,8 +360,15 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
     it("khóa (= tạm dừng) ↔ mở lại; mở lại kiểm lại điều kiện (bảng giá tắt trong lúc khóa → 422)", async () => {
       const { trip, fare } = await readyTrip();
       await trips.changeStatus(actor, authzA, trip.id, status("OPEN_FOR_SALE"));
+      const record = vi.spyOn(audit, "recordAuditEvent");
       const locked = await trips.changeStatus(actor, authzA, trip.id, status("LOCKED", " Kiểm tra xe "));
       expect(locked).toMatchObject({ status: "LOCKED", statusReason: "Kiểm tra xe" });
+      // Lý do vào audit; ghi trong transaction có giới hạn + hạn chót theo transaction.
+      expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: "trip.status.change", reason: "Kiểm tra xe" }), {
+        timeoutMs: 2_000,
+        deadline: expect.any(Number),
+      });
+      record.mockRestore();
       const rules = [rule("SEAT", 300_000), rule("BED", 320_000)];
       await fares.update(actor, authzA, fare!.id, FareUpdateInputSchema.parse({ status: "INACTIVE", note: null, rules }));
       expect((await rejectionOf(trips.changeStatus(actor, authzA, trip.id, status("OPEN_FOR_SALE")))).reasons).toEqual([
@@ -386,6 +432,28 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
       expect((await trips.changeStatus(actor, authzA, trip.id, status("LOCKED"))).status).toBe("LOCKED");
     });
 
+    it("hủy trong lúc một transaction khác đang bán ghế (chưa commit) → chờ rồi thấy BOOKED → 409, chuyến không hủy", async () => {
+      const { trip } = await readyTrip();
+      await trips.changeStatus(actor, authzA, trip.id, status("OPEN_FOR_SALE"));
+      let release!: () => void;
+      let sold!: () => void;
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      const selling = new Promise<void>((resolve) => (sold = resolve));
+      // Mô phỏng luồng xác nhận vé (BTP-002) đổi A1 sang BOOKED nhưng chưa commit.
+      const seller = prisma.withTenant(tenantA, async (tx) => {
+        await tx.tripSeat.updateMany({ where: { tripId: trip.id, seatCode: "A1" }, data: { status: "BOOKED" } });
+        sold();
+        await gate;
+      });
+      await selling;
+      const cancelling = rejectionOf(trips.changeStatus(actor, authzA, trip.id, status("CANCELLED", "Xe hỏng")));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      release();
+      await seller;
+      expect((await cancelling).code).toBe("TRIP_STATUS_TRANSITION_INVALID");
+      expect((await trips.get(authzA, trip.id)).status).toBe("OPEN_FOR_SALE");
+    });
+
     it("hai request mở bán đồng thời → đúng một thành công, một 409, đúng một audit", async () => {
       const { trip } = await readyTrip();
       const results = await Promise.allSettled([
@@ -413,11 +481,27 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
       expect((await trips.get(authzA, trip.id)).status).toBe("DRAFT");
     });
 
-    it("DB: chuyến hủy phải có lý do; thời điểm ngừng bán ngoài 0–1440 bị chặn (kể cả đường system)", async () => {
+    it(
+      "transaction hết hạn (audit chậm hơn 5s, bỏ qua hạn chót) → 503 thử lại được, trạng thái không đổi",
+      async () => {
+        const { trip } = await readyTrip();
+        const slow = {
+          recordAuditEvent: () => new Promise<void>((resolve) => setTimeout(resolve, 6_000)),
+        } as unknown as AuditService;
+        expect(
+          await rejectionOf(new TripService(prisma, slow).changeStatus(actor, authzA, trip.id, status("OPEN_FOR_SALE"))),
+        ).toMatchObject({ status: 503, code: "SERVICE_UNAVAILABLE" });
+        expect((await trips.get(authzA, trip.id)).status).toBe("DRAFT");
+      },
+      20_000,
+    );
+
+    it("DB: chuyến hủy phải có lý do khác rỗng; thời điểm ngừng bán ngoài 0–1440 bị chặn (kể cả đường system)", async () => {
       const { trip } = await readyTrip();
       const write = (data: Record<string, unknown>) =>
         rejectionOf(prisma.withSystem((tx) => tx.trip.update({ where: { id: trip.id }, data })));
       expect((await write({ status: "CANCELLED" })).text).toMatch(/trips_cancel_requires_reason/);
+      expect((await write({ status: "CANCELLED", statusReason: "   " })).text).toMatch(/trips_cancel_requires_reason/);
       expect((await write({ onlineSaleCutoffMinutes: -1 })).text).toMatch(/trips_online_sale_cutoff_range/);
       expect((await write({ onlineSaleCutoffMinutes: 1441 })).text).toMatch(/trips_online_sale_cutoff_range/);
     });
@@ -456,6 +540,71 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Trip sale lifecycle — Postg
         "TRIP_SEAT_NOT_AVAILABLE",
       );
       expect((await trips.get(authzA, trip.id)).seats.map((seat) => seat.status)).toEqual(["AVAILABLE", "BOOKED"]);
+    });
+
+    it("tranh chấp: ghế đang được transaction khác giữ (chưa commit) → cả lô 409, ghế còn lại không đổi", async () => {
+      const { trip } = await readyTrip();
+      let release!: () => void;
+      let held!: () => void;
+      const gate = new Promise<void>((resolve) => (release = resolve));
+      const holding = new Promise<void>((resolve) => (held = resolve));
+      // Mô phỏng luồng giữ ghế (BTP-001) đổi A1 sang HOLDING nhưng chưa commit.
+      const holder = prisma.withTenant(tenantA, async (tx) => {
+        await tx.tripSeat.updateMany({ where: { tripId: trip.id, seatCode: "A1" }, data: { status: "HOLDING" } });
+        held();
+        await gate;
+      });
+      await holding;
+      const blocking = rejectionOf(trips.setSeatStatus(actor, authzA, trip.id, seats(["A1", "A2"], "BLOCKED")));
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      release();
+      await holder;
+      expect((await blocking).code).toBe("TRIP_SEAT_NOT_AVAILABLE");
+      expect((await trips.get(authzA, trip.id)).seats.map((seat) => [seat.code, seat.status])).toEqual([
+        ["A1", "HOLDING"],
+        ["A2", "AVAILABLE"],
+      ]);
+    });
+
+    it("đổi xe: sơ đồ mới thiếu ghế đang khóa → 409 nêu mã ghế; còn ghế đang giữ / đã bán thì không sinh lại ghế", async () => {
+      const { trip, routeId } = await readyTrip();
+      await trips.setSeatStatus(actor, authzA, trip.id, seats(["A2"], "BLOCKED"));
+      const map = await seatMaps.create(
+        authzA,
+        SeatMapInputSchema.parse({
+          name: `Sơ đồ nhỏ ${tag} ${seq++}`,
+          layout: { decks: [{ deck: 1, rows: 1, columns: 1 }] },
+          seats: [{ code: "A1", deck: 1, row: 1, column: 1, type: "SEAT" }],
+        }),
+      );
+      const small = await vehicles.create(
+        authzA,
+        VehicleInputSchema.parse({
+          plateNumber: `51G${String(10000 + seq++)}`,
+          vehicleTypeId: typeSleeper,
+          seatMapId: map.id,
+          amenityIds: [],
+          status: "ACTIVE",
+          description: null,
+        }),
+      );
+      const input = (vehicleId: string) =>
+        TripInputSchema.parse({
+          routeId,
+          vehicleId,
+          departureAt: trip.departureAt,
+          arrivalAt: trip.arrivalAt,
+          stopTimes: null,
+          onlineSaleCutoffMinutes: 60,
+          note: null,
+        });
+      const missing = await rejectionOf(trips.update(authzA, trip.id, input(small.id)));
+      expect(missing).toMatchObject({ status: 409, code: "TRIP_BLOCKED_SEATS_MISSING" });
+      expect(missing.detail).toMatch(/: A2\./);
+      await trips.setSeatStatus(actor, authzA, trip.id, seats(["A2"], "AVAILABLE"));
+      await setSeat(trip.id, "A1", "BOOKED");
+      expect((await rejectionOf(trips.update(authzA, trip.id, input(small.id)))).code).toBe("TRIP_SEAT_NOT_AVAILABLE");
+      expect((await trips.get(authzA, trip.id)).vehicleId).not.toBe(small.id);
     });
 
     it("chuyến hủy → 409 TRIP_NOT_EDITABLE; Mongo lỗi vẫn khóa được ghế (chống overbooking)", async () => {

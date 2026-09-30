@@ -6,8 +6,11 @@ ALTER TABLE "trips" ADD COLUMN "online_sale_cutoff_minutes" INTEGER NOT NULL DEF
 ALTER TABLE "trips" ADD CONSTRAINT "trips_online_sale_cutoff_range"
   CHECK ("online_sale_cutoff_minutes" BETWEEN 0 AND 1440);
 
--- Lý do lần đổi trạng thái gần nhất (lịch sử đầy đủ ở audit Mongo). Chuyến hủy phải có lý do (SRS §17.3) —
+-- Lý do lần đổi trạng thái gần nhất (lịch sử đầy đủ ở audit Mongo). Chuyến hủy phải có lý do khác rỗng (SRS §17.3) —
 -- giữ ở DB để mọi đường hủy về sau (Admin, TRN-008) cũng không bỏ sót.
 ALTER TABLE "trips" ADD COLUMN "status_reason" TEXT;
+-- Trước TRN-006 không có API hủy, nhưng DB dev / test có thể còn chuyến CANCELLED ghi thẳng: điền lý do để CHECK áp được.
+UPDATE "trips" SET "status_reason" = 'Hủy trước khi bắt buộc lý do (TRN-006)'
+  WHERE "status" = 'CANCELLED' AND ("status_reason" IS NULL OR btrim("status_reason") = '');
 ALTER TABLE "trips" ADD CONSTRAINT "trips_cancel_requires_reason"
-  CHECK ("status" <> 'CANCELLED' OR "status_reason" IS NOT NULL);
+  CHECK ("status" <> 'CANCELLED' OR ("status_reason" IS NOT NULL AND btrim("status_reason") <> ''));
