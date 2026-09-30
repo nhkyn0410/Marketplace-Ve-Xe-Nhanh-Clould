@@ -337,7 +337,10 @@ describe.skipIf(!(url && mongoUrl) && !requireDb)("Fare — Postgres + Mongo th�
       const record = vi.spyOn(audit, "recordAuditEvent");
       const fare = await fares.create(actor, authzA, createInput(await newRoute(authzA), [rule({ price: 100_000 })]));
       // Ghi trong transaction PHẢI có giới hạn thời gian (Mongo chậm → 503, không giữ kết nối pool / khoá dòng).
-      expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: "fare.create" }), { timeoutMs: 2_000 });
+      expect(record).toHaveBeenCalledWith(expect.objectContaining({ action: "fare.create" }), {
+        timeoutMs: 2_000,
+        deadline: expect.any(Number),
+      });
       record.mockRestore();
       await fares.update(actor, authzA, fare.id, updateInput([rule({ price: 200_000 })]));
       await fares.update(actor, authzA, fare.id, updateInput([rule({ price: 300_000 })], { status: "INACTIVE" }));
