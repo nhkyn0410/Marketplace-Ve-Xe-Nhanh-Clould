@@ -7,6 +7,7 @@
 ## Trạng thái (30/09/2026) — ⏸ **CHỜ KHANH CHỐT Q1–Q8**
 
 - ✅ Tạo nhánh `TASK-TRN-006`; đối chiếu SDLC. SDLC có danh sách trạng thái (§17.3/§17.4) và điều kiện mở bán (BR-39) nhưng **chưa có**: bảng chuyển trạng thái, "tạm dừng" khác "khóa" thế nào, nơi cấu hình thời điểm ngừng bán online / cửa sổ đón, endpoint, audit cho đổi trạng thái / khóa ghế.
+- 📝 Q5: Khanh lưu ý "hệ thống quầy" chưa có trong tài liệu nào → ghi chú tạm ở Q5 (30/09/2026). Các ý khác của Q5 và Q1–Q4, Q6–Q8 vẫn chờ chốt.
 - ⏸ **Chưa code** tới khi Khanh chốt Q. Chốt xong → **đồng bộ mọi tài liệu nhắc tới quy tắc bị đổi trước khi code** (bài học TRN-003/005).
 
 ---
@@ -28,7 +29,7 @@
 - Giữ ghế Redis, trạng thái `HOLDING` / `BOOKED` (BTP-001/002); `SOLD_OUT` do bán hết (Q2).
 - `BOARDING` / `DEPARTED` / `IN_PROGRESS` / `COMPLETED` / `INCIDENT` do Employee cập nhật (EMP-002).
 - Admin khóa chuyến khi vi phạm (Security §7 "task Admin sau"); Admin cấu hình policy thời gian ngừng bán (FR-ADM-06) → ADM.
-- Search công khai (TRN-004); lịch lặp (TRN-007); đồng bộ tự động với hệ thống bán vé quầy / đại lý (Q5).
+- Search công khai (TRN-004); lịch lặp (TRN-007); đồng bộ tự động với hệ thống bán vé quầy / đại lý — chưa có trong tài liệu nào, ghi chú tạm ở Q5.
 
 ---
 
@@ -92,7 +93,7 @@ SDLC nhắc ở 3 cấp: `AS-20` (theo nhà xe / tuyến), `UC-14` bước 6 (Op
 - Chỉ `AVAILABLE ↔ BLOCKED`; ghế đang giữ / đã bán → 409 `TRIP_SEAT_NOT_AVAILABLE`. Mã ghế không thuộc chuyến → 422.
 - Chuyến `DRAFT` / `OPEN_FOR_SALE` / `LOCKED` được khóa ghế (khóa trước khi mở bán = đã bán quầy trước); `CANCELLED` / đã khởi hành → 409.
 - **Đổi xe khi chuyến có ghế khóa** (`PUT` nháp sinh lại ghế): giữ `BLOCKED` theo `seat_code` nếu sơ đồ mới có ghế cùng mã; ghế khóa không còn trong sơ đồ mới → 409 (không cho đổi xe âm thầm làm mất ghế đã bán quầy → overbooking).
-- **Không** đồng bộ tự động với hệ thống quầy / đại lý ở v1 (FR-OPS-13 "nếu vận hành đa kênh" — chỉ thủ công).
+- 📝 **Ghi chú tạm (Khanh, 30/09/2026) — "hệ thống quầy" chưa được đề cập ở tài liệu nào.** SDLC chỉ nêu **kênh** bán ngoài Platform (quầy vé, tổng đài, đại lý — SRS `AS-19`, `CO-18`, `DP-16`, `RSK-07`) và cách xử lý là khóa ghế thủ công hoặc đồng bộ tồn ghế (`FR-OPS-13`, `BR-42`); **không** có actor / hệ thống ngoài (§7.6) / adapter / API nào cho phần mềm bán vé tại quầy. TRN-006 chỉ làm **khóa ghế thủ công**; đồng bộ tự động với hệ thống quầy / đại lý để mở lại khi có yêu cầu + tài liệu riêng.
 - Giữ ghế Redis chưa có (BTP-001): khi làm BTP-001, giữ ghế phải kiểm `BLOCKED` ở Postgres và khóa ghế phải kiểm không có hold — ghi bàn giao.
 
 ### Q6 — Lý do + audit
