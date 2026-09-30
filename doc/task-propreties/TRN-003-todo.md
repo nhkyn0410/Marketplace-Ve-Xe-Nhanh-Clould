@@ -38,7 +38,7 @@
 
 | ID | Điểm cần chốt | Quyết định |
 | --- | --- | --- |
-| Q1 | Thời gian quay đầu xe (BR-14) | ✅ Khanh: **không cần** — sau khi chuyến kết thúc, nhà xe tự sắp xếp chuyến mới. Xe bận trong `[departureAt, arrivalAt)`; chuyến sau được khởi hành **đúng lúc** chuyến trước đến. Lệch câu chữ SRS `BR-14` ("hoặc không đủ thời gian quay đầu") → cần Khanh xác nhận sửa SRS (BR-13 của tài xế có cùng khái niệm, quyết ở EMP-001). |
+| Q1 | Thời gian quay đầu xe (BR-14) | ✅ Khanh: **không cần** — sau khi chuyến kết thúc, nhà xe tự sắp xếp chuyến mới. Xe bận trong `[departureAt, arrivalAt)`; chuyến sau được khởi hành **đúng lúc** chuyến trước đến. SRS `BR-14` đã sửa theo (v1.28). BR-13 của tài xế có cùng khái niệm, quyết ở EMP-001. |
 | Q2 | Cách chặn trùng xe | ✅ Theo khuyến nghị: ràng buộc `EXCLUDE USING gist` (extension `btree_gist`) trên `(vehicle_id, tsrange(departure_at, arrival_at, '[)'))`, bỏ qua chuyến `CANCELLED` và chuyến chưa gắn xe. Hai request đồng thời cũng chỉ một bên thành công. |
 | Q3 | Xe bắt buộc khi tạo chuyến? | ✅ Tạm theo khuyến nghị: tuỳ chọn khi `DRAFT`, bắt buộc lúc mở bán (TRN-006). Khanh sẽ tham khảo quy định tuyến / loại xe để thêm ràng buộc sau. |
 | Q4 | Cửa sổ đón + thời điểm ngừng bán online | ✅ Để TRN-006. TRN-003 chỉ có giờ dự kiến từng điểm. |
@@ -65,6 +65,12 @@
 ### ✅ #1 — [TRN-003.1] Chốt Q1–Q6 và khóa contract
 
 **Success:** Khanh duyệt 30/09/2026; API §7.3, DB §7, Security §7, file 11 cập nhật (giữ trạng thái Review).
+
+> **Ghi chú bổ sung (30/09/2026, Khanh nhắc):** lúc chốt Q chỉ đồng bộ API/DB/Security/file 11, **còn sót** các chỗ sau — đã sửa sau:
+> - SRS `BR-14` (v1.28): bỏ "thời gian quay đầu" theo Q1 (xe bận trong [giờ đi, giờ đến), chuyến sau khởi hành đúng giờ đến chuyến trước). `BR-13` (tài xế) chưa đổi — chốt ở EMP-001.
+> - HLD §8 (v0.8), LLD §5 (v0.9), DOMAIN-MAP §5: TripSeat nằm trong module `trip/`, bỏ `trip-seat/` / `TripSeatService` riêng cho khớp code.
+> - Test plan §9 (v0.7): thêm `TC-TRN-001..003`.
+> Bài học: khi chốt Q, rà **tất cả** tài liệu nhắc tới quy tắc/module bị đổi (grep từ khoá), không chỉ tài liệu contract.
 
 ### ✅ #2 — [TRN-003.2] Schema + migration + RLS
 
