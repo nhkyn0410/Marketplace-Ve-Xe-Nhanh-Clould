@@ -4440,6 +4440,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
+            /** @description Chưa ghi được lịch sử giá — không tạo gì, thử lại. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
         };
     };
     FareController_get: {
@@ -4553,6 +4562,15 @@ export interface operations {
             };
             /** @description `CATALOG_ITEM_UNAVAILABLE`. */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Chưa ghi được lịch sử giá — bảng giá không đổi, thử lại. */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

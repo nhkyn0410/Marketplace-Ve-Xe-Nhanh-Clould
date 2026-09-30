@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { AuditService } from "../audit/audit.service";
+import { AuditService, AuditWriteError } from "../audit/audit.service";
 import { catalogItemUnavailable } from "../catalog/catalog.errors";
 import { PrismaService, type DbTransaction } from "../database/prisma.service";
 import { CatalogStatus, RouteStatus, type FareStatus, type SeatType } from "../database/prisma.types";
@@ -18,12 +18,23 @@ import type {
   FareUpdateInput,
 } from "./dto/fare.dto";
 import { vndToJson } from "./fare-pricing";
-import { fareNotFound, fareRouteConflict, fareRulesOverlap, isFareRuleOverlapViolation } from "./fare.errors";
+import {
+  fareHistoryUnavailable,
+  fareNotFound,
+  fareRouteConflict,
+  fareRulesOverlap,
+  isFareRuleOverlapViolation,
+  isTransactionExpired,
+} from "./fare.errors";
 
 /** Người thực hiện thao tác (từ access token) — ghi vào audit. */
 export type FareActor = { sub: string; role: string };
 
 const AUDIT_TARGET = "fare";
+const AUDIT_ACTIONS = ["fare.create", "fare.update"] as const;
+// Ghi lịch sử giá nằm trong transaction Postgres (Prisma: chạy ≤ 5s). Giới hạn Mongo ở 2s để Mongo chậm / failover
+// trả 503 sớm thay vì giữ kết nối pool + khoá dòng bảng giá tới khi transaction hết hạn.
+const AUDIT_TIMEOUT_MS = 2_000;
 const RULE_SELECT = {
   vehicleTypeId: true,
   seatType: true,
@@ -129,6 +140,8 @@ export class FareService {
         await this.recordRevision(actor, operatorId, fare.id, "fare.create", null, created);
         return created;
       }),
+      // Chỉ còn unique `(route_id, operator_id)`: hai request tạo bảng giá cho một tuyến cùng lúc.
+      fareRouteConflict,
     );
     return toResponse(row);
   }
@@ -149,6 +162,10 @@ export class FareService {
           throw fareNotFound();
         }
         const before = (await findDetail(tx, operatorId, fareId))!;
+        if (sameContent(before, input)) {
+          // Không đổi gì → không ghi DB, không thêm dòng lịch sử trùng (before = after).
+          return before;
+        }
         await assertVehicleTypes(
           tx,
           input.rules,
@@ -185,24 +202,28 @@ export class FareService {
       targetType: AUDIT_TARGET,
       targetId: fareId,
       operatorId,
+      actions: AUDIT_ACTIONS,
       before: query.cursor,
-      limit: query.limit,
+      limit: query.limit + 1,
     });
+    const page = events.slice(0, query.limit);
     return {
-      items: events.map((event) => ({
-        action: event.action as "fare.create" | "fare.update",
+      items: page.map((event) => ({
+        action: event.action as (typeof AUDIT_ACTIONS)[number],
         actorId: event.actorId ?? null,
         createdAt: event.createdAt.toISOString(),
         before: (event.before as FareSnapshot | null | undefined) ?? null,
         after: event.after as FareSnapshot,
       })),
-      nextCursor: events.length === query.limit ? events[events.length - 1]!.createdAt.toISOString() : null,
+      // Cursor = `createdAt`: các lần ghi của MỘT bảng giá tuần tự qua khoá dòng nên không trùng mili-giây.
+      nextCursor: events.length > query.limit ? page[page.length - 1]!.createdAt.toISOString() : null,
     };
   }
 
-  // Ghi TRONG transaction Postgres (trước commit): Mongo lỗi → throw → Postgres rollback, không có thay đổi giá nào
-  // thiếu lịch sử. Chỉ lệch khi commit Postgres lỗi sau khi Mongo đã ghi (rất hiếm) — chấp nhận ở Q4 vì lịch sử giá
-  // không dùng để tính tiền (giá thu tiền đã chụp vào booking).
+  // Ghi TRONG transaction Postgres (trước commit), giới hạn thời gian ở driver: Mongo lỗi / chậm → throw → Postgres
+  // rollback và server Mongo huỷ lệnh, không có thay đổi giá nào thiếu lịch sử hay dòng lịch sử "ma". Chỉ lệch khi commit
+  // Postgres lỗi sau khi Mongo đã ghi (rất hiếm) — chấp nhận ở Q4 vì lịch sử giá không dùng để tính tiền (giá thu tiền
+  // đã chụp vào booking).
   private async recordRevision(
     actor: FareActor,
     operatorId: string,
@@ -220,23 +241,40 @@ export class FareService {
       operatorId,
       before: before ? toSnapshot(before) : null,
       after: toSnapshot(after),
-    });
+    }, { timeoutMs: AUDIT_TIMEOUT_MS });
   }
 
-  private async withDbConflicts<T>(work: () => Promise<T>): Promise<T> {
+  private async withDbConflicts<T>(work: () => Promise<T>, onUniqueConflict?: () => Error): Promise<T> {
     try {
       return await work();
     } catch (error) {
-      // Chỉ còn unique `(route_id, operator_id)` (tạo đồng thời hai bảng giá cho một tuyến).
-      if (isPrismaUniqueConflict(error)) {
-        throw fareRouteConflict();
+      if (onUniqueConflict && isPrismaUniqueConflict(error)) {
+        throw onUniqueConflict();
       }
       if (isFareRuleOverlapViolation(error)) {
         throw fareRulesOverlap();
       }
+      if (error instanceof AuditWriteError || isTransactionExpired(error)) {
+        throw fareHistoryUnavailable();
+      }
       throw error;
     }
   }
+}
+
+/** Nội dung gửi lên trùng hệt bản đang lưu (trạng thái, ghi chú, tập rule — không kể thứ tự rule). */
+function sameContent(current: FareDetailRow, input: FareUpdateInput): boolean {
+  if (current.status !== input.status || current.note !== input.note || current.rules.length !== input.rules.length) {
+    return false;
+  }
+  const keys = (rules: (FareRuleInput | RuleRow)[]) =>
+    rules
+      .map((rule) =>
+        [rule.vehicleTypeId, rule.seatType, rule.validFrom?.getTime(), rule.validTo?.getTime(), String(rule.price)].join("|"),
+      )
+      .sort()
+      .join("\n");
+  return keys(current.rules) === keys(input.rules);
 }
 
 /**

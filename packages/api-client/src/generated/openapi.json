@@ -4034,6 +4034,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Chưa ghi được lịch sử giá — không tạo gì, thử lại.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4194,6 +4204,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "Chưa ghi được lịch sử giá — bảng giá không đổi, thử lại.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -4235,7 +4255,7 @@
             "in": "query",
             "schema": {
               "minimum": 1,
-              "maximum": 100,
+              "maximum": 20,
               "default": 20,
               "type": "number"
             }

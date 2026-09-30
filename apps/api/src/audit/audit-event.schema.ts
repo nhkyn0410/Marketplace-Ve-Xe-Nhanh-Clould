@@ -49,6 +49,7 @@ export const AuditEventSchema = new Schema<AuditEvent>(
 );
 
 AuditEventSchema.index({ actorId: 1, createdAt: -1 });
-AuditEventSchema.index({ targetType: 1, targetId: 1 });
+// Kèm `createdAt` để đọc lịch sử một đối tượng mới nhất trước không phải sort trong bộ nhớ (lịch sử giá TRN-005).
+AuditEventSchema.index({ targetType: 1, targetId: 1, createdAt: -1 });
 AuditEventSchema.index({ operatorId: 1, createdAt: -1 });
 applyAppendOnlyGuard(AuditEventSchema);

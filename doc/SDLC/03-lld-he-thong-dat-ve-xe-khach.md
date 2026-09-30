@@ -29,6 +29,7 @@
 | v0.8      | 30/09/2026 | AI Agent       | **A2 — đăng ký nhà xe theo closed enrollment (Khanh duyệt 30/09/2026, SRS v1.23)**: §5.2 `OperatorApplicationService`; thêm §6.11 đăng ký và duyệt hồ sơ nhà xe; §7 error `OPERATOR_APPLICATION_*`, `OPERATOR_SLUG_CONFLICT`; §9 audit duyệt hồ sơ. Giữ trạng thái Review. |
 | v0.9      | 30/09/2026 | AI Agent       | **TASK-TRN-003:** §5 nhóm Trip & Inventory — TripSeat do `TripService` trong module `trip/` quản lý (sinh ghế từ SeatMap lúc gắn xe), bỏ module `trip-seat/` / `TripSeatService` riêng cho khớp code; BR-14 giữ bằng ràng buộc EXCLUDE ở DB, không có thời gian đệm quay đầu (Q1). Giữ trạng thái Review. |
 | v0.10     | 30/09/2026 | AI Agent       | **TASK-TRN-005** (Khanh chốt Q1 = PA1, Q4 = Mongo): `FareService` — mỗi tuyến một bảng giá, rule giá tuyệt đối theo loại xe × loại chỗ × khung giờ khởi hành, rule cụ thể hơn thắng (có khung giờ > không; đúng loại xe > mọi loại; đúng loại chỗ > mọi loại); giá ghế của chuyến tính khi đọc theo loại xe đang gắn. §audit thêm dòng "Tạo/sửa bảng giá": `audit_event` ghi trong transaction Postgres trước commit, đồng thời là lịch sử giá BR-40. Giữ trạng thái Review. |
+| v0.11     | 30/09/2026 | AI Agent       | **TASK-TRN-005 (review):** §9 dòng audit bảng giá — ghi trong transaction có giới hạn 2 giây ở driver (CSOT `timeoutMS`), Mongo chưa kết nối thì từ chối ngay (không xếp hàng), lỗi → 503. Giữ trạng thái Review. |
 
 ---
 
@@ -290,7 +291,7 @@ Sự kiện nhạy cảm ghi vào Mongo `audit_event` (cluster RIÊNG, append-on
 | Refund thủ công                | Có             | adminId, booking/payment/refund id, amount, reason |
 | Đổi policy/commission/payout   | Có             | before/after, effective date, actor                |
 | Đổi trip đã có vé bán          | Có             | tripId, affected bookings, reason                  |
-| Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit (Mongo lỗi → không đổi giá); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
+| Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit, giới hạn 2 giây ở driver Mongo (lỗi / chậm / chưa kết nối → không đổi giá, 503; server Mongo tự huỷ lệnh quá hạn nên không có dòng lịch sử "ma"); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
 | Khóa/mở khóa tài khoản         | Có             | target actor, actor thực hiện, reason              |
 | Confirm payout / nhập bank ref | Có             | adminId, payoutId, operatorId, amount, bank ref    |
 | Điều chỉnh điểm loyalty        | Có             | adminId, userId, points (+/−), reason, số dư trước / sau |
