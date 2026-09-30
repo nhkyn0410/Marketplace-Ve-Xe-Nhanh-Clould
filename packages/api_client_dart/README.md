@@ -113,6 +113,10 @@ Class | Method | HTTP request | Description
 [*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerGet**](doc/OperatorStopPointsApi.md#stoppointcontrollerget) | **GET** /v1/operator/stop-points/{stopPointId} | 
 [*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerList**](doc/OperatorStopPointsApi.md#stoppointcontrollerlist) | **GET** /v1/operator/stop-points | 
 [*OperatorStopPointsApi*](doc/OperatorStopPointsApi.md) | [**stopPointControllerUpdate**](doc/OperatorStopPointsApi.md#stoppointcontrollerupdate) | **PUT** /v1/operator/stop-points/{stopPointId} | 
+[*OperatorTripsApi*](doc/OperatorTripsApi.md) | [**tripControllerCreate**](doc/OperatorTripsApi.md#tripcontrollercreate) | **POST** /v1/operator/trips | 
+[*OperatorTripsApi*](doc/OperatorTripsApi.md) | [**tripControllerGet**](doc/OperatorTripsApi.md#tripcontrollerget) | **GET** /v1/operator/trips/{tripId} | 
+[*OperatorTripsApi*](doc/OperatorTripsApi.md) | [**tripControllerList**](doc/OperatorTripsApi.md#tripcontrollerlist) | **GET** /v1/operator/trips | 
+[*OperatorTripsApi*](doc/OperatorTripsApi.md) | [**tripControllerUpdate**](doc/OperatorTripsApi.md#tripcontrollerupdate) | **PUT** /v1/operator/trips/{tripId} | 
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerCreate**](doc/OperatorVehiclesApi.md#vehiclecontrollercreate) | **POST** /v1/operator/vehicles | 
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerGet**](doc/OperatorVehiclesApi.md#vehiclecontrollerget) | **GET** /v1/operator/vehicles/{vehicleId} | 
 [*OperatorVehiclesApi*](doc/OperatorVehiclesApi.md) | [**vehicleControllerList**](doc/OperatorVehiclesApi.md#vehiclecontrollerlist) | **GET** /v1/operator/vehicles | 
@@ -191,6 +195,12 @@ Class | Method | HTTP request | Description
  - [StopPointProposalListResponseDtoOutput](doc/StopPointProposalListResponseDtoOutput.md)
  - [StopPointProposalListResponseDtoOutputItemsInner](doc/StopPointProposalListResponseDtoOutputItemsInner.md)
  - [StopPointProposalResponseDtoOutput](doc/StopPointProposalResponseDtoOutput.md)
+ - [TripInputDto](doc/TripInputDto.md)
+ - [TripListResponseDtoOutput](doc/TripListResponseDtoOutput.md)
+ - [TripListResponseDtoOutputItemsInner](doc/TripListResponseDtoOutputItemsInner.md)
+ - [TripResponseDtoOutput](doc/TripResponseDtoOutput.md)
+ - [TripResponseDtoOutputSeatsInner](doc/TripResponseDtoOutputSeatsInner.md)
+ - [TripResponseDtoOutputStopsInner](doc/TripResponseDtoOutputStopsInner.md)
  - [VehicleInputDto](doc/VehicleInputDto.md)
  - [VehicleListResponseDtoOutput](doc/VehicleListResponseDtoOutput.md)
  - [VehicleListResponseDtoOutputItemsInner](doc/VehicleListResponseDtoOutputItemsInner.md)

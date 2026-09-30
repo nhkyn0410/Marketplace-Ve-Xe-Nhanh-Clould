@@ -17,6 +17,7 @@ import 'package:api_client_dart/src/api/operator_routes_api.dart';
 import 'package:api_client_dart/src/api/operator_seat_maps_api.dart';
 import 'package:api_client_dart/src/api/operator_stop_point_proposals_api.dart';
 import 'package:api_client_dart/src/api/operator_stop_points_api.dart';
+import 'package:api_client_dart/src/api/operator_trips_api.dart';
 import 'package:api_client_dart/src/api/operator_vehicles_api.dart';
 
 class ApiClientDart {
@@ -159,6 +160,12 @@ class ApiClientDart {
   /// by doing that all interceptors will not be executed
   OperatorStopPointsApi getOperatorStopPointsApi() {
     return OperatorStopPointsApi(dio, serializers);
+  }
+
+  /// Get OperatorTripsApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  OperatorTripsApi getOperatorTripsApi() {
+    return OperatorTripsApi(dio, serializers);
   }
 
   /// Get OperatorVehiclesApi instance, base route and serializer can be overridden by a given but be careful,

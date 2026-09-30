@@ -84,6 +84,12 @@ import 'package:api_client_dart/src/model/stop_point_proposal_input_dto.dart';
 import 'package:api_client_dart/src/model/stop_point_proposal_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/stop_point_proposal_list_response_dto_output_items_inner.dart';
 import 'package:api_client_dart/src/model/stop_point_proposal_response_dto_output.dart';
+import 'package:api_client_dart/src/model/trip_input_dto.dart';
+import 'package:api_client_dart/src/model/trip_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/trip_list_response_dto_output_items_inner.dart';
+import 'package:api_client_dart/src/model/trip_response_dto_output.dart';
+import 'package:api_client_dart/src/model/trip_response_dto_output_seats_inner.dart';
+import 'package:api_client_dart/src/model/trip_response_dto_output_stops_inner.dart';
 import 'package:api_client_dart/src/model/vehicle_input_dto.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output_items_inner.dart';
@@ -166,6 +172,12 @@ part 'serializers.g.dart';
   StopPointProposalListResponseDtoOutput,
   StopPointProposalListResponseDtoOutputItemsInner,
   StopPointProposalResponseDtoOutput,
+  TripInputDto,
+  TripListResponseDtoOutput,
+  TripListResponseDtoOutputItemsInner,
+  TripResponseDtoOutput,
+  TripResponseDtoOutputSeatsInner,
+  TripResponseDtoOutputStopsInner,
   VehicleInputDto,
   VehicleListResponseDtoOutput,
   VehicleListResponseDtoOutputItemsInner,
@@ -193,6 +205,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<RouteInputDtoStopsInner>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(DateTime)]),
+        () => ListBuilder<DateTime>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(EmployeeListResponseDtoOutputItemsInner)]),
         () => ListBuilder<EmployeeListResponseDtoOutputItemsInner>(),
       )
@@ -209,6 +225,14 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<WardListResponseDtoOutputItemsInner>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(TripResponseDtoOutputSeatsInner)]),
+        () => ListBuilder<TripResponseDtoOutputSeatsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(TripListResponseDtoOutputItemsInner)]),
+        () => ListBuilder<TripListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SessionListResponseDtoOutputItemsInner)]),
         () => ListBuilder<SessionListResponseDtoOutputItemsInner>(),
       )
@@ -223,6 +247,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(SeatMapListResponseDtoOutputItemsInner)]),
         () => ListBuilder<SeatMapListResponseDtoOutputItemsInner>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(TripResponseDtoOutputStopsInner)]),
+        () => ListBuilder<TripResponseDtoOutputStopsInner>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OperatorStopPointListResponseDtoOutputItemsInner)]),

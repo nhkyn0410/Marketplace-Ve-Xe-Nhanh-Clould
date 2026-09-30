@@ -38,6 +38,7 @@ doc/OperatorStopPointListResponseDtoOutputItemsInner.md
 doc/OperatorStopPointProposalsApi.md
 doc/OperatorStopPointResponseDtoOutput.md
 doc/OperatorStopPointsApi.md
+doc/OperatorTripsApi.md
 doc/OperatorVehiclesApi.md
 doc/OtpRequestDto.md
 doc/OtpVerifyDto.md
@@ -80,6 +81,12 @@ doc/StopPointProposalInputDto.md
 doc/StopPointProposalListResponseDtoOutput.md
 doc/StopPointProposalListResponseDtoOutputItemsInner.md
 doc/StopPointProposalResponseDtoOutput.md
+doc/TripInputDto.md
+doc/TripListResponseDtoOutput.md
+doc/TripListResponseDtoOutputItemsInner.md
+doc/TripResponseDtoOutput.md
+doc/TripResponseDtoOutputSeatsInner.md
+doc/TripResponseDtoOutputStopsInner.md
 doc/VehicleInputDto.md
 doc/VehicleListResponseDtoOutput.md
 doc/VehicleListResponseDtoOutputItemsInner.md
@@ -98,6 +105,7 @@ lib/src/api/operator_routes_api.dart
 lib/src/api/operator_seat_maps_api.dart
 lib/src/api/operator_stop_point_proposals_api.dart
 lib/src/api/operator_stop_points_api.dart
+lib/src/api/operator_trips_api.dart
 lib/src/api/operator_vehicles_api.dart
 lib/src/api_util.dart
 lib/src/auth/api_key_auth.dart
@@ -177,6 +185,12 @@ lib/src/model/stop_point_proposal_input_dto.dart
 lib/src/model/stop_point_proposal_list_response_dto_output.dart
 lib/src/model/stop_point_proposal_list_response_dto_output_items_inner.dart
 lib/src/model/stop_point_proposal_response_dto_output.dart
+lib/src/model/trip_input_dto.dart
+lib/src/model/trip_list_response_dto_output.dart
+lib/src/model/trip_list_response_dto_output_items_inner.dart
+lib/src/model/trip_response_dto_output.dart
+lib/src/model/trip_response_dto_output_seats_inner.dart
+lib/src/model/trip_response_dto_output_stops_inner.dart
 lib/src/model/vehicle_input_dto.dart
 lib/src/model/vehicle_list_response_dto_output.dart
 lib/src/model/vehicle_list_response_dto_output_items_inner.dart
