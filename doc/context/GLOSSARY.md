@@ -42,6 +42,8 @@ Rules:
 | Trip                   | Chuyến xe                  | A concrete operating instance of a Route on a specific date / time, served by a Vehicle and crew.     |
 | TripStop               | Điểm dừng của chuyến       | An ordered stop within a Trip.                                                                        |
 | TripSeat               | Ghế của chuyến             | A seat allocation for a specific Trip, with its own status lifecycle.                                 |
+| Online sale cutoff     | Thời điểm ngừng bán online | Minutes before a Trip's departure after which online sale stops (AS-20); set per Trip in v1 (`onlineSaleCutoffMinutes`, default 60). |
+| Sale lock              | Khóa / tạm dừng bán        | Trip status `LOCKED`: hidden from search, no new hold / booking; the Operator can reopen it (FR-OPS-10). Pausing and locking are the same state in v1. |
 | Fare / FareRule        | Giá vé / quy tắc giá vé    | A route's price table (one per route in v1); each FareRule prices a vehicle type × seat type × optional departure-time window (BR-41). A Trip's seat price follows its route and assigned vehicle's type. |
 | Booking                | Đơn đặt vé                 | A purchase order placed by User or Guest; may contain one or more Tickets and a policy snapshot.      |
 | PassengerInfo          | Thông tin hành khách       | Per-passenger information captured in a Booking.                                                      |

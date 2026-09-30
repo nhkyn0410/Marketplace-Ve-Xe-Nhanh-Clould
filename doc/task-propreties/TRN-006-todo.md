@@ -4,11 +4,11 @@
 > **Dependency:** TASK-TRN-005 (fare) — nhánh `TASK-TRN-006` tách từ nhánh `TASK-TRN-005` (chưa merge `develop`; thứ tự merge: TRN-003 → TRN-005 → TRN-006).
 > **Mở khóa:** TASK-TRN-004 (search chỉ chuyến đang mở bán), TASK-TRN-007 (lịch lặp), TASK-BTP-001 (giữ ghế: chuyến mở bán + ghế không `BLOCKED`), TASK-TRN-008 (đổi chuyến đã bán vé).
 
-## Trạng thái (30/09/2026) — ⏸ **CHỜ KHANH CHỐT Q1–Q8**
+## Trạng thái (30/09/2026) — 🔨 **ĐANG TRIỂN KHAI**
 
 - ✅ Tạo nhánh `TASK-TRN-006`; đối chiếu SDLC. SDLC có danh sách trạng thái (§17.3/§17.4) và điều kiện mở bán (BR-39) nhưng **chưa có**: bảng chuyển trạng thái, "tạm dừng" khác "khóa" thế nào, nơi cấu hình thời điểm ngừng bán online / cửa sổ đón, endpoint, audit cho đổi trạng thái / khóa ghế.
 - 📝 Q5: Khanh lưu ý "hệ thống quầy" chưa có trong tài liệu nào → ghi chú tạm ở Q5 (30/09/2026). Các ý khác của Q5 và Q1–Q4, Q6–Q8 vẫn chờ chốt.
-- ⏸ **Chưa code** tới khi Khanh chốt Q. Chốt xong → **đồng bộ mọi tài liệu nhắc tới quy tắc bị đổi trước khi code** (bài học TRN-003/005).
+- ✅ Khanh chốt **Q1–Q8 theo khuyến nghị** (30/09/2026). **Đồng bộ tài liệu trước khi code**: SRS v1.31 (`FR-OPS-10`, `AS-20`, `BR-39`, `UC-14` bước 6, §17.3 `LOCKED`), GLOSSARY (Online sale cutoff, Sale lock), LLD v0.12 (§8 chuyển trạng thái, §9 audit), DB v0.18 (§7 `trips`, `trip_seats`), API v0.16 (§6.2 `reasons`, §7.3 hai route mới + body chuyến), Security v0.13, Test plan v0.9 (`TC-TRN-004..007`), file 11 v0.29 (**cửa sổ đón khách → EMP-002**).
 
 ---
 
@@ -33,7 +33,16 @@
 
 ---
 
-## Câu hỏi cần Khanh chốt
+## Quyết định (Khanh chốt Q1–Q8 theo khuyến nghị, 30/09/2026)
+
+Toàn bộ phương án **khuyến nghị** bên dưới được chọn. Chi tiết hiện thực (khớp API v0.16):
+
+- Mã lý do mở bán thêm `SEAT_PRICE_ZERO` (tách khỏi `SEAT_PRICE_MISSING` cho Owner biết sửa gì).
+- `onlineSaleCutoffMinutes` **bắt buộc** trong body POST/PUT (quy ước TRN-003: PUT thay toàn bộ phải gửi đủ trường, tránh PUT thiếu trường âm thầm đưa về mặc định); DB mặc định 60 cho chuyến cũ, UI gợi ý 60.
+- Chuyển sang chính trạng thái hiện tại → 409 như chuyển sai bảng.
+- Lỗi cần nhiều lý do dùng member mở rộng RFC 7807 `reasons: string[]` (API §6.2).
+
+### Câu hỏi đã chốt (giữ để tra cứu)
 
 ### Q1 — "Tạm dừng bán" và "khóa bán" có khác nhau không?
 

@@ -31,6 +31,7 @@
 | v0.10     | 30/09/2026 | AI Agent       | §5 Passenger: làm rõ không có mật khẩu / luồng reset, khớp SRS v1.25 (A1). Giữ trạng thái Review. |
 | v0.11     | 30/09/2026 | AI Agent       | **TASK-TRN-003** (Khanh duyệt Q5): §7 thêm dòng Trip — quyền `trip:manage` chỉ Operator Owner trong tenant; Employee/Admin để task sau. Giữ trạng thái Review. |
 | v0.12     | 30/09/2026 | AI Agent       | **TASK-TRN-005** (Khanh duyệt Q5): §7 dòng Trip thêm bảng giá — dùng lại quyền `trip:manage` (Owner). Lịch sử giá đọc từ Mongo `audit_event`: kiểm bảng giá thuộc tenant ở Postgres trước, rồi lọc `operatorId` + `targetId`. Giữ trạng thái Review. |
+| v0.13     | 30/09/2026 | AI Agent       | **TASK-TRN-006** (Khanh duyệt Q7): §7 dòng Trip thêm mở bán / khóa / hủy chuyến và khóa ghế thủ công — dùng lại `trip:manage` (Owner); Employee không khóa ghế ở v1. Hủy bắt buộc lý do; đổi trạng thái ghi audit trong transaction. Giữ trạng thái Review. |
 
 ---
 
@@ -159,7 +160,7 @@ RBAC 8-role hardcoded enum v1 (Anonymous / Passenger / OperatorOwner / Driver / 
 | Cancel/refund request    | Vé / booking đã xác minh, theo policy | Vé của mình | Vé thuộc Operator theo policy | Không                  | Có                     |
 | Vehicle/SeatMap          | Không              | Không       | Có trong tenant               | Xem nếu được phân công | Giám sát/toàn hệ thống |
 | Route/StopPoint riêng/đề xuất | Không         | Không       | Có trong tenant (`route:manage`, Owner) | Xem theo chuyến được phân công (task sau) | Duyệt đề xuất, quản lý catalog (ADM-001) |
-| Trip (tạo/sửa chuyến nháp), bảng giá (fare) | Không | Không  | Có trong tenant (`trip:manage`, Owner) | Xem / cập nhật trạng thái chuyến được phân công (EMP-001/002) | Giám sát, khoá khi vi phạm (task Admin sau) |
+| Trip (tạo/sửa chuyến nháp, mở bán / khóa / hủy, khóa ghế thủ công), bảng giá (fare) | Không | Không  | Có trong tenant (`trip:manage`, Owner) | Xem / cập nhật trạng thái chuyến được phân công (EMP-001/002) | Giám sát, khoá khi vi phạm (task Admin sau) |
 | Check-in                 | Không              | Không       | Xem kết quả                   | Có theo assignment     | Giám sát               |
 | KYC Operator             | Không              | Không       | Người đại diện: hồ sơ đăng ký qua link (chưa có tài khoản); Owner: cập nhật giấy tờ sau khi duyệt                | Không                  | Duyệt/quản lý          |
 | Policy/commission/payout | Không              | Không       | Xem phần liên quan            | Không                  | Cấu hình               |

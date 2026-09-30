@@ -30,6 +30,7 @@
 | v0.9      | 30/09/2026 | AI Agent       | **TASK-TRN-003:** §5 nhóm Trip & Inventory — TripSeat do `TripService` trong module `trip/` quản lý (sinh ghế từ SeatMap lúc gắn xe), bỏ module `trip-seat/` / `TripSeatService` riêng cho khớp code; BR-14 giữ bằng ràng buộc EXCLUDE ở DB, không có thời gian đệm quay đầu (Q1). Giữ trạng thái Review. |
 | v0.10     | 30/09/2026 | AI Agent       | **TASK-TRN-005** (Khanh chốt Q1 = PA1, Q4 = Mongo): `FareService` — mỗi tuyến một bảng giá, rule giá tuyệt đối theo loại xe × loại chỗ × khung giờ khởi hành, rule cụ thể hơn thắng (có khung giờ > không; đúng loại xe > mọi loại; đúng loại chỗ > mọi loại); giá ghế của chuyến tính khi đọc theo loại xe đang gắn. §audit thêm dòng "Tạo/sửa bảng giá": `audit_event` ghi trong transaction Postgres trước commit, đồng thời là lịch sử giá BR-40. Giữ trạng thái Review. |
 | v0.11     | 30/09/2026 | AI Agent       | **TASK-TRN-005 (review):** §9 dòng audit bảng giá — ghi trong transaction có giới hạn 2 giây ở driver (CSOT `timeoutMS`), Mongo chưa kết nối thì từ chối ngay (không xếp hàng), lỗi → 503. Giữ trạng thái Review. |
+| v0.12     | 30/09/2026 | AI Agent       | **TASK-TRN-006** (Khanh chốt Q1–Q8): §8 bảng chuyển trạng thái Trip v1 của Operator + khóa ghế thủ công; §9 thêm audit đổi trạng thái chuyến (trong transaction) và khóa / mở ghế (sau commit, best-effort). Giữ trạng thái Review. |
 
 ---
 
@@ -268,8 +269,8 @@ Error response theo RFC 7807 Problem Details (`application/problem+json`) với 
 
 | State group | Nguồn chuẩn               | LLD cần chốt                                         |
 | ----------- | ------------------------- | ---------------------------------------------------- |
-| Trip        | SRS §17.1 / DOMAIN-MAP §5 | Transition hợp lệ, actor được phép đổi state         |
-| Seat        | SRS §17.2                 | Redis hold + TripSeat status, block/manual inventory |
+| Trip        | SRS §17.1 / DOMAIN-MAP §5 | Transition hợp lệ, actor được phép đổi state. **v1 Operator (TRN-006):** `DRAFT → OPEN_FOR_SALE` (đủ BR-39, trả 422 kèm mọi lý do); `OPEN_FOR_SALE ↔ LOCKED` (mở lại kiểm lại BR-39); `OPEN_FOR_SALE / LOCKED → DRAFT` (thu hồi nháp, chưa có vé); `DRAFT / OPEN_FOR_SALE / LOCKED → CANCELLED` (lý do bắt buộc, chưa có vé — có vé ở TRN-008). `SOLD_OUT` do bán hết (BTP); `BOARDING`… do Employee. Khoá dòng chuyến + `updateMany` có điều kiện `status` chống đua |
+| Seat        | SRS §17.2                 | Redis hold + TripSeat status, block/manual inventory. **v1 (TRN-006):** Operator khóa / mở theo lô `AVAILABLE ↔ BLOCKED` (ghế đang giữ / đã bán → 409) khi chuyến `DRAFT` / `OPEN_FOR_SALE` / `LOCKED`; đổi xe giữ ghế `BLOCKED` theo `seat_code`, sơ đồ mới thiếu ghế đã khóa → 409 |
 | Booking     | SRS §17.3                 | Transition khi payment success/fail/expire/refund    |
 | Ticket      | SRS §17.4                 | Transition khi issue/check-in/no-show/refund         |
 | Payment     | SRS §17.5                 | Callback idempotency và reconciliation               |
@@ -292,6 +293,8 @@ Sự kiện nhạy cảm ghi vào Mongo `audit_event` (cluster RIÊNG, append-on
 | Đổi policy/commission/payout   | Có             | before/after, effective date, actor                |
 | Đổi trip đã có vé bán          | Có             | tripId, affected bookings, reason                  |
 | Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit, giới hạn 2 giây ở driver Mongo (lỗi / chậm / chưa kết nối → không đổi giá, 503; server Mongo tự huỷ lệnh quá hạn nên không có dòng lịch sử "ma"); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
+| Đổi trạng thái chuyến (mở bán / khóa / mở lại / thu hồi nháp / hủy) | Có — `audit_event` ghi **trong** transaction, giới hạn 2 giây như bảng giá (lỗi → không đổi, 503) | tripId, operatorId, actor, trạng thái trước / sau, reason (hủy bắt buộc) |
+| Khóa / mở ghế thủ công (đa kênh, BR-42) | Có — ghi **sau commit, best-effort**: Mongo lỗi không được chặn khóa ghế (khóa ghế là để chống overbooking) | tripId, operatorId, actor, seatCodes, trạng thái đích, ghi chú |
 | Khóa/mở khóa tài khoản         | Có             | target actor, actor thực hiện, reason              |
 | Confirm payout / nhập bank ref | Có             | adminId, payoutId, operatorId, amount, bank ref    |
 | Điều chỉnh điểm loyalty        | Có             | adminId, userId, points (+/−), reason, số dư trước / sau |
