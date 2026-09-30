@@ -98,10 +98,10 @@ Chọn **P** nếu Khanh muốn lịch sử giá vẫn xem/sửa giá được k
 
 - [x] #0 Chốt Q2, Q3, Q5, Q6, Q7; đồng bộ SRS BR-41, GLOSSARY, file 11 (TRN-005 + ADM-001).
 - [x] #1 [TRN-005.1] Chốt Q1 + Q4; đồng bộ SRS, GLOSSARY, HLD, LLD, DB, API, Security, Test plan, file 11 — đã rà mọi tài liệu nhắc tới fare (bài học TRN-003).
-- [ ] #2 [TRN-005.2] Schema + migration + RLS.
-- [ ] #3 [TRN-005.3] Module `fare/` + API + tính giá ghế trong chi tiết chuyến.
-- [ ] #4 [TRN-005.4] OpenAPI + client TS/Dart.
-- [ ] #5 [TRN-005.5] Test bắt buộc: money (BIGINT, rule nào thắng, biên khung giờ), tenant-RLS/IDOR, lịch sử append-only.
+- [x] #2 [TRN-005.2] Schema + migration `20260930110000_add_fare` + RLS — `migrate diff` rỗng. Ghi chú: Postgres không cho ép `enum::text` trong EXCLUDE (không IMMUTABLE) → dùng `CASE` đổi loại chỗ sang số; thêm giá trị vào `SeatType` thì phải sửa hai ràng buộc.
+- [x] #3 [TRN-005.3] Module `fare/` + API + giá ghế trong chi tiết chuyến; `AuditService.listAuditEvents`; `audit/audit.testing.ts` (luật ESLint cấm Mongoose ngoài `audit/`, kể cả file test).
+- [x] #4 [TRN-005.4] OpenAPI (+5 operation, +5 schema, `TripResponse` thêm `price`) + client TS/Dart; phép so CI Contract khớp.
+- [x] #5 [TRN-005.5] Test: 71/71 file, **835/835** test, 0 skip (Postgres/Redis/Mongo thật, role app); mutation 3/3 (EXCLUDE, RLS, nuốt lỗi audit) đỏ đúng chỗ.
 - [ ] #6 [TRN-005.6] Review + CI + màn Operator OS.
 
 ## Rủi ro phải test chủ động
