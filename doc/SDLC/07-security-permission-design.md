@@ -25,6 +25,7 @@
 | v0.4      | 01/06/2026 | AI Agent       | **Sprint 5 Rework** — bake **ADR-017/019/020 (Khanh re-confirm CRITICAL 01/06/2026)** + ADR-011/018. §5 auth: Better Auth 3-namespace + Hybrid token (JWT 15min + opaque refresh 30d rotation/family) + §5.2 MFA TOTP + §5.3 OAuth Google/FB/Apple PKCE. §6 TenantGuard + Postgres RLS. §8 payout manual confirm + maker-checker (ADR-022). §9 KYC R2 private presigned (ADR-018) + payment PCI SAQ-A (ADR-019) + cross-border PII. §11 webhook HMAC + OAuth/refresh-reuse threat + SQL injection (Prisma). **Đóng SEC-OQ-01/02/04/06** (per ADR-017/018); refine SEC-OQ-05/07; thêm SEC-OQ-08 (OAuth linking). |
 | v0.5      | 25/09/2026 | AI Agent       | **Hiện thực hóa phần Web của ADR-017 qua TASK-OQ-05/TASK-IAM-006:** bỏ defer cookie; chốt cookie host-only, signed double-submit CSRF, strict Origin/CORS allowlist, dual transport tường minh và chống credential ambiguity. Giữ JSON/Bearer cho Mobile; không thay đổi trạng thái Approved. |
 | v0.6      | 26/09/2026 | AI Agent       | §7 thêm dòng Route/StopPoint theo SRS permission matrix (TASK-TRN-002, Khanh duyệt Q6): quyền `route:manage` chỉ Operator Owner trong tenant. Giữ trạng thái Approved, không tự promote. |
+| v0.7      | 27/09/2026 | AI Agent       | **TASK-IAM-006 (Khanh chốt):** §5 tách Owner / nhân viên (nhân viên `{slug}/nv.{tên}` qua cổng riêng, chỉ Bearer); §5.1 ràng origin ↔ scope phiên (M1 security-auditor) với env `OPERATOR_WEB_ORIGINS`/`ADMIN_WEB_ORIGINS`, làm rõ vai trò HMAC của CSRF token. Không đổi trạng thái Approved. |
 
 ---
 
@@ -67,7 +68,7 @@ Tài liệu này mô tả thiết kế bảo mật và phân quyền cho hệ th
 
 ## 4. Actor và trust boundary
 
-Identity 3 namespace tách biệt (ADR-017): Passenger=Email; Operator-side=`{slug}/{username}`; Platform-side=`platform/{username}`.
+Identity 3 namespace tách biệt (ADR-017): Passenger=Email; Operator-side=Owner `{slug}/{username}` (cổng `/auth/operator/login`) và nhân viên `{slug}/nv.{tên}` (cổng riêng `/auth/employee/login`, chỉ Bearer — amend 27/09/2026, TASK-IAM-006); Platform-side=`platform/{username}`. Sai cổng trả cùng lỗi như sai mật khẩu.
 
 | Actor             | Trust level          | Boundary                                        |
 | ----------------- | -------------------- | ----------------------------------------------- |
@@ -87,7 +88,8 @@ Auth library = **Better Auth** + custom NestJS adapter (ADR-017).
 | Actor               | Cơ chế                                                                | Rule                                                                         |
 | ------------------- | --------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Passenger (User)    | Email + OTP (Resend) primary; hoặc OAuth Google/Facebook/Apple (PKCE) | Self-register; reset qua email; account linking email-match                  |
-| Operator / Employee | `{operatorSlug}/{username}` + password; closed enrollment             | Không public/OAuth; Operator quản lý trạng thái + assignment scope           |
+| Operator (Owner)    | `{operatorSlug}/{username}` + password; closed enrollment; cấm tiền tố `nv.` | Không public/OAuth; TOTP bắt buộc; web cookie hoặc Bearer                    |
+| Employee            | `{operatorSlug}/nv.{tên}` + password (Owner cấp); cổng `/auth/employee/login` | Không public/OAuth; chỉ Bearer (app Nhân viên); Operator quản lý trạng thái + assignment scope |
 | Admin / Platform    | `platform/{username}` + password; closed enrollment                   | TOTP mandatory; không public/OAuth                                           |
 | Guest               | Guest session, không login                                            | Search/hold/book/pay/lookup; email/OTP verify cho thao tác nhạy cảm + lookup |
 
@@ -105,7 +107,7 @@ Auth library = **Better Auth** + custom NestJS adapter (ADR-017).
 
 Cookie Web là host-only, không khai `Domain`: access `SameSite=Lax`, path `/v1`, 15 phút; refresh `SameSite=Strict`, path `/v1/auth/refresh`, 30 ngày; `Secure` bắt buộc staging/production và chỉ được false trên local HTTP. Mọi lần xóa cookie phải dùng đúng tên/path/flags đã cấp.
 
-CSRF dùng signed double-submit `vxn_csrf` + header `X-CSRF-Token`. Token được cấp/khôi phục qua `GET /v1/auth/csrf`, rotate khi session được cấp/refresh/đổi mật khẩu và clear khi logout/current family bị revoke. Mọi unsafe method dùng cookie bắt buộc token hợp lệ **và** `Origin` thuộc exact allowlist; Bearer mode không dùng CSRF. Request đồng thời mang Bearer và access cookie bị từ chối `AUTH_TRANSPORT_AMBIGUOUS` thay vì chọn ngầm.
+CSRF dùng signed double-submit `vxn_csrf` + header `X-CSRF-Token`. Token được cấp/khôi phục qua `GET /v1/auth/csrf`, rotate khi session được cấp/refresh/đổi mật khẩu và clear khi logout/current family bị revoke. Mọi unsafe method dùng cookie bắt buộc token hợp lệ **và** `Origin` thuộc exact allowlist; Bearer mode không dùng CSRF. Request đồng thời mang Bearer và access cookie bị từ chối `AUTH_TRANSPORT_AMBIGUOUS` thay vì chọn ngầm. **Ràng origin ↔ scope** (TASK-IAM-006, M1): origin khai theo app (`OPERATOR_WEB_ORIGINS` → scope `operator`, `ADMIN_WEB_ORIGINS` → `platform`); phiên cookie gọi từ origin của app khác scope bị `403 AUTH_ORIGIN_FORBIDDEN` (kể cả GET, login và refresh — refresh kiểm trước khi xoay, không xoá cookie), nên XSS ở một app không mượn được phiên app kia trong cùng trình duyệt. HMAC của CSRF token chỉ chặn token tự bịa (ai cũng xin được token qua `/auth/csrf`); lớp chặn chính là Origin allowlist + header tuỳ biến cần preflight.
 
 ### 5.2. MFA (ADR-017)
 

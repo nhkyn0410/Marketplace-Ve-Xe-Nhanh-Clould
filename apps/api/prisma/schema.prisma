@@ -381,7 +381,7 @@ model Ward {
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
-  province   Province           @relation(fields: [provinceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  province           Province            @relation(fields: [provinceId], references: [id], onDelete: Restrict, onUpdate: Restrict)
   stopPoints         StopPointCatalog[]
   privateStopPoints  StopPoint[]
   stopPointProposals StopPointProposal[]

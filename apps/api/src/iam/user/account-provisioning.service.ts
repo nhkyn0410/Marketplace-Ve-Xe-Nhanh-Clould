@@ -33,7 +33,8 @@ const ProvisionOperatorOwnerSchema = z.object({
   operatorSlug: z.string().trim().toLowerCase().min(3).max(64)
     .regex(/^[a-z0-9][a-z0-9-]*$/).refine((slug) => slug !== "platform"),
   displayName: z.string().trim().min(1).max(200),
-  ownerUsername: z.string().trim().min(3).max(64).regex(/^[A-Za-z0-9._-]+$/),
+  // Tiền tố `nv.` dành riêng cho nhân viên (TASK-IAM-006) — DB cũng CHECK tương tự.
+  ownerUsername: z.string().trim().min(3).max(64).regex(/^[A-Za-z0-9._-]+$/).refine((name) => !/^nv\./i.test(name)),
   contactEmail: z.string().trim().pipe(z.email().max(254)).transform((email) => email.toLowerCase()),
   reason: z.string().trim().min(3).max(500),
 });

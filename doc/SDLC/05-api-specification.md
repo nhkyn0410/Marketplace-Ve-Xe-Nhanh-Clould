@@ -28,6 +28,8 @@
 | v0.7      | 25/09/2026 | AI Agent       | **TASK-CAT-001 Q1 do Khanh duyệt:** thêm §7.6 — 5 endpoint đọc catalog công khai `/catalog/*` (provinces, wards, stop-points, vehicle-types, amenities), chỉ item `ACTIVE`. Ghi catalog vẫn ở `/admin/catalog/*` (ADM-001). Giữ trạng thái Approved, không tự promote. |
 | v0.8      | 25/09/2026 | AI Agent       | **TASK-TRN-001 Q1–Q3 do Khanh duyệt:** §7.3 tách route Vehicle/SeatMap có path param (`GET/PUT /{id}`), quyền Owner `vehicle:manage`, lỗi `VEHICLE_PLATE_CONFLICT` / `CATALOG_ITEM_UNAVAILABLE`, SeatMap mẫu dùng chung + tùy chỉnh bằng bản sao. Giữ trạng thái Approved, không tự promote. |
 | v0.9      | 26/09/2026 | AI Agent       | **TASK-TRN-002 Q1–Q8 do Khanh duyệt:** §7.3 thêm route chi tiết `/operator/routes`, `/operator/stop-points`, `/operator/stop-point-proposals` (endpoint đề xuất StopPoint mới), quyền `route:manage`, lỗi Goong 503. Giữ trạng thái Approved, không tự promote. |
+| v0.10     | 27/09/2026 | AI Agent       | **TASK-IAM-006:** §7.1 làm rõ `/auth/operator/login` là cổng chung Owner/Employee (Q4 Khanh chốt: Operator OS web v1 chỉ cho Owner, Employee báo không có dữ liệu); §7.1.1 chi tiết `/auth/refresh` hai chế độ và xóa cookie khi refresh thất bại. Không đổi trạng thái Approved. |
+| v0.11     | 27/09/2026 | AI Agent       | **TASK-IAM-006 (Khanh chốt):** §6 + §7.1 tách cổng — `/auth/operator/login` chỉ Owner, thêm `/auth/employee/login` cho nhân viên `{slug}/nv.{tên}` (chỉ Bearer), sai cổng = 401 chung; §7.1.1 liệt endpoint chỉ Bearer (employee login, OTP verify, OAuth session); §7.1.2 ràng origin ↔ scope phiên (env `OPERATOR_WEB_ORIGINS` / `ADMIN_WEB_ORIGINS` thay `CORS_ALLOWED_ORIGINS`). Không đổi trạng thái Approved. |
 
 ---
 
@@ -81,7 +83,8 @@ Identity 3 namespace tách biệt (ADR-017). Hybrid token: JWT RS256 access 15mi
 | ------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------- |
 | Guest               | Không token cho public search/detail; guest session cho hold/book/pay/lookup | Guest checkout có trong v1 (SRS/GLOSSARY)                |
 | Passenger (User)    | Email + OTP (primary) hoặc OAuth Google/Facebook/Apple (ADR-020)             | Self-register; Hybrid token                              |
-| Operator / Employee | `{operatorSlug}/{username}` + password (closed enrollment)                   | Scope theo `operatorId` + assignment; không public/OAuth |
+| Operator (Owner)    | `{operatorSlug}/{username}` + password (closed enrollment), cổng `/auth/operator/login` | Scope theo `operatorId`; không public/OAuth; cấm tiền tố `nv.` |
+| Employee            | `{operatorSlug}/nv.{tên}` + password (Owner cấp), cổng riêng `/auth/employee/login`, chỉ Bearer | Scope theo `operatorId` + assignment; không public/OAuth (TASK-IAM-006) |
 | Admin / Platform    | `platform/{username}` + password (closed enrollment)                         | TOTP mandatory; không public/OAuth                       |
 
 MFA: TOTP bắt buộc OperatorOwner / PlatformAdmin / PlatformSupport; optional Driver / TicketStaff / SupportStaff (ADR-017).
@@ -148,7 +151,8 @@ Path dưới đây tương đối với base `/v1`.
 | POST   | `/auth/otp/request`      | Passenger, Guest   | Gửi Email OTP (Resend)                    |
 | POST   | `/auth/otp/verify`       | Passenger          | Xác thực OTP + cấp token                  |
 | POST   | `/auth/oauth/{provider}` | Passenger          | OAuth Google / Facebook / Apple (ADR-020) |
-| POST   | `/auth/operator/login`   | Operator, Employee | Login `{slug}/{username}` + password; Owner nhận MFA challenge thay vì token |
+| POST   | `/auth/operator/login`   | Operator (Owner)   | Login `{slug}/{username}` + password; nhận challenge đổi mật khẩu/MFA trước khi có phiên; web + Bearer |
+| POST   | `/auth/employee/login`   | Employee           | Login `{slug}/nv.{tên}` + password cho app Nhân viên; **chỉ Bearer** (cookie → `400 AUTH_TRANSPORT_INVALID`) |
 | POST   | `/auth/platform/login`   | Admin, Platform    | Login `platform/{username}` + password; nhận MFA challenge thay vì token |
 | POST   | `/auth/mfa/verify`       | Có `challengeToken` từ login (không Bearer) | Xác thực TOTP / backup code (lần đầu = enrollment) → cấp token |
 | POST   | `/auth/password/change-required` | Có `passwordChangeToken` từ login (không Bearer) | Đổi mật khẩu tạm một lần; token TTL 5 phút; phải login lại trước MFA/token |
@@ -162,13 +166,17 @@ Path dưới đây tương đối với base `/v1`.
 
 Operator/Employee login bằng mật khẩu tạm còn hạn trả `passwordChangeRequired`, `passwordChangeToken`, `passwordChangeExpiresIn` thay vì access/refresh token hay MFA secret. Khi `credentialDeliveryPending` hoặc `status` không `ACTIVE`, login bị chặn. Challenge cấp trước reset/retry bị vô hiệu bởi `authEpoch`; lệnh đổi mật khẩu kiểm lại epoch và `ACTIVE`. Password change thành công không tự đăng nhập. V1 không hard-cap số phiên.
 
+**Owner và nhân viên dùng hai cổng riêng** (Khanh chốt 27/09/2026, amend ADR-017): `/auth/operator/login` chỉ tra `operator_accounts`, `/auth/employee/login` chỉ tra `employee_accounts`. Tài khoản đúng mật khẩu nhưng gọi sai cổng nhận cùng lỗi `401 AUTH_INVALID_CREDENTIALS` như sai mật khẩu (không lộ tài khoản, không tạo phiên). Username nhân viên bắt buộc tiền tố `nv.` (Owner đặt phần sau: 2–61 ký tự `[a-z0-9._-]`), Owner cấm tiền tố này; registry `operator_login_names` vẫn giữ tên duy nhất trong một nhà xe. Dữ liệu nghiệp vụ vẫn do RBAC/permission của từng endpoint bảo vệ.
+
 #### 7.1.1. Dual transport Web / Mobile (TASK-OQ-05 — đóng 25/09/2026)
 
 - Client chọn tường minh bằng `X-Auth-Transport: cookie | bearer`; **không sniff User-Agent**. Thiếu header = `bearer` để giữ tương thích Mobile. Giá trị khác → `400 AUTH_TRANSPORT_INVALID`.
 - Header áp dụng cho login Operator/Platform, MFA verify, đổi mật khẩu bắt buộc, refresh, logout và re-auth. Challenge `passwordChangeToken`/`challengeToken` vẫn ở JSON và web chỉ giữ trong memory; chưa cấp cookie auth trước khi hoàn tất login/MFA.
+- Endpoint **chỉ Bearer** (chưa có web cookie mode): `/auth/employee/login`, `/auth/otp/verify`, `/auth/oauth/session` — gửi `X-Auth-Transport: cookie` → `400 AUTH_TRANSPORT_INVALID` thay vì trả token thô trong body.
 - `bearer`: response token giữ nguyên `{accessToken, refreshToken, tokenType, expiresIn, refreshExpiresIn, scope, role}`; không có `Set-Cookie`.
 - `cookie`: response cấp session **không chứa** access/refresh token thô; trả metadata `{authenticated, scope, role, expiresIn, refreshExpiresIn}` và `backupCodes` đúng một lần nếu vừa enrollment MFA. CSRF token mới trả qua header `X-CSRF-Token`.
 - Protected endpoint nhận đúng một credential: `Authorization: Bearer` **hoặc** `vxn_access`. Có cả hai → `400 AUTH_TRANSPORT_AMBIGUOUS`; không có ưu tiên ngầm.
+- `/auth/refresh`: bearer mode bắt buộc `refreshToken` trong body (thiếu → 400); cookie mode đọc `vxn_refresh` và **không** gửi body token (gửi kèm → `400 AUTH_TRANSPORT_AMBIGUOUS`). Refresh cookie mode thất bại 401/403 (hết hạn, reuse, khóa, cần MFA) xóa cả ba cookie; 429/503 giữ cookie để thử lại. OpenAPI khai response login/MFA verify/refresh dạng `anyOf` (token JSON | metadata phiên web).
 
 | Cookie        | HttpOnly | Secure                              | SameSite | Path               | Domain    | Max-Age |
 | ------------- | -------- | ----------------------------------- | -------- | ------------------ | --------- | ------- |
@@ -183,7 +191,8 @@ Gửi cả `Max-Age` và `Expires`; logout/reuse/revoke current family phải x�
 - CSRF dùng **signed double-submit cookie**: web gọi `GET /auth/csrf`, nhận cookie `vxn_csrf` và body `{csrfToken}`; giữ token trong memory, gửi `X-CSRF-Token`.
 - Bắt buộc CSRF + `Origin` hợp allowlist cho mọi `POST/PUT/PATCH/DELETE` dùng cookie trong `/v1/**`, gồm login/MFA/password-change/refresh/logout/re-auth/session revoke và mutation nghiệp vụ. `GET/HEAD/OPTIONS` và Bearer mode được miễn; các method an toàn không được tạo side effect.
 - Rotate CSRF khi cấp session, refresh hoặc đổi mật khẩu thành công; clear khi logout/current family bị revoke. Thiếu/sai/cũ → `403 AUTH_CSRF_INVALID`; origin sai/thiếu ở unsafe cookie request → `403 AUTH_ORIGIN_FORBIDDEN`.
-- CORS: `credentials: true`, echo đúng exact origin từ `CORS_ALLOWED_ORIGINS`, `Vary: Origin`, tuyệt đối không `*`; `OPTIONS` không qua auth/CSRF. Cho phép `Content-Type`, `Authorization`, `X-Auth-Transport`, `X-CSRF-Token`, `X-Request-Id`, `Idempotency-Key`; expose `X-CSRF-Token`, `X-Request-Id`, `Deprecation`.
+- **Ràng origin ↔ scope phiên** (security M1, Khanh duyệt 27/09/2026): origin được khai theo từng app — `OPERATOR_WEB_ORIGINS` (scope `operator`) và `ADMIN_WEB_ORIGINS` (scope `platform`). Request mang `vxn_access` hợp lệ + `Origin` của app khác scope → `403 AUTH_ORIGIN_FORBIDDEN` (kể cả GET); login cookie mode chỉ nhận từ app đúng scope; refresh cookie mode từ origin sai scope → 403 **trước khi xoay token** và không xoá cookie. Mục đích: XSS ở một app không mượn được phiên của app kia trong cùng trình duyệt.
+- CORS: `credentials: true`, echo đúng exact origin thuộc `OPERATOR_WEB_ORIGINS` ∪ `ADMIN_WEB_ORIGINS`, `Vary: Origin`, tuyệt đối không `*`; `OPTIONS` không qua auth/CSRF. Cho phép `Content-Type`, `Authorization`, `X-Auth-Transport`, `X-CSRF-Token`, `X-Request-Id`, `Idempotency-Key`; expose `X-CSRF-Token`, `X-Request-Id`, `Deprecation`.
 - `GET /auth/me` trả `subjectId`, `scope`, `role`, `username`, `sessionId`, `accessExpiresAt`, `mfaVerified`; Operator thêm `operatorId`, `operatorSlug`. Response `no-store`, không trả access/refresh token, MFA secret hay backup code và **không tự refresh**. Web nhận 401 thì chạy đúng một refresh single-flight rồi retry `/auth/me`.
 
 ### 7.2. Marketplace

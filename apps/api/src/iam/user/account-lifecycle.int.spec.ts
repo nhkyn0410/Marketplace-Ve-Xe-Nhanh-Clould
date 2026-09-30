@@ -33,8 +33,9 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
   const epochSessionId = randomUUID();
   const slugA = `iam005-a-${tag}`;
   const slugB = `iam005-b-${tag}`;
-  const sharedUsername = `shared-${tag}`;
-  const employeeUsername = `driver-${tag}`;
+  const ownerUsername = `owner-${tag}`;
+  // TASK-IAM-006: nhân viên bắt buộc tiền tố `nv.`; cùng tên được ở hai tenant khác nhau.
+  const employeeUsername = `nv.driver-${tag}`;
   let ready = false;
 
   beforeAll(async () => {
@@ -57,14 +58,14 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
           id: ownerA,
           operatorId: tenantA,
           operatorSlug: slugA,
-          username: sharedUsername,
+          username: ownerUsername,
           passwordHash: "x",
         },
       });
       await tx.employeeAccount.createMany({
         data: [
           { id: employeeA, operatorId: tenantA, username: employeeUsername, passwordHash: "x", role: "DRIVER" },
-          { id: employeeB, operatorId: tenantB, username: sharedUsername, passwordHash: "x", role: "DRIVER" },
+          { id: employeeB, operatorId: tenantB, username: employeeUsername, passwordHash: "x", role: "DRIVER" },
         ],
       });
     });
@@ -83,27 +84,36 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
     await prisma?.$disconnect();
   });
 
-  it("Owner và Employee cùng tenant không thể lấy cùng username, nhưng tenant khác được", async () => {
+  it("nhân viên cùng tenant không trùng username, tenant khác được; tiền tố `nv.` tách Owner/nhân viên (IAM-006)", async () => {
     const employeeConflict = await rejectionText(
       prisma.withSystem((tx) =>
         tx.employeeAccount.create({
-          data: { operatorId: tenantA, username: sharedUsername, passwordHash: "x", role: "DRIVER" },
+          data: { operatorId: tenantA, username: employeeUsername, passwordHash: "x", role: "DRIVER" },
         }),
       ),
     );
     expect(employeeConflict).toMatch(/operator_login_names_pkey|P2002|unique constraint/i);
 
-    const ownerConflict = await rejectionText(
+    const employeeWithoutPrefix = await rejectionText(
       prisma.withSystem((tx) =>
-        tx.operatorAccount.create({
-          data: { operatorId: tenantA, operatorSlug: slugA, username: employeeUsername, passwordHash: "x" },
+        tx.employeeAccount.create({
+          data: { operatorId: tenantA, username: `driver-${tag}`, passwordHash: "x", role: "DRIVER" },
         }),
       ),
     );
-    expect(ownerConflict).toMatch(/operator_login_names_pkey|P2002|unique constraint/i);
+    expect(employeeWithoutPrefix).toMatch(/employee_accounts_username_employee_prefix|check constraint/i);
+
+    const ownerWithPrefix = await rejectionText(
+      prisma.withSystem((tx) =>
+        tx.operatorAccount.create({
+          data: { operatorId: tenantA, operatorSlug: slugA, username: `NV.owner-${tag}`, passwordHash: "x" },
+        }),
+      ),
+    );
+    expect(ownerWithPrefix).toMatch(/operator_accounts_username_not_employee_prefix|check constraint/i);
 
     const crossTenant = await prisma.withSystem((tx) =>
-      tx.operatorLoginName.findMany({ where: { username: sharedUsername }, select: { operatorId: true } }),
+      tx.operatorLoginName.findMany({ where: { username: employeeUsername }, select: { operatorId: true } }),
     );
     expect(crossTenant.map((row) => row.operatorId).sort()).toEqual([tenantA, tenantB].sort());
   });
@@ -137,7 +147,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
         select: { operatorId: true, username: true },
       }),
     );
-    expect(seenA.map((row) => row.username).sort()).toEqual([employeeUsername, sharedUsername].sort());
+    expect(seenA.map((row) => row.username).sort()).toEqual([employeeUsername, ownerUsername].sort());
     expect(seenA.every((row) => row.operatorId === tenantA)).toBe(true);
 
     const seenB = await prisma.withTenant(tenantB, (tx) =>
@@ -146,7 +156,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
         select: { operatorId: true, username: true },
       }),
     );
-    expect(seenB).toEqual([{ operatorId: tenantB, username: sharedUsername }]);
+    expect(seenB).toEqual([{ operatorId: tenantB, username: employeeUsername }]);
   });
 
   it("tenant không thể sửa reservation của tenant khác hoặc ghi trực tiếp registry", async () => {
@@ -158,7 +168,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account lifecycle — Postgres th�
     const direct = await rejectionText(
       prisma.withTenant(tenantA, (tx) =>
         tx.operatorLoginName.updateMany({
-          where: { operatorId: tenantA, username: sharedUsername },
+          where: { operatorId: tenantA, username: ownerUsername },
           data: { accountId: randomUUID() },
         }),
       ),

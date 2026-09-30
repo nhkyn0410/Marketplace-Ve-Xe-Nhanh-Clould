@@ -9,8 +9,13 @@ import type { Request } from "express";
 import { sessionExpired } from "../session/session.errors";
 import { SessionService } from "../session/session.service";
 import { TokenService, type VerifiedAccessToken } from "./token.service";
+import { accessCredential, type AuthTransport } from "./web/auth-transport";
 
-export type AuthenticatedRequest = Request & { user?: VerifiedAccessToken };
+export type AuthenticatedRequest = Request & {
+  user?: VerifiedAccessToken;
+  /** Credential đã dùng để xác thực: header Bearer hay cookie `vxn_access` (TASK-IAM-006). */
+  authCredentialSource?: AuthTransport;
+};
 
 const ALLOW_REVOKED_SESSION = "iam:allow-revoked-session";
 
@@ -35,10 +40,11 @@ export class AccessTokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const token = bearerToken(request.headers.authorization);
+    // Đúng một credential: Bearer (Mobile) HOẶC cookie `vxn_access` (web); cả hai → 400 ambiguous.
+    const credential = accessCredential(request);
     // Verify chữ ký TRƯỚC khi hỏi Redis: token rác không tốn lệnh Redis nào.
-    const claims = token ? await this.tokens.verifyAccessToken(token) : null;
-    if (!claims) {
+    const claims = credential ? await this.tokens.verifyAccessToken(credential.token) : null;
+    if (!credential || !claims) {
       throw sessionExpired();
     }
     const allowRevoked = this.reflector.getAllAndOverride<boolean | undefined>(
@@ -50,11 +56,7 @@ export class AccessTokenGuard implements CanActivate {
       await this.sessions.assertOperatorAccountCurrent(claims);
     }
     request.user = claims;
+    request.authCredentialSource = credential.source;
     return true;
   }
-}
-
-/** Scheme không phân biệt hoa thường (RFC 7235) — client Dart từng gửi `bearer`. */
-function bearerToken(header: string | undefined): string | undefined {
-  return /^Bearer\s+(\S+)$/i.exec(header ?? "")?.[1];
 }

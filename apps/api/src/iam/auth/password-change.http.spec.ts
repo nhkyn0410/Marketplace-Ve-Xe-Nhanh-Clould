@@ -10,6 +10,7 @@ import { SessionService } from "../session/session.service";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { TokenService } from "./token.service";
+import { WebAuthService } from "./web/web-auth.service";
 
 describe("Required password change — HTTP contract", () => {
   const changeRequiredPassword = vi.fn(async () => undefined);
@@ -23,6 +24,7 @@ describe("Required password change — HTTP contract", () => {
       { provide: APP_CONFIG, useValue: { NODE_ENV: "test" } as AppConfig },
       TokenService,
       { provide: SessionService, useValue: { assertActive: async () => undefined } },
+      WebAuthService,
     ],
   })
   class HttpTestModule {}

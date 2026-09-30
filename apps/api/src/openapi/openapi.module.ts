@@ -10,6 +10,7 @@ import { MongoHealthService } from "../database/mongo-health.service";
 import { AuthController } from "../iam/auth/auth.controller";
 import { AuthService } from "../iam/auth/auth.service";
 import { TokenService } from "../iam/auth/token.service";
+import { WebAuthService } from "../iam/auth/web/web-auth.service";
 import { PermissionGuard } from "../iam/role/permission.guard";
 import { RecentReauthGuard } from "../iam/role/recent-reauth.guard";
 import { TenantGuard } from "../iam/role/tenant.guard";
@@ -58,6 +59,8 @@ import { VehicleService } from "../vehicle/vehicle.service";
     // Dependency của AccessTokenGuard (logout, re-auth) — Nest dựng guard lúc khởi tạo module.
     { provide: TokenService, useValue: {} },
     { provide: SessionService, useValue: {} },
+    // TASK-IAM-006: AuthController/SessionController ghi cookie qua service này (scan-only thì không gọi).
+    { provide: WebAuthService, useValue: {} },
     { provide: EmployeeAccountService, useValue: {} },
     { provide: PermissionGuard, useValue: {} },
     { provide: TenantGuard, useValue: {} },

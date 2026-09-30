@@ -3,9 +3,12 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:api_client_dart/src/model/mfa_verify_web_session_response.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:api_client_dart/src/model/mfa_verify_token_response.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
+import 'package:one_of/any_of.dart';
 
 part 'mfa_verify_response_dto_output.g.dart';
 
@@ -21,37 +24,11 @@ part 'mfa_verify_response_dto_output.g.dart';
 /// * [refreshExpiresIn] 
 /// * [mfaRequired] 
 /// * [backupCodes] 
+/// * [authenticated] 
 @BuiltValue()
 abstract class MfaVerifyResponseDtoOutput implements Built<MfaVerifyResponseDtoOutput, MfaVerifyResponseDtoOutputBuilder> {
-  @BuiltValueField(wireName: r'accessToken')
-  String get accessToken;
-
-  @BuiltValueField(wireName: r'tokenType')
-  MfaVerifyResponseDtoOutputTokenTypeEnum get tokenType;
-  // enum tokenTypeEnum {  Bearer,  };
-
-  @BuiltValueField(wireName: r'expiresIn')
-  int get expiresIn;
-
-  @BuiltValueField(wireName: r'scope')
-  MfaVerifyResponseDtoOutputScopeEnum get scope;
-  // enum scopeEnum {  passenger,  operator,  platform,  };
-
-  @BuiltValueField(wireName: r'role')
-  String get role;
-
-  @BuiltValueField(wireName: r'refreshToken')
-  String get refreshToken;
-
-  @BuiltValueField(wireName: r'refreshExpiresIn')
-  int get refreshExpiresIn;
-
-  @BuiltValueField(wireName: r'mfaRequired')
-  MfaVerifyResponseDtoOutputMfaRequiredEnum get mfaRequired;
-  // enum mfaRequiredEnum {  false,  };
-
-  @BuiltValueField(wireName: r'backupCodes')
-  BuiltList<String>? get backupCodes;
+  /// Any Of [MfaVerifyTokenResponse], [MfaVerifyWebSessionResponse]
+  AnyOf get anyOf;
 
   MfaVerifyResponseDtoOutput._();
 
@@ -76,53 +53,6 @@ class _$MfaVerifyResponseDtoOutputSerializer implements PrimitiveSerializer<MfaV
     MfaVerifyResponseDtoOutput object, {
     FullType specifiedType = FullType.unspecified,
   }) sync* {
-    yield r'accessToken';
-    yield serializers.serialize(
-      object.accessToken,
-      specifiedType: const FullType(String),
-    );
-    yield r'tokenType';
-    yield serializers.serialize(
-      object.tokenType,
-      specifiedType: const FullType(MfaVerifyResponseDtoOutputTokenTypeEnum),
-    );
-    yield r'expiresIn';
-    yield serializers.serialize(
-      object.expiresIn,
-      specifiedType: const FullType(int),
-    );
-    yield r'scope';
-    yield serializers.serialize(
-      object.scope,
-      specifiedType: const FullType(MfaVerifyResponseDtoOutputScopeEnum),
-    );
-    yield r'role';
-    yield serializers.serialize(
-      object.role,
-      specifiedType: const FullType(String),
-    );
-    yield r'refreshToken';
-    yield serializers.serialize(
-      object.refreshToken,
-      specifiedType: const FullType(String),
-    );
-    yield r'refreshExpiresIn';
-    yield serializers.serialize(
-      object.refreshExpiresIn,
-      specifiedType: const FullType(int),
-    );
-    yield r'mfaRequired';
-    yield serializers.serialize(
-      object.mfaRequired,
-      specifiedType: const FullType(MfaVerifyResponseDtoOutputMfaRequiredEnum),
-    );
-    if (object.backupCodes != null) {
-      yield r'backupCodes';
-      yield serializers.serialize(
-        object.backupCodes,
-        specifiedType: const FullType(BuiltList, [FullType(String)]),
-      );
-    }
   }
 
   @override
@@ -131,91 +61,8 @@ class _$MfaVerifyResponseDtoOutputSerializer implements PrimitiveSerializer<MfaV
     MfaVerifyResponseDtoOutput object, {
     FullType specifiedType = FullType.unspecified,
   }) {
-    return _serializeProperties(serializers, object, specifiedType: specifiedType).toList();
-  }
-
-  void _deserializeProperties(
-    Serializers serializers,
-    Object serialized, {
-    FullType specifiedType = FullType.unspecified,
-    required List<Object?> serializedList,
-    required MfaVerifyResponseDtoOutputBuilder result,
-    required List<Object?> unhandled,
-  }) {
-    for (var i = 0; i < serializedList.length; i += 2) {
-      final key = serializedList[i] as String;
-      final value = serializedList[i + 1];
-      switch (key) {
-        case r'accessToken':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.accessToken = valueDes;
-          break;
-        case r'tokenType':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(MfaVerifyResponseDtoOutputTokenTypeEnum),
-          ) as MfaVerifyResponseDtoOutputTokenTypeEnum;
-          result.tokenType = valueDes;
-          break;
-        case r'expiresIn':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.expiresIn = valueDes;
-          break;
-        case r'scope':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(MfaVerifyResponseDtoOutputScopeEnum),
-          ) as MfaVerifyResponseDtoOutputScopeEnum;
-          result.scope = valueDes;
-          break;
-        case r'role':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.role = valueDes;
-          break;
-        case r'refreshToken':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(String),
-          ) as String;
-          result.refreshToken = valueDes;
-          break;
-        case r'refreshExpiresIn':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(int),
-          ) as int;
-          result.refreshExpiresIn = valueDes;
-          break;
-        case r'mfaRequired':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType(MfaVerifyResponseDtoOutputMfaRequiredEnum),
-          ) as MfaVerifyResponseDtoOutputMfaRequiredEnum;
-          result.mfaRequired = valueDes;
-          break;
-        case r'backupCodes':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(BuiltList, [FullType(String)]),
-          ) as BuiltList<String>?;
-          if (valueDes == null) continue;
-          result.backupCodes.replace(valueDes);
-          break;
-        default:
-          unhandled.add(key);
-          unhandled.add(value);
-          break;
-      }
-    }
+    final anyOf = object.anyOf;
+    return serializers.serialize(anyOf, specifiedType: FullType(AnyOf, anyOf.types.map((type) => FullType(type)).toList()))!;
   }
 
   @override
@@ -225,16 +72,10 @@ class _$MfaVerifyResponseDtoOutputSerializer implements PrimitiveSerializer<MfaV
     FullType specifiedType = FullType.unspecified,
   }) {
     final result = MfaVerifyResponseDtoOutputBuilder();
-    final serializedList = (serialized as Iterable<Object?>).toList();
-    final unhandled = <Object?>[];
-    _deserializeProperties(
-      serializers,
-      serialized,
-      specifiedType: specifiedType,
-      serializedList: serializedList,
-      unhandled: unhandled,
-      result: result,
-    );
+    Object? anyOfDataSrc;
+    final targetType = const FullType(AnyOf, [FullType(MfaVerifyTokenResponse), FullType(MfaVerifyWebSessionResponse), ]);
+    anyOfDataSrc = serialized;
+    result.anyOf = serializers.deserialize(anyOfDataSrc, specifiedType: targetType) as AnyOf;
     return result.build();
   }
 }
@@ -281,5 +122,18 @@ class MfaVerifyResponseDtoOutputMfaRequiredEnum extends EnumClass {
 
   static BuiltSet<MfaVerifyResponseDtoOutputMfaRequiredEnum> get values => _$mfaVerifyResponseDtoOutputMfaRequiredEnumValues;
   static MfaVerifyResponseDtoOutputMfaRequiredEnum valueOf(String name) => _$mfaVerifyResponseDtoOutputMfaRequiredEnumValueOf(name);
+}
+
+class MfaVerifyResponseDtoOutputAuthenticatedEnum extends EnumClass {
+
+  @BuiltValueEnumConst(wireName: r'true')
+  static const MfaVerifyResponseDtoOutputAuthenticatedEnum true_ = _$mfaVerifyResponseDtoOutputAuthenticatedEnum_true_;
+
+  static Serializer<MfaVerifyResponseDtoOutputAuthenticatedEnum> get serializer => _$mfaVerifyResponseDtoOutputAuthenticatedEnumSerializer;
+
+  const MfaVerifyResponseDtoOutputAuthenticatedEnum._(String name): super(name);
+
+  static BuiltSet<MfaVerifyResponseDtoOutputAuthenticatedEnum> get values => _$mfaVerifyResponseDtoOutputAuthenticatedEnumValues;
+  static MfaVerifyResponseDtoOutputAuthenticatedEnum valueOf(String name) => _$mfaVerifyResponseDtoOutputAuthenticatedEnumValueOf(name);
 }
 

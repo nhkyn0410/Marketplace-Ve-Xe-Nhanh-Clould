@@ -408,7 +408,7 @@ export class SessionService {
     subjectId: string,
     familyId: string,
     currentSid: string,
-  ): Promise<void> {
+  ): Promise<{ current: boolean }> {
     // DELETE cho phép token vừa tự revoke đi qua guard để retry được 204. Vì vậy service phải phân
     // biệt: caller còn active được revoke mọi device của mình; caller đã revoked chỉ được retry đúng
     // family của chính sid đó, không được dùng token chết để DoS các device khác.
@@ -437,6 +437,8 @@ export class SessionService {
       throw sessionNotFound();
     }
     await this.revokeFamily(owned.familyId, SessionRevokeReason.LOGOUT);
+    // `current` = caller vừa tự thu hồi chính family của mình → web phải xoá cookie (TASK-IAM-006).
+    return { current: caller.familyId === owned.familyId };
   }
 
   /**

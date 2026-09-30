@@ -17,6 +17,7 @@ Name | Type | Description | Notes
 **refreshExpiresIn** | **int** |  | 
 **mfaRequired** | **bool** |  | 
 **backupCodes** | **BuiltList&lt;String&gt;** |  | [optional] 
+**authenticated** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

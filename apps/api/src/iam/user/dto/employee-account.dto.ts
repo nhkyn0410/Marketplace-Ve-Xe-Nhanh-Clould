@@ -1,12 +1,16 @@
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
+// TASK-IAM-006: username nhân viên bắt buộc tiền tố `nv.` (Owner đặt phần sau) để tách khỏi Owner;
+// nhân viên đăng nhập `{slug}/nv.{tên}` qua `/auth/employee/login`. DB CHECK cùng quy tắc.
 const UsernameSchema = z
   .string()
   .trim()
-  .min(3)
   .max(64)
-  .regex(/^[A-Za-z0-9._-]+$/, "Username chỉ gồm chữ, số, dấu chấm, gạch dưới hoặc gạch ngang.");
+  .regex(
+    /^nv\.[a-z0-9._-]{2,61}$/,
+    "Username nhân viên phải bắt đầu bằng \"nv.\" rồi tới ít nhất 2 ký tự thường: chữ, số, dấu chấm, gạch dưới hoặc gạch ngang."
+  );
 const ContactEmailSchema = z.email().transform((email) => email.toLowerCase());
 const EmployeeRoleSchema = z.enum(["DRIVER", "TICKET_STAFF", "SUPPORT_STAFF"]);
 const AccountStatusSchema = z.enum(["ACTIVE", "LOCKED", "DISABLED"]);

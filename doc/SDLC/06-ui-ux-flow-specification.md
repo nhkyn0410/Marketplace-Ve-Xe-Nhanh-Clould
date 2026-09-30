@@ -24,6 +24,8 @@
 | v0.3      | 17/09/2026 | AI Agent       | §3: component lib đã chốt **Shadcn/ui + Tailwind CSS 4** cho cả 3 app web (ADR-013, Khanh chốt). |
 | v0.4      | 23/09/2026 | AI Agent       | **Viết lại §6 Passenger/Guest theo Figma** (section _Giao diện dành cho Khách hàng_, 24 frame): §6.1 danh mục 35 màn `SCR-PSG-NN` (24 Review = có frame; 11 Draft = AI bổ sung); §6.2 luồng; §6.3 mỗi màn 1 bảng 5 trạng thái (Ideal / Empty / Loading / Partial-Edge / Error) đánh dấu Review/Draft; §10.1 thêm quy tắc 5 Key UI States áp cho mọi màn §6–§9; §6.4 8 điểm Figma lệch ADR/SRS (auth mật khẩu, phương thức thanh toán, hold 15', bản đồ OSM, SMS, copy hoàn/đổi vé, loyalty, add-on). §5 IA Passenger theo nav Figma. §11 mở UX-OQ-06..09. Trạng thái doc Approved → **Review** (còn OQ ảnh hưởng code, 00a §3.2). §7–§9 chưa đổi. |
 | v0.5      | 25/09/2026 | AI Agent       | **TASK-IAM-006:** bổ sung §7/§9 state machine đăng nhập web, first-login đổi mật khẩu, TOTP, bootstrap cookie session, refresh single-flight và logout. Giữ trạng thái Review. |
+| v0.6      | 27/09/2026 | AI Agent       | **TASK-IAM-006 Q4 (Khanh chốt):** §4 Operator OS v1 chỉ cho Owner (trước ghi "Operator, Employee"); §7 thêm trạng thái "Tài khoản Employee" (chung cổng `/auth/operator/login` nên đăng nhập được → báo không có dữ liệu + thu hồi phiên) và "Sai cổng". Giữ trạng thái Review. |
+| v0.7      | 27/09/2026 | AI Agent       | **TASK-IAM-006 (Khanh chốt tách cổng):** §7 "Tài khoản nhân viên" — nhân viên có cổng/định danh riêng `{slug}/nv.{tên}`, vào Operator OS chỉ nhận lỗi chung; "Sai cổng" — phiên cổng khác bị API chặn theo origin (M1), chỉ hiện form đăng nhập; §8 định danh app Nhân viên. Giữ trạng thái Review. |
 
 ---
 
@@ -56,7 +58,7 @@ Web = Next.js 16 (ADR-013); Mobile = Flutter 2 app tách (ADR-028).
 | Kênh                              | Actor              | Mục tiêu                                                                |
 | --------------------------------- | ------------------ | ----------------------------------------------------------------------- |
 | Marketplace (Web, RSC+SSG/ISR)    | Passenger, Guest   | Search, trip detail, booking, payment, ticket lookup                    |
-| Operator OS (Web, CSR sau auth)   | Operator, Employee | Quản lý profile, vehicle, route, trip, booking, employee, finance       |
+| Operator OS (Web, CSR sau auth)   | Operator (Owner) — v1 | Quản lý profile, vehicle, route, trip, booking, employee, finance; Employee dùng `apps/employee_mobile` (xem §7) |
 | Admin (Web, CSR sau auth)         | Admin              | KYC, catalog, policy, payment, payout, dispute, report, audit           |
 | `apps/passenger_mobile` (Flutter) | Passenger          | Booking/ticket/notification/support trên mobile                         |
 | `apps/employee_mobile` (Flutter)  | Employee           | Check-in, trip status, passenger list, incident report (background geo) |
@@ -527,6 +529,8 @@ Login `{operatorSlug}/{username}` + password; Owner bắt buộc TOTP (ADR-017).
 | Password change | Mật khẩu mới + xác nhận; thành công quay lại login, không tự vào app |
 | MFA | QR/secret enrollment khi cần, TOTP hoặc backup code; backup code chỉ hiện một lần |
 | Session expired/error | Thử refresh đúng một lần; thất bại clear state và về login; giữ safe return URL nội bộ |
+| Tài khoản nhân viên | Nhân viên đăng nhập ở **cổng riêng** `/auth/employee/login` bằng `{slug}/nv.{tên}` trên app Nhân viên (amend ADR-017, Khanh chốt 27/09/2026). Nhập tài khoản nhân viên vào Operator OS → cùng lỗi "Tên đăng nhập hoặc mật khẩu không đúng." như sai mật khẩu, không có phiên. Operator OS vẫn kiểm `/auth/me` role = `OPERATOR_OWNER` làm lớp phòng thủ thứ hai |
+| Sai cổng (phiên của Admin) | Một trình duyệt chỉ giữ một phiên web vì Operator OS và Admin dùng chung host API. Phiên của cổng khác không dùng được từ đây (API trả `AUTH_ORIGIN_FORBIDDEN`) → hiện form đăng nhập kèm thông báo "không thuộc Trang quản lý nhà xe"; đăng nhập lại sẽ thay phiên cũ. Không tự đăng xuất phiên cổng kia (đối xứng §9) |
 
 | Flow            | Màn hình chính                                                           | Ghi chú                                                      |
 | --------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -542,7 +546,7 @@ Login `{operatorSlug}/{username}` + password; Owner bắt buộc TOTP (ADR-017).
 
 ## 8. Flow Employee
 
-App `apps/employee_mobile`; login `{operatorSlug}/{username}` (ADR-028/017).
+App `apps/employee_mobile`; login `{operatorSlug}/nv.{tên}` qua cổng riêng `/auth/employee/login`, chỉ Bearer (ADR-028/017, amend 27/09/2026). Owner đặt tên nhân viên với tiền tố `nv.` khi cấp tài khoản.
 
 | Flow            | Màn hình chính           | Ghi chú                                    |
 | --------------- | ------------------------ | ------------------------------------------ |
@@ -557,7 +561,7 @@ App `apps/employee_mobile`; login `{operatorSlug}/{username}` (ADR-028/017).
 
 ## 9. Flow Admin
 
-Login `platform/{username}` + password + **TOTP bắt buộc** (ADR-017). Dùng cùng bootstrap/cookie/CSRF/refresh/logout state machine của §7; Admin không có public enrollment. Chỉ render shell Admin sau khi `/auth/me` trả đúng scope `platform` và role được phép; sai namespace/role thì logout và về đúng cổng đăng nhập.
+Login `platform/{username}` + password + **TOTP bắt buộc** (ADR-017). Dùng cùng bootstrap/cookie/CSRF/refresh/logout state machine của §7; Admin không có public enrollment. Chỉ render shell Admin sau khi `/auth/me` trả đúng scope `platform` và role được phép; sai namespace/role thì về form đăng nhập Admin; phiên của Operator OS bị API chặn theo origin (`AUTH_ORIGIN_FORBIDDEN`, TASK-IAM-006 M1) nên không tự đăng xuất phiên cổng kia.
 
 | Flow                      | Màn hình chính                                                              | Ghi chú                                                                                  |
 | ------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |

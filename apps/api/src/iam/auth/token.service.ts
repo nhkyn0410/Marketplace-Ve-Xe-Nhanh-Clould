@@ -43,6 +43,9 @@ const verifiedClaimsSchema = z
     mfa: z.literal(true).optional(),
     operatorId: z.string().min(1).optional(),
     operatorSlug: z.string().min(1).optional(),
+    // jose đã bắt buộc `exp` (requiredClaims) nên token thật luôn có; giữ lại để `/auth/me` trả
+    // `accessExpiresAt` (TASK-IAM-006). Optional ở type để fixture test cũ không phải khai.
+    exp: z.number().int().positive().optional(),
   })
   .superRefine((claims, ctx) => {
     // TASK-IAM-003: role phải thuộc đúng namespace của scope, và token phía Operator phải mang đủ

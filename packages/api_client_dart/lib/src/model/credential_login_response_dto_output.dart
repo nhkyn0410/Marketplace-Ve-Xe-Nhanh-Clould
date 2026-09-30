@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 import 'package:api_client_dart/src/model/credential_token_response.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:api_client_dart/src/model/credential_web_session_response.dart';
 import 'package:api_client_dart/src/model/mfa_challenge_response.dart';
 import 'package:api_client_dart/src/model/password_change_challenge_response.dart';
 import 'package:built_value/built_value.dart';
@@ -31,9 +32,10 @@ part 'credential_login_response_dto_output.g.dart';
 /// * [passwordChangeRequired] 
 /// * [passwordChangeToken] 
 /// * [passwordChangeExpiresIn] 
+/// * [authenticated] 
 @BuiltValue()
 abstract class CredentialLoginResponseDtoOutput implements Built<CredentialLoginResponseDtoOutput, CredentialLoginResponseDtoOutputBuilder> {
-  /// Any Of [CredentialTokenResponse], [MfaChallengeResponse], [PasswordChangeChallengeResponse]
+  /// Any Of [CredentialTokenResponse], [CredentialWebSessionResponse], [MfaChallengeResponse], [PasswordChangeChallengeResponse]
   AnyOf get anyOf;
 
   CredentialLoginResponseDtoOutput._();
@@ -79,7 +81,7 @@ class _$CredentialLoginResponseDtoOutputSerializer implements PrimitiveSerialize
   }) {
     final result = CredentialLoginResponseDtoOutputBuilder();
     Object? anyOfDataSrc;
-    final targetType = const FullType(AnyOf, [FullType(CredentialTokenResponse), FullType(MfaChallengeResponse), FullType(PasswordChangeChallengeResponse), ]);
+    final targetType = const FullType(AnyOf, [FullType(CredentialTokenResponse), FullType(MfaChallengeResponse), FullType(PasswordChangeChallengeResponse), FullType(CredentialWebSessionResponse), ]);
     anyOfDataSrc = serialized;
     result.anyOf = serializers.deserialize(anyOfDataSrc, specifiedType: targetType) as AnyOf;
     return result.build();
@@ -141,5 +143,18 @@ class CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum extends EnumCla
 
   static BuiltSet<CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum> get values => _$credentialLoginResponseDtoOutputPasswordChangeRequiredEnumValues;
   static CredentialLoginResponseDtoOutputPasswordChangeRequiredEnum valueOf(String name) => _$credentialLoginResponseDtoOutputPasswordChangeRequiredEnumValueOf(name);
+}
+
+class CredentialLoginResponseDtoOutputAuthenticatedEnum extends EnumClass {
+
+  @BuiltValueEnumConst(wireName: r'true')
+  static const CredentialLoginResponseDtoOutputAuthenticatedEnum true_ = _$credentialLoginResponseDtoOutputAuthenticatedEnum_true_;
+
+  static Serializer<CredentialLoginResponseDtoOutputAuthenticatedEnum> get serializer => _$credentialLoginResponseDtoOutputAuthenticatedEnumSerializer;
+
+  const CredentialLoginResponseDtoOutputAuthenticatedEnum._(String name): super(name);
+
+  static BuiltSet<CredentialLoginResponseDtoOutputAuthenticatedEnum> get values => _$credentialLoginResponseDtoOutputAuthenticatedEnumValues;
+  static CredentialLoginResponseDtoOutputAuthenticatedEnum valueOf(String name) => _$credentialLoginResponseDtoOutputAuthenticatedEnumValueOf(name);
 }
 

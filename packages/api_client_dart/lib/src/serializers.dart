@@ -16,10 +16,13 @@ import 'package:api_client_dart/src/model/date.dart';
 
 import 'package:api_client_dart/src/model/account_mutation_response_dto_output.dart';
 import 'package:api_client_dart/src/model/amenity_list_response_dto_output.dart';
+import 'package:api_client_dart/src/model/auth_me_response_dto_output.dart';
 import 'package:api_client_dart/src/model/auth_token_response_dto_output.dart';
 import 'package:api_client_dart/src/model/credential_login_dto.dart';
 import 'package:api_client_dart/src/model/credential_login_response_dto_output.dart';
 import 'package:api_client_dart/src/model/credential_token_response.dart';
+import 'package:api_client_dart/src/model/credential_web_session_response.dart';
+import 'package:api_client_dart/src/model/csrf_token_response_dto_output.dart';
 import 'package:api_client_dart/src/model/employee_account_response_dto_output.dart';
 import 'package:api_client_dart/src/model/employee_create_dto.dart';
 import 'package:api_client_dart/src/model/employee_list_response_dto_output.dart';
@@ -31,6 +34,8 @@ import 'package:api_client_dart/src/model/message_response_dto_output.dart';
 import 'package:api_client_dart/src/model/mfa_challenge_response.dart';
 import 'package:api_client_dart/src/model/mfa_verify_dto.dart';
 import 'package:api_client_dart/src/model/mfa_verify_response_dto_output.dart';
+import 'package:api_client_dart/src/model/mfa_verify_token_response.dart';
+import 'package:api_client_dart/src/model/mfa_verify_web_session_response.dart';
 import 'package:api_client_dart/src/model/mongo_health_response_dto_output.dart';
 import 'package:api_client_dart/src/model/o_auth_init_dto.dart';
 import 'package:api_client_dart/src/model/o_auth_redirect_response_dto_output.dart';
@@ -50,7 +55,10 @@ import 'package:api_client_dart/src/model/queue_health_response_dto_output.dart'
 import 'package:api_client_dart/src/model/queue_health_response_dto_output_queues_inner.dart';
 import 'package:api_client_dart/src/model/reauth_dto.dart';
 import 'package:api_client_dart/src/model/redis_health_response_dto_output.dart';
+import 'package:api_client_dart/src/model/refresh_response_dto_output.dart';
 import 'package:api_client_dart/src/model/refresh_token_dto.dart';
+import 'package:api_client_dart/src/model/refresh_token_pair_response.dart';
+import 'package:api_client_dart/src/model/refresh_web_session_response.dart';
 import 'package:api_client_dart/src/model/register_dto.dart';
 import 'package:api_client_dart/src/model/route_input_dto.dart';
 import 'package:api_client_dart/src/model/route_input_dto_stops_inner.dart';
@@ -90,10 +98,13 @@ part 'serializers.g.dart';
 @SerializersFor([
   AccountMutationResponseDtoOutput,
   AmenityListResponseDtoOutput,
+  AuthMeResponseDtoOutput,
   AuthTokenResponseDtoOutput,
   CredentialLoginDto,
   CredentialLoginResponseDtoOutput,
   CredentialTokenResponse,
+  CredentialWebSessionResponse,
+  CsrfTokenResponseDtoOutput,
   EmployeeAccountResponseDtoOutput,
   EmployeeCreateDto,
   EmployeeListResponseDtoOutput,
@@ -105,6 +116,8 @@ part 'serializers.g.dart';
   MfaChallengeResponse,
   MfaVerifyDto,
   MfaVerifyResponseDtoOutput,
+  MfaVerifyTokenResponse,
+  MfaVerifyWebSessionResponse,
   MongoHealthResponseDtoOutput,
   OAuthInitDto,
   OAuthRedirectResponseDtoOutput,
@@ -124,7 +137,10 @@ part 'serializers.g.dart';
   QueueHealthResponseDtoOutputQueuesInner,
   ReauthDto,
   RedisHealthResponseDtoOutput,
+  RefreshResponseDtoOutput,
   RefreshTokenDto,
+  RefreshTokenPairResponse,
+  RefreshWebSessionResponse,
   RegisterDto,
   RouteInputDto,
   RouteInputDtoStopsInner,

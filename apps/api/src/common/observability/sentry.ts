@@ -40,7 +40,7 @@ export function initSentry(
   initialized = true;
 }
 
-const SENSITIVE_HEADERS = ["authorization", "cookie", "x-api-key", "x-bull-board-token"];
+const SENSITIVE_HEADERS = ["authorization", "cookie", "x-api-key", "x-bull-board-token", "x-csrf-token"];
 
 // Query param mang secret trong URL (vd. Goong `api_key=`); giữ tên param để còn debug được. Khớp cả
 // chuỗi query không có `?` đầu (span attribute `http.query` có thể ở dạng `a=1&api_key=…`).

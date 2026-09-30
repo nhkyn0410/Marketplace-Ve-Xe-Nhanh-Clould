@@ -86,13 +86,21 @@ describe("auth monitoring log shape", () => {
         { LOG_LEVEL: "info", NODE_ENV: "production", OTEL_SERVICE_NAME: "test-api" },
         "api"
       );
-      logger.info({ res: { headers: { "set-cookie": ["session=secret-cookie; HttpOnly"] } } }, "request completed");
+      logger.info(
+        {
+          req: { headers: { "x-csrf-token": "secret-csrf-in" } },
+          res: { headers: { "set-cookie": ["session=secret-cookie; HttpOnly"], "x-csrf-token": "secret-csrf-out" } }
+        },
+        "request completed"
+      );
     } finally {
       write.mockRestore();
     }
 
     const raw = chunks.join("");
     expect(raw).not.toContain("secret-cookie");
+    // TASK-IAM-006: CSRF token web (30 ngày) không được nằm trong log ở cả hai chiều.
+    expect(raw).not.toContain("secret-csrf");
     const record = JSON.parse(raw) as { res: { headers: Record<string, string> } };
     expect(record.res.headers["set-cookie"]).toBe("[Redacted]");
   });

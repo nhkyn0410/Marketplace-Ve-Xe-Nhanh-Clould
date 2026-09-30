@@ -93,6 +93,38 @@ export function passwordReuseForbidden(): AuthException {
   );
 }
 
+/** `X-Auth-Transport` khác `cookie`/`bearer`, hoặc endpoint không hỗ trợ cookie mode (API §7.1.1). */
+export function authTransportInvalid(detail = "X-Auth-Transport chỉ nhận cookie hoặc bearer."): AuthException {
+  return new AuthException(HttpStatus.BAD_REQUEST, "AUTH_TRANSPORT_INVALID", detail);
+}
+
+/** Request mang đồng thời Bearer và access cookie — không chọn ngầm credential nào (API §7.1.1). */
+export function authTransportAmbiguous(): AuthException {
+  return new AuthException(
+    HttpStatus.BAD_REQUEST,
+    "AUTH_TRANSPORT_AMBIGUOUS",
+    "Chỉ gửi một loại credential: Authorization Bearer hoặc cookie phiên.",
+  );
+}
+
+/** CSRF token thiếu, sai chữ ký, hết hạn hoặc không khớp cookie (API §7.1.2). */
+export function csrfInvalid(): AuthException {
+  return new AuthException(
+    HttpStatus.FORBIDDEN,
+    "AUTH_CSRF_INVALID",
+    "CSRF token không hợp lệ. Vui lòng tải lại trang.",
+  );
+}
+
+/** `Origin` thiếu hoặc không thuộc allowlist ở unsafe request dùng cookie (API §7.1.2). */
+export function originForbidden(): AuthException {
+  return new AuthException(
+    HttpStatus.FORBIDDEN,
+    "AUTH_ORIGIN_FORBIDDEN",
+    "Nguồn gửi yêu cầu không được phép.",
+  );
+}
+
 /** Redis chết → fail-closed (KHÔNG bypass) nhưng trả đúng 503 thay vì 500 (ADR-015). */
 export function serviceUnavailable(): AuthException {
   return new AuthException(

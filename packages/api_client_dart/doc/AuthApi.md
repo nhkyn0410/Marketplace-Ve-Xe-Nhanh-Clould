@@ -10,7 +10,10 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**authControllerChangeRequiredPassword**](AuthApi.md#authcontrollerchangerequiredpassword) | **POST** /v1/auth/password/change-required | 
+[**authControllerCsrf**](AuthApi.md#authcontrollercsrf) | **GET** /v1/auth/csrf | 
+[**authControllerEmployeeLogin**](AuthApi.md#authcontrolleremployeelogin) | **POST** /v1/auth/employee/login | 
 [**authControllerLogout**](AuthApi.md#authcontrollerlogout) | **POST** /v1/auth/logout | 
+[**authControllerMe**](AuthApi.md#authcontrollerme) | **GET** /v1/auth/me | 
 [**authControllerOauth**](AuthApi.md#authcontrolleroauth) | **POST** /v1/auth/oauth/{provider} | 
 [**authControllerOauthSession**](AuthApi.md#authcontrolleroauthsession) | **POST** /v1/auth/oauth/session | 
 [**authControllerOperatorLogin**](AuthApi.md#authcontrolleroperatorlogin) | **POST** /v1/auth/operator/login | 
@@ -26,7 +29,7 @@ Method | HTTP request | Description
 
 
 # **authControllerChangeRequiredPassword**
-> MessageResponseDtoOutput authControllerChangeRequiredPassword(passwordChangeRequiredDto)
+> MessageResponseDtoOutput authControllerChangeRequiredPassword(passwordChangeRequiredDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -36,9 +39,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final PasswordChangeRequiredDto passwordChangeRequiredDto = ; // PasswordChangeRequiredDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerChangeRequiredPassword(passwordChangeRequiredDto);
+    final response = api.authControllerChangeRequiredPassword(passwordChangeRequiredDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerChangeRequiredPassword: $e\n');
@@ -50,6 +55,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **passwordChangeRequiredDto** | [**PasswordChangeRequiredDto**](PasswordChangeRequiredDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 
@@ -66,8 +73,8 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **authControllerLogout**
-> MessageResponseDtoOutput authControllerLogout()
+# **authControllerCsrf**
+> CsrfTokenResponseDtoOutput authControllerCsrf()
 
 
 
@@ -78,10 +85,10 @@ import 'package:api_client_dart/api.dart';
 final api = ApiClientDart().getAuthApi();
 
 try {
-    final response = api.authControllerLogout();
+    final response = api.authControllerCsrf();
     print(response);
 } on DioException catch (e) {
-    print('Exception when calling AuthApi->authControllerLogout: $e\n');
+    print('Exception when calling AuthApi->authControllerCsrf: $e\n');
 }
 ```
 
@@ -90,7 +97,128 @@ This endpoint does not need any parameter.
 
 ### Return type
 
+[**CsrfTokenResponseDtoOutput**](CsrfTokenResponseDtoOutput.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerEmployeeLogin**
+> CredentialLoginResponseDtoOutput authControllerEmployeeLogin(credentialLoginDto)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+final CredentialLoginDto credentialLoginDto = ; // CredentialLoginDto | 
+
+try {
+    final response = api.authControllerEmployeeLogin(credentialLoginDto);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->authControllerEmployeeLogin: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **credentialLoginDto** | [**CredentialLoginDto**](CredentialLoginDto.md)|  | 
+
+### Return type
+
+[**CredentialLoginResponseDtoOutput**](CredentialLoginResponseDtoOutput.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerLogout**
+> MessageResponseDtoOutput authControllerLogout(xAuthTransport, xCSRFToken)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
+
+try {
+    final response = api.authControllerLogout(xAuthTransport, xCSRFToken);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->authControllerLogout: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
+
+### Return type
+
 [**MessageResponseDtoOutput**](MessageResponseDtoOutput.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **authControllerMe**
+> AuthMeResponseDtoOutput authControllerMe()
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getAuthApi();
+
+try {
+    final response = api.authControllerMe();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AuthApi->authControllerMe: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**AuthMeResponseDtoOutput**](AuthMeResponseDtoOutput.md)
 
 ### Authorization
 
@@ -184,7 +312,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerOperatorLogin**
-> CredentialLoginResponseDtoOutput authControllerOperatorLogin(credentialLoginDto)
+> CredentialLoginResponseDtoOutput authControllerOperatorLogin(credentialLoginDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -194,9 +322,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final CredentialLoginDto credentialLoginDto = ; // CredentialLoginDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerOperatorLogin(credentialLoginDto);
+    final response = api.authControllerOperatorLogin(credentialLoginDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerOperatorLogin: $e\n');
@@ -208,6 +338,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **credentialLoginDto** | [**CredentialLoginDto**](CredentialLoginDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 
@@ -225,7 +357,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerPlatformLogin**
-> CredentialLoginResponseDtoOutput authControllerPlatformLogin(credentialLoginDto)
+> CredentialLoginResponseDtoOutput authControllerPlatformLogin(credentialLoginDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -235,9 +367,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final CredentialLoginDto credentialLoginDto = ; // CredentialLoginDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerPlatformLogin(credentialLoginDto);
+    final response = api.authControllerPlatformLogin(credentialLoginDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerPlatformLogin: $e\n');
@@ -249,6 +383,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **credentialLoginDto** | [**CredentialLoginDto**](CredentialLoginDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 
@@ -266,7 +402,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerReauth**
-> MessageResponseDtoOutput authControllerReauth(reauthDto)
+> MessageResponseDtoOutput authControllerReauth(reauthDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -276,9 +412,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final ReauthDto reauthDto = ; // ReauthDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerReauth(reauthDto);
+    final response = api.authControllerReauth(reauthDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerReauth: $e\n');
@@ -290,6 +428,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **reauthDto** | [**ReauthDto**](ReauthDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 
@@ -307,7 +447,7 @@ Name | Type | Description  | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerRefresh**
-> AuthTokenResponseDtoOutput authControllerRefresh(refreshTokenDto)
+> RefreshResponseDtoOutput authControllerRefresh(refreshTokenDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -317,9 +457,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final RefreshTokenDto refreshTokenDto = ; // RefreshTokenDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerRefresh(refreshTokenDto);
+    final response = api.authControllerRefresh(refreshTokenDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerRefresh: $e\n');
@@ -331,10 +473,12 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **refreshTokenDto** | [**RefreshTokenDto**](RefreshTokenDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 
-[**AuthTokenResponseDtoOutput**](AuthTokenResponseDtoOutput.md)
+[**RefreshResponseDtoOutput**](RefreshResponseDtoOutput.md)
 
 ### Authorization
 
@@ -430,7 +574,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **authControllerVerifyMfa**
-> MfaVerifyResponseDtoOutput authControllerVerifyMfa(mfaVerifyDto)
+> MfaVerifyResponseDtoOutput authControllerVerifyMfa(mfaVerifyDto, xAuthTransport, xCSRFToken)
 
 
 
@@ -440,9 +584,11 @@ import 'package:api_client_dart/api.dart';
 
 final api = ApiClientDart().getAuthApi();
 final MfaVerifyDto mfaVerifyDto = ; // MfaVerifyDto | 
+final String xAuthTransport = xAuthTransport_example; // String | `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile).
+final String xCSRFToken = xCSRFToken_example; // String | Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit).
 
 try {
-    final response = api.authControllerVerifyMfa(mfaVerifyDto);
+    final response = api.authControllerVerifyMfa(mfaVerifyDto, xAuthTransport, xCSRFToken);
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AuthApi->authControllerVerifyMfa: $e\n');
@@ -454,6 +600,8 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **mfaVerifyDto** | [**MfaVerifyDto**](MfaVerifyDto.md)|  | 
+ **xAuthTransport** | **String**| `cookie` (web: phiên trong cookie httpOnly) hoặc `bearer` (mặc định, Mobile). | [optional] 
+ **xCSRFToken** | **String**| Bắt buộc ở cookie mode: token từ `GET /auth/csrf` (signed double-submit). | [optional] 
 
 ### Return type
 

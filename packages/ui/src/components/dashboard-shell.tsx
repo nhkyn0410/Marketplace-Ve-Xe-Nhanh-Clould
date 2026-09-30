@@ -17,11 +17,13 @@ type DashboardShellProps = {
   /** Nhãn phụ màu saffron cạnh tên cổng, vd "Hệ thống". */
   badge?: string;
   navGroups: NavGroup[];
+  /** Khối tài khoản (tên + đăng xuất) ở chân sidebar và đầu trang mobile. */
+  account?: ReactNode;
   children: ReactNode;
 };
 
 /** Khung Operator OS / Admin: sidebar cố định trên desktop, menu trượt trên mobile. */
-export function DashboardShell({ title, badge, navGroups, children }: DashboardShellProps) {
+export function DashboardShell({ title, badge, navGroups, account, children }: DashboardShellProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
@@ -29,6 +31,7 @@ export function DashboardShell({ title, badge, navGroups, children }: DashboardS
       <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col overflow-y-auto border-r bg-card lg:flex">
         <Brand title={title} badge={badge} />
         <SidebarNav navGroups={navGroups} />
+        {account && <div className="mt-auto border-t p-3">{account}</div>}
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
@@ -46,6 +49,7 @@ export function DashboardShell({ title, badge, navGroups, children }: DashboardS
             </SheetContent>
           </Sheet>
           <span className="truncate text-sm font-semibold text-vxn-ink">{title}</span>
+          {account && <div className="ml-auto">{account}</div>}
         </header>
 
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-7">{children}</main>

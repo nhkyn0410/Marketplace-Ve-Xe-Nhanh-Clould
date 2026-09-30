@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { APP_GUARD } from "@nestjs/core";
 import { AuditModule } from "../audit/audit.module";
 import { APP_CONFIG, type AppConfig } from "../config/env.config";
 import { DatabaseModule } from "../database/database.module";
@@ -28,6 +29,8 @@ import { AccountProvisioningService } from "./user/account-provisioning.service"
 import { EmployeeAccountController } from "./user/employee-account.controller";
 import { EmployeeAccountService } from "./user/employee-account.service";
 import { TemporaryCredentialEmailLimiter } from "./user/temporary-credential-email-limiter";
+import { WebAuthService } from "./auth/web/web-auth.service";
+import { WebCsrfGuard } from "./auth/web/web-csrf.guard";
 
 /** TASK-IAM-001/002 — Better Auth + login 3-namespace + hybrid token (DOMAIN-MAP `iam/auth`, `iam/session`). */
 @Module({
@@ -57,6 +60,9 @@ import { TemporaryCredentialEmailLimiter } from "./user/temporary-credential-ema
     RefreshTokenService,
     SessionService,
     SessionCache,
+    WebAuthService,
+    // TASK-IAM-006: CSRF/Origin cho MỌI unsafe request dùng cookie trong /v1/** (kể cả route nghiệp vụ).
+    { provide: APP_GUARD, useClass: WebCsrfGuard },
   ],
   exports: [BETTER_AUTH, TokenService, SessionService, AccountProvisioningService],
 })

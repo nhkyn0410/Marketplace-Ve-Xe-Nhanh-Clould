@@ -5,6 +5,8 @@ import { Be_Vietnam_Pro } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { AppShell } from "../components/app-shell";
+import { AuthGate } from "../components/auth/auth-gate";
+import { AuthProvider } from "../lib/auth/auth-context";
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -23,7 +25,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" className={beVietnamPro.variable}>
       <body>
-        <AppShell>{children}</AppShell>
+        <AuthProvider>
+          <AuthGate>
+            <AppShell>{children}</AppShell>
+          </AuthGate>
+        </AuthProvider>
       </body>
     </html>
   );

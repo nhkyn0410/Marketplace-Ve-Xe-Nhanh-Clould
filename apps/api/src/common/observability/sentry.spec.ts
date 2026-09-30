@@ -40,7 +40,12 @@ describe("scrubSentryEvent", () => {
         url: "https://api.example.com/v1/auth/mfa/verify",
         method: "POST",
         data: { challengeToken: "challenge-secret", code: "123456" },
-        headers: { Authorization: "Bearer jwt-secret", cookie: "sid=secret", "user-agent": "vitest" }
+        headers: {
+          Authorization: "Bearer jwt-secret",
+          cookie: "sid=secret",
+          "X-CSRF-Token": "csrf-secret",
+          "user-agent": "vitest"
+        }
       }
     });
 

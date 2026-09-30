@@ -61,7 +61,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account services — Postgres thậ
         { id: foreignTenant, operatorSlug: foreignSlug, displayName: "Foreign tenant" },
       ] });
       await tx.employeeAccount.create({ data: {
-        id: foreignEmployee, operatorId: foreignTenant, username: `foreign-${tag}`,
+        id: foreignEmployee, operatorId: foreignTenant, username: `nv.foreign-${tag}`,
         passwordHash: "legacy-hash", role: "DRIVER",
       } });
     });
@@ -160,7 +160,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account services — Postgres thậ
 
   it("Owner lifecycle stays in tenant; role/reset increment durable auth_epoch", async () => {
     const created = await employees.create(owner, tenantAuthz, {
-      username: `driver-${tag}`, contactEmail: "driver@example.com", role: "DRIVER",
+      username: `nv.driver-${tag}`, contactEmail: "driver@example.com", role: "DRIVER",
       reason: "New driver",
     });
     expect(created.status).toBe("ACTIVE");
@@ -187,7 +187,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account services — Postgres thậ
   });
 
   it("concurrent Employee creates with one username leave exactly one account", async () => {
-    const username = `driver-race-${tag}`;
+    const username = `nv.driver-race-${tag}`;
     const results = await Promise.allSettled([
       employees.create(owner, tenantAuthz, {
         username, contactEmail: "driver-race-a@example.com", role: "DRIVER",
@@ -209,7 +209,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account services — Postgres thậ
   });
 
   it("Employee delivery failure remains recoverable by ID and password reset", async () => {
-    const username = `retry-driver-${tag}`;
+    const username = `nv.retry-driver-${tag}`;
     sendTemporaryPassword.mockRejectedValueOnce(new Error("provider unavailable"));
     const failure = await employees.create(owner, tenantAuthz, {
       username, contactEmail: "retry-driver@example.com", role: "DRIVER",
@@ -237,7 +237,7 @@ describe.skipIf(!url && !requireDb)("IAM-005 account services — Postgres thậ
 
   it("contact-email change satisfies DB invariants and invalidates the previous credential", async () => {
     const created = await employees.create(owner, tenantAuthz, {
-      username: `email-change-${tag}`,
+      username: `nv.email-change-${tag}`,
       contactEmail: "old-address@example.com",
       role: "DRIVER",
       reason: "New driver",

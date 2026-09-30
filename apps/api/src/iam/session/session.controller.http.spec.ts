@@ -9,12 +9,13 @@ import { APP_CONFIG, type AppConfig } from "../../config/env.config";
 import { SubjectType } from "../../database/prisma.types";
 import { configureApiRoutes } from "../../openapi/openapi";
 import { type AccessTokenClaims, TokenService } from "../auth/token.service";
+import { WebAuthService } from "../auth/web/web-auth.service";
 import { SessionController } from "./session.controller";
 import { SessionService } from "./session.service";
 
 describe("Session family routes — HTTP", () => {
   const listForSubject = vi.fn(async () => ({ items: [], nextCursor: null }));
-  const revokeOwnedFamily = vi.fn(async () => undefined);
+  const revokeOwnedFamily = vi.fn(async () => ({ current: false }));
   let app: INestApplication;
   let base: string;
   let tokens: TokenService;
@@ -36,6 +37,7 @@ describe("Session family routes — HTTP", () => {
           revokeOwnedFamily,
         },
       },
+      WebAuthService,
     ],
   })
   class HttpTestModule {}
