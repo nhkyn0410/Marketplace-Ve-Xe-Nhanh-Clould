@@ -11,7 +11,7 @@
 ## PHẦN A — Quyết định & ranh giới
 
 - [x] Q1: không có thời gian đệm quay đầu — xe rảnh ngay tại giờ đến.
-- [ ] SRS `BR-14` sửa câu chữ cho khớp Q1 — chờ Khanh xác nhận.
+- [x] SRS `BR-14` sửa câu chữ cho khớp Q1 (v1.28); HLD/LLD/DOMAIN-MAP bỏ module `trip-seat/`; Test plan thêm `TC-TRN-001..003` (bổ sung 30/09/2026 — ghi chú ở todo #1).
 - [x] Q2–Q6 theo khuyến nghị; API §7.3, DB §7, Security §7, file 11 cập nhật (giữ trạng thái Review).
 - [x] Không kéo mở bán/khoá/huỷ, fare, search, lịch lặp, sửa chuyến đã bán, Employee/Admin vào TRN-003.
 
