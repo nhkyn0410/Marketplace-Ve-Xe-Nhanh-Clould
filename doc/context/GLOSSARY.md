@@ -42,7 +42,7 @@ Rules:
 | Trip                   | Chuyến xe                  | A concrete operating instance of a Route on a specific date / time, served by a Vehicle and crew.     |
 | TripStop               | Điểm dừng của chuyến       | An ordered stop within a Trip.                                                                        |
 | TripSeat               | Ghế của chuyến             | A seat allocation for a specific Trip, with its own status lifecycle.                                 |
-| Fare / FareRule        | Giá vé / quy tắc giá vé    | Pricing rules per route, trip, seat type, segment or time window.                                     |
+| Fare / FareRule        | Giá vé / quy tắc giá vé    | Pricing rules per route, trip, seat type, segment or time window (window = trip departure time, BR-41). |
 | Booking                | Đơn đặt vé                 | A purchase order placed by User or Guest; may contain one or more Tickets and a policy snapshot.      |
 | PassengerInfo          | Thông tin hành khách       | Per-passenger information captured in a Booking.                                                      |
 | Ticket                 | Vé điện tử                 | An electronic ticket representing one passenger on one seat of one Trip; carries a QR token.          |
