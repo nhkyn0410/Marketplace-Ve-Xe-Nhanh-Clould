@@ -292,7 +292,7 @@ Sự kiện nhạy cảm ghi vào Mongo `audit_event` (cluster RIÊNG, append-on
 | Refund thủ công                | Có             | adminId, booking/payment/refund id, amount, reason |
 | Đổi policy/commission/payout   | Có             | before/after, effective date, actor                |
 | Đổi trip đã có vé bán          | Có             | tripId, affected bookings, reason                  |
-| Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit, giới hạn 2 giây ở driver Mongo (lỗi / chậm / chưa kết nối → không đổi giá, 503; server Mongo tự huỷ lệnh quá hạn nên không có dòng lịch sử "ma"); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
+| Tạo/sửa bảng giá (fare)        | Có — `audit_event` ghi **trong** transaction Postgres, trước commit, giới hạn 2 giây ở driver Mongo và không vượt phần còn lại của hạn transaction (lỗi / chậm / chưa kết nối / hết giờ → không đổi giá, 503; server Mongo tự huỷ lệnh quá hạn nên không có dòng lịch sử "ma"); cũng là lịch sử giá BR-40 | fareId, operatorId, actor, before/after toàn bộ rule |
 | Đổi trạng thái chuyến (mở bán / khóa / mở lại / thu hồi nháp / hủy) | Có — `audit_event` ghi **trong** transaction, giới hạn 2 giây như bảng giá (lỗi → không đổi, 503) | tripId, operatorId, actor, trạng thái trước / sau, reason (hủy bắt buộc) |
 | Khóa / mở ghế thủ công (đa kênh, BR-42) | Có — ghi **sau commit, best-effort**: Mongo lỗi không được chặn khóa ghế (khóa ghế là để chống overbooking) | tripId, operatorId, actor, seatCodes, trạng thái đích, ghi chú |
 | Khóa/mở khóa tài khoản         | Có             | target actor, actor thực hiện, reason              |

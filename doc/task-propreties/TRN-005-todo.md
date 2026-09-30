@@ -119,6 +119,7 @@ Chọn **P** nếu Khanh muốn lịch sử giá vẫn xem/sửa giá được k
 | code-reviewer #4 | Low | DB chỉ chặn `price >= 0`; dòng ghi thẳng DB > 2^53 làm xem bảng giá / chi tiết chuyến trả 500 | ✅ Migration `20260930120000_fare_price_cap`: CHECK `price <= 100000000` (test: vượt trần bị chặn, đúng trần được) |
 | code-reviewer #5 | Low | P2002 ở `update` cũng thành `FARE_ROUTE_CONFLICT` | ✅ Chỉ `create` đổi P2002 → 409. Giữ ánh xạ 23P01 làm chốt chặn cuối (service kiểm trước) |
 | code-reviewer nit | Nit | `CASE … ELSE 2` coi loại chỗ mới là `BED` | ✅ Test khoá `SeatType = [SEAT, BED]` — thêm loại chỗ phải sửa EXCLUDE |
+| security-auditor TRN-006 (L-1) | Low | Request xếp hàng chờ khoá dòng đã tiêu một phần hạn 5s của transaction; ghi audit thêm tối đa 2s có thể xong ở Mongo SAU khi Postgres hết hạn → dòng "ma" | ✅ `withScope` ghi tường minh hạn Prisma (chờ 2s, chạy 5s); `transactionDeadline(startedAt)` = 5s − 0,5s; `recordAuditEvent(…, { timeoutMs, deadline })` rút ngắn giới hạn theo phần còn lại, không đủ 200ms thì từ chối **trước khi ghi** (503). Fare truyền `deadline` (test: spy + audit int) |
 | code-reviewer + security-auditor I1 | Nit | `audit.testing.ts` vào `dist` | ✅ `tsconfig.build.json` loại `**/*.testing.ts` |
 | code-reviewer nit | Nit | fare ↔ trip dùng chéo `InstantSchema`, `routeUnavailable` | Giữ nguyên: không có vòng import file, chuyển sang `common/` là refactor ngoài phạm vi |
 | code-reviewer nit | Nit | Ghim `w: "majority"` cho kết nối audit | Giữ nguyên: đổi cấu hình kết nối chung của IAM; Atlas mặc định `majority` |

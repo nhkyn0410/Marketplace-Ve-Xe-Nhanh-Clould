@@ -14,6 +14,9 @@ export type SystemLogInput = Omit<SystemLog, "schemaVersion" | "createdAt"> & {
   createdAt?: Date;
 };
 
+// Dưới mức này một lần ghi Mongo lúc bình thường cũng khó kịp — coi như hết giờ.
+const MIN_BOUNDED_WRITE_MS = 200;
+
 /** Trường audit trả cho màn lịch sử — không lộ `requestId`, `traceId`, `reason`… của bản ghi gốc. */
 export type AuditHistoryItem = Pick<AuditEvent, "action" | "actorId" | "createdAt" | "before" | "after">;
 
@@ -36,9 +39,10 @@ export class AuditService {
 
   /**
    * Ghi một audit event. Có `timeoutMs` (dùng khi ghi TRONG transaction Postgres): quá hạn, Mongo chưa kết nối hoặc
-   * lỗi ghi → `AuditWriteError`, và bản ghi KHÔNG xuất hiện "về sau" khi transaction Postgres đã rollback.
+   * lỗi ghi → `AuditWriteError`, và bản ghi KHÔNG xuất hiện "về sau" khi transaction Postgres đã rollback. `deadline`
+   * (epoch ms, `transactionDeadline`) rút ngắn giới hạn theo phần còn lại của transaction; không còn đủ → lỗi, không ghi.
    */
-  async recordAuditEvent(input: AuditEventInput, options?: { timeoutMs: number }): Promise<void> {
+  async recordAuditEvent(input: AuditEventInput, options?: { timeoutMs: number; deadline?: number }): Promise<void> {
     const document = {
       ...withCorrelation(input),
       schemaVersion: 1,
@@ -56,10 +60,16 @@ export class AuditService {
     if (this.auditEventModel.db.readyState !== ConnectionStates.connected) {
       throw new AuditWriteError(new Error("Mongo audit chưa kết nối."));
     }
+    // Transaction đã tiêu gần hết hạn (vd xếp hàng chờ khoá dòng): ghi lúc này có thể xong ở Mongo SAU khi Postgres đã
+    // hết hạn → dòng audit "ma". Từ chối trước khi ghi.
+    const timeoutMs = Math.min(options.timeoutMs, (options.deadline ?? Infinity) - Date.now());
+    if (timeoutMs < MIN_BOUNDED_WRITE_MS) {
+      throw new AuditWriteError(new Error("Không còn đủ thời gian trong transaction để ghi audit."));
+    }
     try {
       // `create`/`save` của Mongoose bỏ qua `timeoutMS` và schema chặn `insertMany` (append-only) → ghi thẳng driver.
       // CSOT: driver thôi chờ chọn server / đọc socket VÀ gửi `maxTimeMS` để server tự huỷ lệnh quá hạn.
-      await this.auditEventModel.collection.insertOne(event.toObject(), { timeoutMS: options.timeoutMs });
+      await this.auditEventModel.collection.insertOne(event.toObject(), { timeoutMS: timeoutMs });
     } catch (error) {
       throw new AuditWriteError(error);
     }

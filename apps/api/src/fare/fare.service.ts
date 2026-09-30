@@ -1,7 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { AuditService, AuditWriteError } from "../audit/audit.service";
 import { catalogItemUnavailable } from "../catalog/catalog.errors";
-import { PrismaService, type DbTransaction } from "../database/prisma.service";
+import { PrismaService, transactionDeadline, type DbTransaction } from "../database/prisma.service";
 import { CatalogStatus, RouteStatus, type FareStatus, type SeatType } from "../database/prisma.types";
 import type { Authorization } from "../iam/role/authorization";
 import { requireTenant } from "../iam/role/require-tenant";
@@ -119,6 +119,7 @@ export class FareService {
     assertRulesDisjoint(input.rules);
     const row = await this.withDbConflicts(() =>
       this.prisma.withScope(db, async (tx) => {
+        const deadline = transactionDeadline(Date.now());
         const route = await tx.route.findFirst({
           where: { id: input.routeId, operatorId, status: RouteStatus.ACTIVE },
           select: { id: true },
@@ -137,7 +138,7 @@ export class FareService {
         });
         await tx.fareRule.createMany({ data: ruleRows(operatorId, fare.id, input.rules) });
         const created = (await findDetail(tx, operatorId, fare.id))!;
-        await this.recordRevision(actor, operatorId, fare.id, "fare.create", null, created);
+        await this.recordRevision(actor, operatorId, fare.id, "fare.create", null, created, deadline);
         return created;
       }),
       // Chỉ còn unique `(route_id, operator_id)`: hai request tạo bảng giá cho một tuyến cùng lúc.
@@ -156,6 +157,7 @@ export class FareService {
     assertRulesDisjoint(input.rules);
     const row = await this.withDbConflicts(() =>
       this.prisma.withScope(db, async (tx) => {
+        const deadline = transactionDeadline(Date.now());
         const [locked] = await tx.$queryRaw<{ id: string }[]>`
           SELECT id FROM fares WHERE id = ${fareId} AND operator_id = ${operatorId} FOR NO KEY UPDATE`;
         if (!locked) {
@@ -178,7 +180,7 @@ export class FareService {
         await tx.fareRule.deleteMany({ where: { fareId, operatorId } });
         await tx.fareRule.createMany({ data: ruleRows(operatorId, fareId, input.rules) });
         const after = (await findDetail(tx, operatorId, fareId))!;
-        await this.recordRevision(actor, operatorId, fareId, "fare.update", before, after);
+        await this.recordRevision(actor, operatorId, fareId, "fare.update", before, after, deadline);
         return after;
       }),
     );
@@ -231,6 +233,7 @@ export class FareService {
     action: "fare.create" | "fare.update",
     before: FareDetailRow | null,
     after: FareDetailRow,
+    deadline: number,
   ): Promise<void> {
     await this.audit.recordAuditEvent({
       actorId: actor.sub,
@@ -241,7 +244,7 @@ export class FareService {
       operatorId,
       before: before ? toSnapshot(before) : null,
       after: toSnapshot(after),
-    }, { timeoutMs: AUDIT_TIMEOUT_MS });
+    }, { timeoutMs: AUDIT_TIMEOUT_MS, deadline });
   }
 
   private async withDbConflicts<T>(work: () => Promise<T>, onUniqueConflict?: () => Error): Promise<T> {

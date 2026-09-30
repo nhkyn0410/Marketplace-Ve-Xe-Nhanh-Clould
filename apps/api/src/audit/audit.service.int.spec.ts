@@ -63,6 +63,24 @@ describe.skipIf(!mongoUrl && !requireDb)("AuditService — ghi có giới hạn 
     insertOne.mockRestore();
   });
 
+  it("hạn chót transaction: rút ngắn timeoutMS theo phần còn lại; không còn đủ thì từ chối TRƯỚC khi ghi", async () => {
+    const { audit, events } = auditOn(connection);
+    const insertOne = vi.spyOn(events.collection, "insertOne");
+    const targetId = randomUUID();
+    const operatorId = randomUUID();
+    await audit.recordAuditEvent(event(targetId, operatorId, "fare.update"), { timeoutMs: 2_000, deadline: Date.now() + 800 });
+    const [, options] = insertOne.mock.calls[0] as unknown as [unknown, { timeoutMS: number }];
+    expect(options.timeoutMS).toBeGreaterThan(200);
+    expect(options.timeoutMS).toBeLessThanOrEqual(800);
+    insertOne.mockClear();
+    await expect(
+      audit.recordAuditEvent(event(targetId, operatorId, "fare.update"), { timeoutMs: 2_000, deadline: Date.now() + 100 }),
+    ).rejects.toBeInstanceOf(AuditWriteError);
+    expect(insertOne).not.toHaveBeenCalled();
+    expect(await audit.listAuditEvents({ targetType: "fare", targetId, operatorId, actions: ["fare.update"], limit: 10 })).toHaveLength(1);
+    insertOne.mockRestore();
+  });
+
   it("sai schema là lỗi lập trình → ném nguyên, không đổi thành AuditWriteError (503)", async () => {
     const { audit } = auditOn(connection);
     const wrong = { ...event(randomUUID(), randomUUID(), "fare.update"), unexpected: true } as AuditEventInput;
