@@ -109,6 +109,8 @@ export 'package:api_client_dart/src/model/trip_list_response_dto_output_items_in
 export 'package:api_client_dart/src/model/trip_response_dto_output.dart';
 export 'package:api_client_dart/src/model/trip_response_dto_output_seats_inner.dart';
 export 'package:api_client_dart/src/model/trip_response_dto_output_stops_inner.dart';
+export 'package:api_client_dart/src/model/trip_seat_status_input_dto.dart';
+export 'package:api_client_dart/src/model/trip_status_input_dto.dart';
 export 'package:api_client_dart/src/model/vehicle_input_dto.dart';
 export 'package:api_client_dart/src/model/vehicle_list_response_dto_output.dart';
 export 'package:api_client_dart/src/model/vehicle_list_response_dto_output_items_inner.dart';

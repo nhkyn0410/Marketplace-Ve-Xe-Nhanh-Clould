@@ -99,6 +99,8 @@ doc/TripListResponseDtoOutputItemsInner.md
 doc/TripResponseDtoOutput.md
 doc/TripResponseDtoOutputSeatsInner.md
 doc/TripResponseDtoOutputStopsInner.md
+doc/TripSeatStatusInputDto.md
+doc/TripStatusInputDto.md
 doc/VehicleInputDto.md
 doc/VehicleListResponseDtoOutput.md
 doc/VehicleListResponseDtoOutputItemsInner.md
@@ -215,6 +217,8 @@ lib/src/model/trip_list_response_dto_output_items_inner.dart
 lib/src/model/trip_response_dto_output.dart
 lib/src/model/trip_response_dto_output_seats_inner.dart
 lib/src/model/trip_response_dto_output_stops_inner.dart
+lib/src/model/trip_seat_status_input_dto.dart
+lib/src/model/trip_status_input_dto.dart
 lib/src/model/vehicle_input_dto.dart
 lib/src/model/vehicle_list_response_dto_output.dart
 lib/src/model/vehicle_list_response_dto_output_items_inner.dart

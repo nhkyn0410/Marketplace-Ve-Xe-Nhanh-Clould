@@ -3832,7 +3832,7 @@
             }
           },
           "409": {
-            "description": "`TRIP_NOT_EDITABLE` (không còn nháp) / `VEHICLE_SCHEDULE_CONFLICT`.",
+            "description": "`TRIP_NOT_EDITABLE` (không còn nháp) / `VEHICLE_SCHEDULE_CONFLICT` / `TRIP_BLOCKED_SEATS_MISSING` (xe mới thiếu ghế đang khóa).",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -3843,6 +3843,228 @@
           },
           "422": {
             "description": "`ROUTE_UNAVAILABLE` / `VEHICLE_UNAVAILABLE` / `TRIP_STOP_TIMES_INVALID`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "operator-trips"
+        ]
+      }
+    },
+    "/v1/operator/trips/{tripId}/status": {
+      "put": {
+        "operationId": "TripController_changeStatus",
+        "parameters": [
+          {
+            "name": "tripId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripStatusInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chuyến sau khi đổi trạng thái.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ (vd hủy thiếu lý do).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Thiếu hoặc sai access token.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`TRIP_NOT_FOUND` (kể cả khác tenant).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`TRIP_STATUS_TRANSITION_INVALID` (chuyển sai bảng, hoặc thu hồi nháp / hủy khi đã có vé).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`TRIP_NOT_READY_FOR_SALE` — `reasons` liệt kê mọi điều kiện mở bán chưa đạt (BR-39).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Chưa ghi được lịch sử — chuyến không đổi, thử lại.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "operator-trips"
+        ]
+      }
+    },
+    "/v1/operator/trips/{tripId}/seats/status": {
+      "put": {
+        "operationId": "TripController_setSeatStatus",
+        "parameters": [
+          {
+            "name": "tripId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TripSeatStatusInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Chuyến sau khi khóa / mở ghế.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripResponseDto_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dữ liệu không hợp lệ (vd trùng mã ghế).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Thiếu hoặc sai access token.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`TRIP_NOT_FOUND` (kể cả khác tenant).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "`TRIP_SEAT_NOT_AVAILABLE` (ghế đang giữ / đã bán) / `TRIP_NOT_EDITABLE` (chuyến đã hủy / khởi hành).",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetailsDto"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`TRIP_SEAT_UNKNOWN` (mã ghế không thuộc chuyến).",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -4353,6 +4575,12 @@
           },
           "code": {
             "type": "string"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "requestId": {
             "type": "string"
@@ -7341,6 +7569,21 @@
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
           },
+          "onlineSaleCutoffMinutes": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "statusReason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "note": {
             "anyOf": [
               {
@@ -7506,6 +7749,8 @@
           "seatCount",
           "createdAt",
           "updatedAt",
+          "onlineSaleCutoffMinutes",
+          "statusReason",
           "note",
           "stops",
           "seats"
@@ -7559,6 +7804,11 @@
               }
             ]
           },
+          "onlineSaleCutoffMinutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1440
+          },
           "note": {
             "anyOf": [
               {
@@ -7577,6 +7827,73 @@
           "departureAt",
           "arrivalAt",
           "stopTimes",
+          "onlineSaleCutoffMinutes",
+          "note"
+        ]
+      },
+      "TripStatusInputDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "OPEN_FOR_SALE",
+              "LOCKED",
+              "DRAFT",
+              "CANCELLED"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "reason"
+        ]
+      },
+      "TripSeatStatusInputDto": {
+        "type": "object",
+        "properties": {
+          "seatCodes": {
+            "minItems": 1,
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 20
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "BLOCKED",
+              "AVAILABLE"
+            ]
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "seatCodes",
+          "status",
           "note"
         ]
       },

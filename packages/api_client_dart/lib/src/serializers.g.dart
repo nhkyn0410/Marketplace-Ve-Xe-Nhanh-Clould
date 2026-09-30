@@ -169,6 +169,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(TripResponseDtoOutputStatusEnum.serializer)
       ..add(TripResponseDtoOutputStopsInner.serializer)
       ..add(TripResponseDtoOutputStopsInnerRoleEnum.serializer)
+      ..add(TripSeatStatusInputDto.serializer)
+      ..add(TripSeatStatusInputDtoStatusEnum.serializer)
+      ..add(TripStatusInputDto.serializer)
+      ..add(TripStatusInputDtoStatusEnum.serializer)
       ..add(VehicleInputDto.serializer)
       ..add(VehicleInputDtoStatusEnum.serializer)
       ..add(VehicleListResponseDtoOutput.serializer)
@@ -278,6 +282,12 @@ Serializers _$serializers = (Serializers().toBuilder()
             const FullType(StopPointProposalListResponseDtoOutputItemsInner)
           ]),
           () => ListBuilder<StopPointProposalListResponseDtoOutputItemsInner>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

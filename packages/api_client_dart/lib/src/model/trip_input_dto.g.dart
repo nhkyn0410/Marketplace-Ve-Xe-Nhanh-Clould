@@ -18,6 +18,8 @@ class _$TripInputDto extends TripInputDto {
   @override
   final BuiltList<DateTime>? stopTimes;
   @override
+  final int onlineSaleCutoffMinutes;
+  @override
   final String? note;
 
   factory _$TripInputDto([void Function(TripInputDtoBuilder)? updates]) =>
@@ -29,6 +31,7 @@ class _$TripInputDto extends TripInputDto {
       required this.departureAt,
       required this.arrivalAt,
       this.stopTimes,
+      required this.onlineSaleCutoffMinutes,
       this.note})
       : super._();
   @override
@@ -47,6 +50,7 @@ class _$TripInputDto extends TripInputDto {
         departureAt == other.departureAt &&
         arrivalAt == other.arrivalAt &&
         stopTimes == other.stopTimes &&
+        onlineSaleCutoffMinutes == other.onlineSaleCutoffMinutes &&
         note == other.note;
   }
 
@@ -58,6 +62,7 @@ class _$TripInputDto extends TripInputDto {
     _$hash = $jc(_$hash, departureAt.hashCode);
     _$hash = $jc(_$hash, arrivalAt.hashCode);
     _$hash = $jc(_$hash, stopTimes.hashCode);
+    _$hash = $jc(_$hash, onlineSaleCutoffMinutes.hashCode);
     _$hash = $jc(_$hash, note.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -71,6 +76,7 @@ class _$TripInputDto extends TripInputDto {
           ..add('departureAt', departureAt)
           ..add('arrivalAt', arrivalAt)
           ..add('stopTimes', stopTimes)
+          ..add('onlineSaleCutoffMinutes', onlineSaleCutoffMinutes)
           ..add('note', note))
         .toString();
   }
@@ -102,6 +108,11 @@ class TripInputDtoBuilder
   set stopTimes(ListBuilder<DateTime>? stopTimes) =>
       _$this._stopTimes = stopTimes;
 
+  int? _onlineSaleCutoffMinutes;
+  int? get onlineSaleCutoffMinutes => _$this._onlineSaleCutoffMinutes;
+  set onlineSaleCutoffMinutes(int? onlineSaleCutoffMinutes) =>
+      _$this._onlineSaleCutoffMinutes = onlineSaleCutoffMinutes;
+
   String? _note;
   String? get note => _$this._note;
   set note(String? note) => _$this._note = note;
@@ -118,6 +129,7 @@ class TripInputDtoBuilder
       _departureAt = $v.departureAt;
       _arrivalAt = $v.arrivalAt;
       _stopTimes = $v.stopTimes?.toBuilder();
+      _onlineSaleCutoffMinutes = $v.onlineSaleCutoffMinutes;
       _note = $v.note;
       _$v = null;
     }
@@ -150,6 +162,10 @@ class TripInputDtoBuilder
             arrivalAt: BuiltValueNullFieldError.checkNotNull(
                 arrivalAt, r'TripInputDto', 'arrivalAt'),
             stopTimes: _stopTimes?.build(),
+            onlineSaleCutoffMinutes: BuiltValueNullFieldError.checkNotNull(
+                onlineSaleCutoffMinutes,
+                r'TripInputDto',
+                'onlineSaleCutoffMinutes'),
             note: note,
           );
     } catch (_) {

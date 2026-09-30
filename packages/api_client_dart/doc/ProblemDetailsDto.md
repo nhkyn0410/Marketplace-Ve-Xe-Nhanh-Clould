@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **detail** | **String** |  | 
 **instance** | **String** |  | 
 **code** | **String** |  | 
+**reasons** | **BuiltList&lt;String&gt;** |  | [optional] 
 **requestId** | **String** |  | [optional] 
 **traceId** | **String** |  | [optional] 
 

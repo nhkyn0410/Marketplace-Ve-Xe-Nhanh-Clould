@@ -25,6 +25,8 @@ part 'trip_response_dto_output.g.dart';
 /// * [seatCount] 
 /// * [createdAt] 
 /// * [updatedAt] 
+/// * [onlineSaleCutoffMinutes] 
+/// * [statusReason] 
 /// * [note] 
 /// * [stops] 
 /// * [seats] 
@@ -63,6 +65,12 @@ abstract class TripResponseDtoOutput implements Built<TripResponseDtoOutput, Tri
 
   @BuiltValueField(wireName: r'updatedAt')
   DateTime get updatedAt;
+
+  @BuiltValueField(wireName: r'onlineSaleCutoffMinutes')
+  int get onlineSaleCutoffMinutes;
+
+  @BuiltValueField(wireName: r'statusReason')
+  String? get statusReason;
 
   @BuiltValueField(wireName: r'note')
   String? get note;
@@ -150,6 +158,16 @@ class _$TripResponseDtoOutputSerializer implements PrimitiveSerializer<TripRespo
     yield serializers.serialize(
       object.updatedAt,
       specifiedType: const FullType(DateTime),
+    );
+    yield r'onlineSaleCutoffMinutes';
+    yield serializers.serialize(
+      object.onlineSaleCutoffMinutes,
+      specifiedType: const FullType(int),
+    );
+    yield r'statusReason';
+    yield object.statusReason == null ? null : serializers.serialize(
+      object.statusReason,
+      specifiedType: const FullType.nullable(String),
     );
     yield r'note';
     yield object.note == null ? null : serializers.serialize(
@@ -267,6 +285,21 @@ class _$TripResponseDtoOutputSerializer implements PrimitiveSerializer<TripRespo
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.updatedAt = valueDes;
+          break;
+        case r'onlineSaleCutoffMinutes':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.onlineSaleCutoffMinutes = valueDes;
+          break;
+        case r'statusReason':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.statusReason = valueDes;
           break;
         case r'note':
           final valueDes = serializers.deserialize(

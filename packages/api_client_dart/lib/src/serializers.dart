@@ -101,6 +101,8 @@ import 'package:api_client_dart/src/model/trip_list_response_dto_output_items_in
 import 'package:api_client_dart/src/model/trip_response_dto_output.dart';
 import 'package:api_client_dart/src/model/trip_response_dto_output_seats_inner.dart';
 import 'package:api_client_dart/src/model/trip_response_dto_output_stops_inner.dart';
+import 'package:api_client_dart/src/model/trip_seat_status_input_dto.dart';
+import 'package:api_client_dart/src/model/trip_status_input_dto.dart';
 import 'package:api_client_dart/src/model/vehicle_input_dto.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output.dart';
 import 'package:api_client_dart/src/model/vehicle_list_response_dto_output_items_inner.dart';
@@ -200,6 +202,8 @@ part 'serializers.g.dart';
   TripResponseDtoOutput,
   TripResponseDtoOutputSeatsInner,
   TripResponseDtoOutputStopsInner,
+  TripSeatStatusInputDto,
+  TripStatusInputDto,
   VehicleInputDto,
   VehicleListResponseDtoOutput,
   VehicleListResponseDtoOutputItemsInner,

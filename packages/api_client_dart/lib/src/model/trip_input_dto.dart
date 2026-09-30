@@ -17,6 +17,7 @@ part 'trip_input_dto.g.dart';
 /// * [departureAt] 
 /// * [arrivalAt] 
 /// * [stopTimes] 
+/// * [onlineSaleCutoffMinutes] 
 /// * [note] 
 @BuiltValue()
 abstract class TripInputDto implements Built<TripInputDto, TripInputDtoBuilder> {
@@ -34,6 +35,9 @@ abstract class TripInputDto implements Built<TripInputDto, TripInputDtoBuilder> 
 
   @BuiltValueField(wireName: r'stopTimes')
   BuiltList<DateTime>? get stopTimes;
+
+  @BuiltValueField(wireName: r'onlineSaleCutoffMinutes')
+  int get onlineSaleCutoffMinutes;
 
   @BuiltValueField(wireName: r'note')
   String? get note;
@@ -85,6 +89,11 @@ class _$TripInputDtoSerializer implements PrimitiveSerializer<TripInputDto> {
     yield object.stopTimes == null ? null : serializers.serialize(
       object.stopTimes,
       specifiedType: const FullType.nullable(BuiltList, [FullType(DateTime)]),
+    );
+    yield r'onlineSaleCutoffMinutes';
+    yield serializers.serialize(
+      object.onlineSaleCutoffMinutes,
+      specifiedType: const FullType(int),
     );
     yield r'note';
     yield object.note == null ? null : serializers.serialize(
@@ -150,6 +159,13 @@ class _$TripInputDtoSerializer implements PrimitiveSerializer<TripInputDto> {
           ) as BuiltList<DateTime>?;
           if (valueDes == null) continue;
           result.stopTimes.replace(valueDes);
+          break;
+        case r'onlineSaleCutoffMinutes':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.onlineSaleCutoffMinutes = valueDes;
           break;
         case r'note':
           final valueDes = serializers.deserialize(

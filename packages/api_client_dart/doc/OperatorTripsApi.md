@@ -9,11 +9,56 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**tripControllerChangeStatus**](OperatorTripsApi.md#tripcontrollerchangestatus) | **PUT** /v1/operator/trips/{tripId}/status | 
 [**tripControllerCreate**](OperatorTripsApi.md#tripcontrollercreate) | **POST** /v1/operator/trips | 
 [**tripControllerGet**](OperatorTripsApi.md#tripcontrollerget) | **GET** /v1/operator/trips/{tripId} | 
 [**tripControllerList**](OperatorTripsApi.md#tripcontrollerlist) | **GET** /v1/operator/trips | 
+[**tripControllerSetSeatStatus**](OperatorTripsApi.md#tripcontrollersetseatstatus) | **PUT** /v1/operator/trips/{tripId}/seats/status | 
 [**tripControllerUpdate**](OperatorTripsApi.md#tripcontrollerupdate) | **PUT** /v1/operator/trips/{tripId} | 
 
+
+# **tripControllerChangeStatus**
+> TripResponseDtoOutput tripControllerChangeStatus(tripId, tripStatusInputDto)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getOperatorTripsApi();
+final String tripId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final TripStatusInputDto tripStatusInputDto = ; // TripStatusInputDto | 
+
+try {
+    final response = api.tripControllerChangeStatus(tripId, tripStatusInputDto);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling OperatorTripsApi->tripControllerChangeStatus: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **tripId** | **String**|  | 
+ **tripStatusInputDto** | [**TripStatusInputDto**](TripStatusInputDto.md)|  | 
+
+### Return type
+
+[**TripResponseDtoOutput**](TripResponseDtoOutput.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **tripControllerCreate**
 > TripResponseDtoOutput tripControllerCreate(tripInputDto)
@@ -146,6 +191,49 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **tripControllerSetSeatStatus**
+> TripResponseDtoOutput tripControllerSetSeatStatus(tripId, tripSeatStatusInputDto)
+
+
+
+### Example
+```dart
+import 'package:api_client_dart/api.dart';
+
+final api = ApiClientDart().getOperatorTripsApi();
+final String tripId = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String | 
+final TripSeatStatusInputDto tripSeatStatusInputDto = ; // TripSeatStatusInputDto | 
+
+try {
+    final response = api.tripControllerSetSeatStatus(tripId, tripSeatStatusInputDto);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling OperatorTripsApi->tripControllerSetSeatStatus: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **tripId** | **String**|  | 
+ **tripSeatStatusInputDto** | [**TripSeatStatusInputDto**](TripSeatStatusInputDto.md)|  | 
+
+### Return type
+
+[**TripResponseDtoOutput**](TripResponseDtoOutput.md)
+
+### Authorization
+
+[bearer](../README.md#bearer)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

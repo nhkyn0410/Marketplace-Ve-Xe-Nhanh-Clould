@@ -20,6 +20,8 @@ class _$ProblemDetailsDto extends ProblemDetailsDto {
   @override
   final String code;
   @override
+  final BuiltList<String>? reasons;
+  @override
   final String? requestId;
   @override
   final String? traceId;
@@ -35,6 +37,7 @@ class _$ProblemDetailsDto extends ProblemDetailsDto {
       required this.detail,
       required this.instance,
       required this.code,
+      this.reasons,
       this.requestId,
       this.traceId})
       : super._();
@@ -56,6 +59,7 @@ class _$ProblemDetailsDto extends ProblemDetailsDto {
         detail == other.detail &&
         instance == other.instance &&
         code == other.code &&
+        reasons == other.reasons &&
         requestId == other.requestId &&
         traceId == other.traceId;
   }
@@ -69,6 +73,7 @@ class _$ProblemDetailsDto extends ProblemDetailsDto {
     _$hash = $jc(_$hash, detail.hashCode);
     _$hash = $jc(_$hash, instance.hashCode);
     _$hash = $jc(_$hash, code.hashCode);
+    _$hash = $jc(_$hash, reasons.hashCode);
     _$hash = $jc(_$hash, requestId.hashCode);
     _$hash = $jc(_$hash, traceId.hashCode);
     _$hash = $jf(_$hash);
@@ -84,6 +89,7 @@ class _$ProblemDetailsDto extends ProblemDetailsDto {
           ..add('detail', detail)
           ..add('instance', instance)
           ..add('code', code)
+          ..add('reasons', reasons)
           ..add('requestId', requestId)
           ..add('traceId', traceId))
         .toString();
@@ -118,6 +124,10 @@ class ProblemDetailsDtoBuilder
   String? get code => _$this._code;
   set code(String? code) => _$this._code = code;
 
+  ListBuilder<String>? _reasons;
+  ListBuilder<String> get reasons => _$this._reasons ??= ListBuilder<String>();
+  set reasons(ListBuilder<String>? reasons) => _$this._reasons = reasons;
+
   String? _requestId;
   String? get requestId => _$this._requestId;
   set requestId(String? requestId) => _$this._requestId = requestId;
@@ -139,6 +149,7 @@ class ProblemDetailsDtoBuilder
       _detail = $v.detail;
       _instance = $v.instance;
       _code = $v.code;
+      _reasons = $v.reasons?.toBuilder();
       _requestId = $v.requestId;
       _traceId = $v.traceId;
       _$v = null;
@@ -160,23 +171,37 @@ class ProblemDetailsDtoBuilder
   ProblemDetailsDto build() => _build();
 
   _$ProblemDetailsDto _build() {
-    final _$result = _$v ??
-        _$ProblemDetailsDto._(
-          type: BuiltValueNullFieldError.checkNotNull(
-              type, r'ProblemDetailsDto', 'type'),
-          title: BuiltValueNullFieldError.checkNotNull(
-              title, r'ProblemDetailsDto', 'title'),
-          status: BuiltValueNullFieldError.checkNotNull(
-              status, r'ProblemDetailsDto', 'status'),
-          detail: BuiltValueNullFieldError.checkNotNull(
-              detail, r'ProblemDetailsDto', 'detail'),
-          instance: BuiltValueNullFieldError.checkNotNull(
-              instance, r'ProblemDetailsDto', 'instance'),
-          code: BuiltValueNullFieldError.checkNotNull(
-              code, r'ProblemDetailsDto', 'code'),
-          requestId: requestId,
-          traceId: traceId,
-        );
+    _$ProblemDetailsDto _$result;
+    try {
+      _$result = _$v ??
+          _$ProblemDetailsDto._(
+            type: BuiltValueNullFieldError.checkNotNull(
+                type, r'ProblemDetailsDto', 'type'),
+            title: BuiltValueNullFieldError.checkNotNull(
+                title, r'ProblemDetailsDto', 'title'),
+            status: BuiltValueNullFieldError.checkNotNull(
+                status, r'ProblemDetailsDto', 'status'),
+            detail: BuiltValueNullFieldError.checkNotNull(
+                detail, r'ProblemDetailsDto', 'detail'),
+            instance: BuiltValueNullFieldError.checkNotNull(
+                instance, r'ProblemDetailsDto', 'instance'),
+            code: BuiltValueNullFieldError.checkNotNull(
+                code, r'ProblemDetailsDto', 'code'),
+            reasons: _reasons?.build(),
+            requestId: requestId,
+            traceId: traceId,
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'reasons';
+        _reasons?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'ProblemDetailsDto', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

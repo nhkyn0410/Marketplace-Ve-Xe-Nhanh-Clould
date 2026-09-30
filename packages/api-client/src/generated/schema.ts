@@ -676,6 +676,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/operator/trips/{tripId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["TripController_changeStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/operator/trips/{tripId}/seats/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["TripController_setSeatStatus"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/operator/fares": {
         parameters: {
             query?: never;
@@ -735,6 +767,7 @@ export interface components {
             detail: string;
             instance: string;
             code: string;
+            reasons?: string[];
             requestId?: string;
             traceId?: string;
         };
@@ -1381,6 +1414,8 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            onlineSaleCutoffMinutes: number;
+            statusReason: string | null;
             note: string | null;
             stops: {
                 sequence: number;
@@ -1415,6 +1450,18 @@ export interface components {
             /** Format: date-time */
             arrivalAt: string;
             stopTimes: string[] | null;
+            onlineSaleCutoffMinutes: number;
+            note: string | null;
+        };
+        TripStatusInputDto: {
+            /** @enum {string} */
+            status: "OPEN_FOR_SALE" | "LOCKED" | "DRAFT" | "CANCELLED";
+            reason: string | null;
+        };
+        TripSeatStatusInputDto: {
+            seatCodes: string[];
+            /** @enum {string} */
+            status: "BLOCKED" | "AVAILABLE";
             note: string | null;
         };
         FareListResponseDto_Output: {
@@ -4301,7 +4348,7 @@ export interface operations {
                     "application/problem+json": components["schemas"]["ProblemDetailsDto"];
                 };
             };
-            /** @description `TRIP_NOT_EDITABLE` (không còn nháp) / `VEHICLE_SCHEDULE_CONFLICT`. */
+            /** @description `TRIP_NOT_EDITABLE` (không còn nháp) / `VEHICLE_SCHEDULE_CONFLICT` / `TRIP_BLOCKED_SEATS_MISSING` (xe mới thiếu ghế đang khóa). */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -4311,6 +4358,175 @@ export interface operations {
                 };
             };
             /** @description `ROUTE_UNAVAILABLE` / `VEHICLE_UNAVAILABLE` / `TRIP_STOP_TIMES_INVALID`. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    TripController_changeStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tripId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TripStatusInputDto"];
+            };
+        };
+        responses: {
+            /** @description Chuyến sau khi đổi trạng thái. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ (vd hủy thiếu lý do). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_STATUS_TRANSITION_INVALID` (chuyển sai bảng, hoặc thu hồi nháp / hủy khi đã có vé). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_NOT_READY_FOR_SALE` — `reasons` liệt kê mọi điều kiện mở bán chưa đạt (BR-39). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Chưa ghi được lịch sử — chuyến không đổi, thử lại. */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+        };
+    };
+    TripController_setSeatStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tripId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TripSeatStatusInputDto"];
+            };
+        };
+        responses: {
+            /** @description Chuyến sau khi khóa / mở ghế. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TripResponseDto_Output"];
+                };
+            };
+            /** @description Dữ liệu không hợp lệ (vd trùng mã ghế). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description Thiếu hoặc sai access token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `PERMISSION_DENIED` hoặc `TENANT_SCOPE_VIOLATION`. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_NOT_FOUND` (kể cả khác tenant). */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_SEAT_NOT_AVAILABLE` (ghế đang giữ / đã bán) / `TRIP_NOT_EDITABLE` (chuyến đã hủy / khởi hành). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetailsDto"];
+                };
+            };
+            /** @description `TRIP_SEAT_UNKNOWN` (mã ghế không thuộc chuyến). */
             422: {
                 headers: {
                     [name: string]: unknown;

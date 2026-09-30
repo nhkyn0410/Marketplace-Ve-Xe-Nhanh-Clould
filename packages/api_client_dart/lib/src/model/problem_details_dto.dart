@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -17,6 +18,7 @@ part 'problem_details_dto.g.dart';
 /// * [detail] 
 /// * [instance] 
 /// * [code] 
+/// * [reasons] 
 /// * [requestId] 
 /// * [traceId] 
 @BuiltValue()
@@ -38,6 +40,9 @@ abstract class ProblemDetailsDto implements Built<ProblemDetailsDto, ProblemDeta
 
   @BuiltValueField(wireName: r'code')
   String get code;
+
+  @BuiltValueField(wireName: r'reasons')
+  BuiltList<String>? get reasons;
 
   @BuiltValueField(wireName: r'requestId')
   String? get requestId;
@@ -98,6 +103,13 @@ class _$ProblemDetailsDtoSerializer implements PrimitiveSerializer<ProblemDetail
       object.code,
       specifiedType: const FullType(String),
     );
+    if (object.reasons != null) {
+      yield r'reasons';
+      yield serializers.serialize(
+        object.reasons,
+        specifiedType: const FullType(BuiltList, [FullType(String)]),
+      );
+    }
     if (object.requestId != null) {
       yield r'requestId';
       yield serializers.serialize(
@@ -176,6 +188,14 @@ class _$ProblemDetailsDtoSerializer implements PrimitiveSerializer<ProblemDetail
             specifiedType: const FullType(String),
           ) as String;
           result.code = valueDes;
+          break;
+        case r'reasons':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(BuiltList, [FullType(String)]),
+          ) as BuiltList<String>?;
+          if (valueDes == null) continue;
+          result.reasons.replace(valueDes);
           break;
         case r'requestId':
           final valueDes = serializers.deserialize(
